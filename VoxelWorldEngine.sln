@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelWorldEngine", "VoxelWorldEngine\VoxelWorldEngine.csproj", "{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI", "WebAPI\WebAPI.csproj", "{80819AF9-B395-4257-AE4A-F2E0144D1AB4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelWorldEngineTests", "VoxelWorldEngineTests\VoxelWorldEngineTests.csproj", "{CF0139B4-42F0-4E71-9193-E8B74F8B7261}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80819AF9-B395-4257-AE4A-F2E0144D1AB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80819AF9-B395-4257-AE4A-F2E0144D1AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80819AF9-B395-4257-AE4A-F2E0144D1AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80819AF9-B395-4257-AE4A-F2E0144D1AB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF0139B4-42F0-4E71-9193-E8B74F8B7261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF0139B4-42F0-4E71-9193-E8B74F8B7261}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF0139B4-42F0-4E71-9193-E8B74F8B7261}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF0139B4-42F0-4E71-9193-E8B74F8B7261}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
