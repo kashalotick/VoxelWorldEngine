@@ -21,4 +21,8 @@
         <Using Include="NUnit.Framework"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\VoxelWorldEngine\VoxelWorldEngine.csproj" />
+    </ItemGroup>
+
 </Project>
