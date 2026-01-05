@@ -9,70 +9,89 @@ public class World
     public Seed Seed;
     public Dictionary<Vector3Int, Chunk> Chunks;
 
-    private Queue<ChunkLoading> _chunkLoadingQueue;
+    // TODO: Queue or pool
+    
+    
+    private ChunkLoader _chunkLoader;
 
     public World(Seed seed)
     {
         Seed = seed;
         Chunks = [];
+        _chunkLoader = new ChunkLoader();
     }
 
 
-    public void RecalculateChunks(Vector3Int observerPosition, int viewRadius)
+    public void RecalculateChunksAround(Vector3Int observerPosition)
     {
-        var extraChunks = GetExtraChunks(observerPosition, viewRadius);
-        var newChunksPositions = GetNewChunkPositions(observerPosition, extraChunks);
-        DeleteExtraChunks(extraChunks);
-    }
-
-
-    private List<Chunk> GetExtraChunks(Vector3Int observerPosition, int viewRadius)
-    {
-        var extraChunks = new List<Chunk>();
-        foreach (var chunk in Chunks)
-        {
-            var distanceSquared = Vector3Int.DistanceSquared(observerPosition, chunk.Key);
-            if (distanceSquared > viewRadius * viewRadius)
-            {
-                extraChunks.Add(chunk.Value);
-            }
-        }
-
-        return extraChunks;
-    }
-
-    private HashSet<Vector3Int> GetNewChunkPositions(Vector3Int observerPosition, List<Chunk> oldChunks)
-    {
-        var newChunksPositions = new HashSet<Vector3Int>();
-        foreach (var chunk in oldChunks)
-        {
-            var newPosition = 2 * observerPosition - chunk.Position;
-            newChunksPositions.Add(newPosition);
-        }
-
-        return newChunksPositions;
-    }
-
-    private void DeleteExtraChunks(List<Chunk> chunks)
-    {
-        foreach (var chunk in chunks)
+        _chunkLoader.SetObserverPosition(observerPosition);
+        
+        var extraChunks = _chunkLoader.GetExtra(Chunks);
+        
+        foreach (var chunk in extraChunks)
         {
             Chunks.Remove(chunk.Position);
-            chunk.Dispose();
         }
-
-        chunks.Clear();
-    }
-
-    private void EnqueueChunksOnLoad(HashSet<Vector3Int> newChunksPositions)
-    {
-        foreach (var position in newChunksPositions)
+        
+        var missingChunks = _chunkLoader.GetMissing(Chunks);
+        var missingChunksOrdered = missingChunks.OrderBy(chunk => Vector3Int.DistanceSquared(chunk.Position, observerPosition));
+        
+        foreach (var chunk in missingChunksOrdered)
         {
-            _chunkLoadingQueue.Enqueue(new ChunkLoading(position));
+            chunk.Generate();
+            Chunks.Add(chunk.Position, chunk);
         }
     }
 
 
+    
+
+    // private List<Chunk> GetExtraChunks(Vector3Int observerPosition, int viewRadius)
+    // {
+    //     var extraChunks = new List<Chunk>();
+    //     foreach (var chunk in Chunks)
+    //     {
+    //         var distanceSquared = Vector3Int.DistanceSquared(observerPosition, chunk.Key);
+    //         if (distanceSquared > viewRadius * viewRadius)
+    //         {
+    //             extraChunks.Add(chunk.Value);
+    //         }
+    //     }
+    //
+    //     return extraChunks;
+    // }
+    //
+    // private HashSet<Vector3Int> GetNewChunkPositions(Vector3Int observerPosition, List<Chunk> oldChunks)
+    // {
+    //     var newChunksPositions = new HashSet<Vector3Int>();
+    //     foreach (var chunk in oldChunks)
+    //     {
+    //         // TODO: find new position
+    //         var newPosition = 2 * observerPosition - chunk.Position;
+    //         newChunksPositions.Add(newPosition);
+    //     }
+    //
+    //     return newChunksPositions;
+    // }
+    //
+    // private void DeleteExtraChunks(List<Chunk> chunks)
+    // {
+    //     foreach (var chunk in chunks)
+    //     {
+    //         Chunks.Remove(chunk.Position);
+    //         chunk.Dispose();
+    //     }
+    //
+    //     chunks.Clear();
+    // }
+    //
+    // private void EnqueueChunksOnLoad(HashSet<Vector3Int> newChunksPositions)
+    // {
+    //     foreach (var position in newChunksPositions)
+    //     {
+    //         _chunkLoadingQueue.Enqueue(new ChunkLoading(position));
+    //     }
+    // }
     // .....
     
     
