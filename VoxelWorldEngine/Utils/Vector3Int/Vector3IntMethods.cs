@@ -30,11 +30,7 @@ public partial struct Vector3Int
     {
         return a.X * b.X + a.Y * b.Y + a.Z * b.Z;
     }
-
-    // public static Vector3Int MirrorRelativeTo(Vector3Int a, Vector3Int relativeTo)
-    // {
-    //     
-    // }
+    
     
     public static Vector3Int Abs(Vector3Int value)
     {
