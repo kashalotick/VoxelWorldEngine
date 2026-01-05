@@ -1,0 +1,38 @@
+﻿namespace VoxelWorldEngine.Utils.Vector3Int;
+
+public partial struct Vector3Int
+{
+    public int X, Y, Z;
+
+    public const int Count = 3;
+
+    // constructors
+    public Vector3Int(int value)
+    {
+        X = value;
+        Y = value;
+        Z = value;
+    }
+    public Vector3Int(int x, int y, int z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+
+    public static Vector3Int Zero => new Vector3Int(0, 0, 0);
+    public static Vector3Int One => new Vector3Int(1, 1, 1);
+    
+   
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(X, Y, Z);
+    }
+    
+    public override string ToString()
+    {
+        return $"{X}, {Y}, {Z}";
+    }
+
+}
