@@ -1,4 +1,6 @@
-﻿using VoxelWorldEngine.Core;
+﻿using DotnetNoise;
+using VoxelWorldEngine.Core;
+using VoxelWorldEngine.Core.Generator;
 using VoxelWorldEngine.Utils;
 using VoxelWorldEngine.Utils.Vector3Int;
 
@@ -8,9 +10,25 @@ class Program
 {
     static void Main(string[] args)
     {
+        
+        var s = 2 >> 3;
 
-        byte b = 0b_0011_1101;
+        var sfg = new SimplexSurfaceGenerator();
+        
+        var top = new Vector3Int(4, 10, -142);
+        var middle = new Vector3Int(4, 10, 120);
+        var bottom = new Vector3Int(4, 10, 5);
 
-        Console.WriteLine(Byte.PopCount(b));
+
+
+        Console.WriteLine(sfg.GetValue(top));
+        Console.WriteLine(sfg.GetValue(middle));
+        Console.WriteLine(sfg.GetValue(bottom));
+
+        Console.WriteLine(sfg.GetMaximum(top, middle));
+        Console.WriteLine(sfg.GetMinimum(top, middle));
+
+
+
     }
 }

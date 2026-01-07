@@ -6,4 +6,12 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Core\Worlds\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="DotnetNoise" Version="1.0.0" />
+    </ItemGroup>
+
 </Project>

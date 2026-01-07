@@ -1,4 +1,4 @@
-﻿namespace VoxelWorldEngine;
+﻿namespace VoxelWorldEngine.Core;
 
 public class Config
 {

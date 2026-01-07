@@ -10,6 +10,7 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AVector3_002Ecs_002Fl_003AC_0021_003FUsers_003Fsasha_003FAppData_003FRoaming_003FJetBrains_003FRider2025_002E1_003Fresharper_002Dhost_003FSourcesCache_003Fcbd9aa2e183e415276e47ce25bf4e2604cdb91cfaf74d6b3621074aad4605e62_003FVector3_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="C:\Program Files\dotnet\packs\Microsoft.NETCore.App.Ref\8.0.8\ref\net8.0\System.Numerics.Vectors.dll" /&gt;&#xD;
+  &lt;Assembly Path="C:\Users\sasha\.nuget\packages\dotnetnoise\1.0.0\lib\netstandard2.0\DotnetNoise.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f4bda4f3_002Dccb8_002D4cf8_002Db74e_002D75d209882d99/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;VoxelWorldEngineTests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Project Location="F:\Димина папка\Univer\VoxelWorldEngine\VoxelWorldEngineTests" Presentation="&amp;lt;VoxelWorldEngineTests&amp;gt;" /&gt;&#xD;

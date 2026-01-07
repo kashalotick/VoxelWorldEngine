@@ -1,7 +1,7 @@
 ﻿namespace VoxelWorldEngine.Core.Voxels;
 
-public enum Material
+public enum Material : byte
 {
-    Air = 0,
-    Stone = 1,
+    Air,
+    Stone,
 }
