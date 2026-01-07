@@ -1,6 +1,6 @@
 ﻿namespace VoxelWorldEngine;
 
-public static class Config
+public class Config
 {
-    public static int ChunkLoadRadius = 1;
+    public int ChunkLoadRadius = 2;
 }

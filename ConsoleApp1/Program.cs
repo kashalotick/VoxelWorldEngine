@@ -8,27 +8,9 @@ class Program
 {
     static void Main(string[] args)
     {
-        var mins = new Seed(100_000_000_000_000_000L);
-        
-        var seed = new Seed(284_014_432_143_005_581L);
-        var world = new World(seed);
-        
-        
-        var observer = new Vector3Int(0);
-        
-        world.RecalculateChunksAround(observer);
-        
 
-        Console.WriteLine(world.Chunks.Count);
-        Console.WriteLine(world.Chunks[observer].Voxels.Length);
+        byte b = 0b_0011_1101;
 
-
-        var serializer = new WorldSerializer();
-        serializer.Save(world, observer);
-    }
-
-    static void GenerateChunks()
-    {
-        
+        Console.WriteLine(Byte.PopCount(b));
     }
 }
