@@ -12,6 +12,7 @@
 
     <ItemGroup>
       <PackageReference Include="DotnetNoise" Version="1.0.0" />
+      <PackageReference Include="FastNoiseOO" Version="1.0.0" />
     </ItemGroup>
 
 </Project>

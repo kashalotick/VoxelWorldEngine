@@ -2,17 +2,19 @@
 
 public struct Voxel
 {
-    public byte Density;
     public Material Material;
+    public byte Density;
 
-    public Voxel(byte density, Material material)
+
+    
+    public Voxel Air => new Voxel(Material.Air, 0);
+    public Voxel Mixed => new Voxel(Material.Mixed, 0);
+    
+    public Voxel(Material material, byte density)
     {
-        Density = density;
         Material = material;
+        Density = density;
     }
-    public Voxel()
-    {
-        Density = 0;
-        Material = Material.Air;
-    }
+
+
 }

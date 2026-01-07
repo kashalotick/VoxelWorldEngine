@@ -1,8 +1,5 @@
-﻿using DotnetNoise;
-using VoxelWorldEngine.Core;
-using VoxelWorldEngine.Core.Generator;
-using VoxelWorldEngine.Utils;
-using VoxelWorldEngine.Utils.Vector3Int;
+﻿using FastNoiseOO;
+using VoxelWorldEngine.Core.Octrees;
 
 namespace ConsoleApp1;
 
@@ -10,24 +7,15 @@ class Program
 {
     static void Main(string[] args)
     {
-        
-        var s = 2 >> 3;
 
-        var sfg = new SimplexSurfaceGenerator();
-        
-        var top = new Vector3Int(4, 10, -142);
-        var middle = new Vector3Int(4, 10, 120);
-        var bottom = new Vector3Int(4, 10, 5);
+        // var octree = new SparseOctree();
+        //
+        // Console.WriteLine(octree.Size);
 
 
-
-        Console.WriteLine(sfg.GetValue(top));
-        Console.WriteLine(sfg.GetValue(middle));
-        Console.WriteLine(sfg.GetValue(bottom));
-
-        Console.WriteLine(sfg.GetMaximum(top, middle));
-        Console.WriteLine(sfg.GetMinimum(top, middle));
-
+        var noise = new FastNoiseOO.Generators.SineWave();
+        var t = noise.GenUniformGrid2D(-100, -100, 100, 100, 0.1f, 120, out var minMax);
+        Console.WriteLine(minMax);
 
 
     }
