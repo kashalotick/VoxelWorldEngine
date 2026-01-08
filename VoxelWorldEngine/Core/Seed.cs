@@ -11,10 +11,11 @@ public struct Seed
     {
         Value = new Random().NextInt64(Min, Max);
     }
+
     public Seed(long seed)
     {
         if (seed < Min || seed > Max) throw new ArgumentOutOfRangeException(nameof(seed));
-        
+
         Value = seed;
     }
 }

@@ -4,5 +4,5 @@ public enum Material : byte
 {
     Air,
     Mixed,
-    Stone,
+    Stone
 }

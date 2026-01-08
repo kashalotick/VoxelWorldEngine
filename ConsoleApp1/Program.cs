@@ -1,22 +1,26 @@
-﻿using FastNoiseOO;
-using VoxelWorldEngine.Core.Octrees;
+﻿using System.Diagnostics;
+using DotnetNoise;
 
 namespace ConsoleApp1;
 
-class Program
+internal class Program
 {
-    static void Main(string[] args)
+    private static readonly FastNoise _noise = new();
+
+
+    private static void Main(string[] args)
     {
+  
+        var octant = 4;
+        var mask = 1 << octant;
+        var r = (byte)~mask;
 
-        // var octree = new SparseOctree();
-        //
-        // Console.WriteLine(octree.Size);
-
-
-        var noise = new FastNoiseOO.Generators.SineWave();
-        var t = noise.GenUniformGrid2D(-100, -100, 100, 100, 0.1f, 120, out var minMax);
-        Console.WriteLine(minMax);
-
-
+        Console.WriteLine($"for {octant}");
+        Console.WriteLine($"  {mask:b8}");
+        Console.WriteLine($"  {r:b8}");
+        
+        
     }
+
+  
 }

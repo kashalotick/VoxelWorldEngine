@@ -6,15 +6,12 @@ public struct Voxel
     public byte Density;
 
 
-    
-    public Voxel Air => new Voxel(Material.Air, 0);
-    public Voxel Mixed => new Voxel(Material.Mixed, 0);
-    
+    public Voxel Air => new(Material.Air, 0);
+    public Voxel Mixed => new(Material.Mixed, 0);
+
     public Voxel(Material material, byte density)
     {
         Material = material;
         Density = density;
     }
-
-
 }

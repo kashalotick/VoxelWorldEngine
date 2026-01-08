@@ -1,4 +1,4 @@
-﻿namespace VoxelWorldEngine.Utils.Vector3Int;
+﻿namespace VoxelWorldEngine.DataStructures.Vector3Int;
 
 public partial struct Vector3Int
 {
@@ -10,9 +10,9 @@ public partial struct Vector3Int
 
     public int LengthSquared()
     {
-        return Dot(this,this);
+        return Dot(this, this);
     }
-    
+
 
     public static float Distance(Vector3Int a, Vector3Int b)
     {
@@ -30,8 +30,8 @@ public partial struct Vector3Int
     {
         return a.X * b.X + a.Y * b.Y + a.Z * b.Z;
     }
-    
-    
+
+
     public static Vector3Int Abs(Vector3Int value)
     {
         return new Vector3Int(

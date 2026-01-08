@@ -1,7 +1,4 @@
-﻿using System.Numerics;
-using VoxelWorldEngine.Core;
-
-namespace VoxelWorldEngineTests.Core;
+﻿namespace VoxelWorldEngineTests.Core;
 
 // TODO: make tests
 public class WorldTest
@@ -14,6 +11,5 @@ public class WorldTest
     [Test]
     public void Test1()
     {
-        
     }
 }

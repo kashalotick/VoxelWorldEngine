@@ -2,14 +2,10 @@
 
 public class SparseOctree
 {
+    private readonly int _maxDepth = 8;
     private List<OctreeNode> _nodes;
-    
-    private int _maxDepth = 8;
-    
-    public int Size => 1 << _maxDepth;
-    
-    
-    
+
+
     public SparseOctree()
     {
         _nodes =
@@ -17,4 +13,6 @@ public class SparseOctree
             new OctreeNode()
         ];
     }
+
+    public int Size => 1 << _maxDepth;
 }

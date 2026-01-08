@@ -1,4 +1,4 @@
-﻿namespace VoxelWorldEngine.Utils.Vector3Int;
+﻿namespace VoxelWorldEngine.DataStructures.Vector3Int;
 
 public partial struct Vector3Int
 {
@@ -13,6 +13,7 @@ public partial struct Vector3Int
         Y = value;
         Z = value;
     }
+
     public Vector3Int(int x, int y, int z)
     {
         X = x;
@@ -20,19 +21,17 @@ public partial struct Vector3Int
         Z = z;
     }
 
-    public static Vector3Int Zero => new Vector3Int(0, 0, 0);
-    public static Vector3Int One => new Vector3Int(1, 1, 1);
-    
-   
+    public static Vector3Int Zero => new(0, 0, 0);
+    public static Vector3Int One => new(1, 1, 1);
+
 
     public override int GetHashCode()
     {
         return HashCode.Combine(X, Y, Z);
     }
-    
+
     public override string ToString()
     {
         return $"{X}, {Y}, {Z}";
     }
-
 }
