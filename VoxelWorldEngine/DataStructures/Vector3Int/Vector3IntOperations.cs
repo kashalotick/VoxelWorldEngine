@@ -26,6 +26,18 @@ public partial struct Vector3Int : IEquatable<Vector3Int>
     {
         return obj is Vector3Int other && Equals(other);
     }
+    
+    // compare 
+    
+    public static bool operator >(Vector3Int left, Vector3Int right)
+    {
+        return left.LengthSquared() > right.LengthSquared();
+    }
+
+    public static bool operator <(Vector3Int left, Vector3Int right)
+    {
+        return left.LengthSquared() < right.LengthSquared();
+    }
 
     // add
     public static Vector3Int operator +(Vector3Int left, Vector3Int right)

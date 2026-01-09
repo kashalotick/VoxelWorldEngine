@@ -13,6 +13,19 @@ public partial struct Vector3Int
         return Dot(this, this);
     }
 
+    public bool IsInBounds(int size)
+    {
+        return (uint)X < (uint)size && 
+               (uint)Y < (uint)size && 
+               (uint)Z < (uint)size;
+    }
+    public bool IsBetween(Vector3Int min, Vector3Int max)
+    {
+        return X >= min.X && X < max.X &&
+               Y >= min.Y && Y < max.Y &&
+               Y >= min.Y && Y < max.Y;
+    }
+
 
     public static float Distance(Vector3Int a, Vector3Int b)
     {
