@@ -23,6 +23,10 @@ public partial struct Vector3Int
 
     public static Vector3Int Zero => new(0, 0, 0);
     public static Vector3Int One => new(1, 1, 1);
+    public static Vector3Int UnitX => new(1, 0, 0);
+    public static Vector3Int UnitY => new(0, 1, 0);
+    public static Vector3Int UnitZ => new(0, 0, 1);
+
 
 
     public override int GetHashCode()

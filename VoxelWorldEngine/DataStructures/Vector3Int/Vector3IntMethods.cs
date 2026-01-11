@@ -8,10 +8,8 @@ public partial struct Vector3Int
         return (float)Math.Sqrt(lengthSquared);
     }
 
-    public int LengthSquared()
-    {
-        return Dot(this, this);
-    }
+    public int LengthSquared() => Dot(this, this);
+    
 
     public bool IsInBounds(int size)
     {
@@ -39,18 +37,7 @@ public partial struct Vector3Int
         return Dot(difference, difference);
     }
 
-    public static int Dot(Vector3Int a, Vector3Int b)
-    {
-        return a.X * b.X + a.Y * b.Y + a.Z * b.Z;
-    }
-
-
-    public static Vector3Int Abs(Vector3Int value)
-    {
-        return new Vector3Int(
-            Math.Abs(value.X),
-            Math.Abs(value.Y),
-            Math.Abs(value.Z)
-        );
-    }
+    public static int Dot(Vector3Int a, Vector3Int b) => a.X * b.X + a.Y * b.Y + a.Z * b.Z;
+    public static Vector3Int Abs(Vector3Int value) => new (Math.Abs(value.X), Math.Abs(value.Y), Math.Abs(value.Z));
+    
 }
