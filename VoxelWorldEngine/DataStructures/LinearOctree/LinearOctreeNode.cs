@@ -14,6 +14,13 @@ public struct LinearOctreeNode
     public static LinearOctreeNode Air => new(new(byte.MinValue), -1);
     public static LinearOctreeNode Solid => new(new(byte.MaxValue), -2);
 
+    
+    public LinearOctreeNode(Voxel.Voxel voxel)
+    {
+        Voxel = voxel;
+        ChildrenStartIndex = -1;
+    }
+    
     public LinearOctreeNode(Voxel.Voxel voxel, int childrenStartIndex)
     {
         Voxel = voxel;

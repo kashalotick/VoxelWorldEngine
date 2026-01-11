@@ -55,6 +55,8 @@ public class LinearOctree
 
         _nodes[lastLeafIndex] = newNode;
     }
+    
+    
 
 
     /// <summary>
@@ -110,8 +112,22 @@ public class LinearOctree
         return currentIndex;
     }
 
-    public void SubdivideNode(int index)
+    public int SubdivideNode(int index)
     {
-        throw new NotImplementedException(); // TODO: implement
+        var parent = _nodes[index];
+        if (!parent.IsLeaf) throw new ArgumentException("Node is already subdivided", nameof(index));
+        
+        var startChildIndex = _nodes.Count;
+        parent.SetChildrenStartIndex(startChildIndex);
+        
+        _nodes[index] = parent;
+
+        for (int i = 0; i < 8; i++)
+        {
+            var child = new LinearOctreeNode(parent.Voxel);
+            _nodes.Add(child);
+        }
+
+        return startChildIndex;
     }
 }
