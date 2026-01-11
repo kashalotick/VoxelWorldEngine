@@ -2,9 +2,8 @@
 
 namespace VoxelWorldEngine.Core.Generator.Interfaces;
 
-public interface IScalarFieldGenerator<T>
+public interface IScalarFieldGenerator<in TVector, TValue>
 {
-    T GetValue(Vector3Int position);
-    T GetMinimum(Vector3Int a, Vector3Int b);
-    T GetMaximum(Vector3Int a, Vector3Int b);
+    TValue GetValue(TVector position);
+    (TValue min, TValue max) GetMinMax(TVector a, TVector b);
 }

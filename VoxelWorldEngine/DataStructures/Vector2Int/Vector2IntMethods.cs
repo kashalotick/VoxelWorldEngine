@@ -9,8 +9,6 @@ public partial struct Vector2Int
     }
 
     public int LengthSquared() => Dot(this, this);
-
-
     public bool IsInBounds(int size) => (uint)X < (uint)size && (uint)Y < (uint)size;
 
     public bool IsBetween(Vector2Int min, Vector2Int max) =>
