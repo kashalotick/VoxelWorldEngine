@@ -1,4 +1,4 @@
-﻿namespace VoxelWorldEngine.Core;
+﻿namespace VoxelWorldEngine.Core.Worlds;
 
 public class World
 {

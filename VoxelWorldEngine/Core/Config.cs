@@ -2,5 +2,5 @@
 
 public class Config
 {
-    public int ChunkLoadRadius = 2;
+    public int ChunkLoadRadius = 1;
 }

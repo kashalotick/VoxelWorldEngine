@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using DotnetNoise;
 
 namespace ConsoleApp1;
@@ -19,6 +20,7 @@ internal class Program
         Console.WriteLine($"  {mask:b8}");
         Console.WriteLine($"  {r:b8}");
         
+
         
     }
 
