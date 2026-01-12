@@ -8,17 +8,17 @@ public static class LinearOctreeMath
     /// <summary>
     ///     Calculate octant index for position in octree.
     /// </summary>
-    /// <param name="point">Local position in octree 0-size.</param>
+    /// <param name="position">Local position in octree 0-size.</param>
     /// <param name="size">Size of octree. Power of 2.</param>
     /// <returns>0-7 octant index.</returns>
-    public static int GetOctant(Vector3Int.Vector3Int point, int size)
+    public static int GetOctant(Vector3Int.Vector3Int position, int size)
     {
         var halfSize = size >> 1;
         var octant = 0;
         
-        if (point.X >= halfSize) octant |= 1;
-        if (point.Y >= halfSize) octant |= 2;
-        if (point.Z >= halfSize) octant |= 4;
+        if (position.X >= halfSize) octant |= 1;
+        if (position.Y >= halfSize) octant |= 2;
+        if (position.Z >= halfSize) octant |= 4;
         
         return octant;
     }
@@ -45,20 +45,20 @@ public static class LinearOctreeMath
     /// <summary>
     ///     Calculate the way to position in octree.
     /// </summary>
-    /// <param name="point">Local position in octree 0-size.</param>
+    /// <param name="position">Local position in octree 0-size.</param>
     /// <param name="size">Size of octree. Power of 2.</param>
     /// <returns>Array of octant indices way to position</returns>
-    public static int[] FindWayTo(Vector3Int.Vector3Int point, int size)
+    public static int[] FindWayTo(Vector3Int.Vector3Int position, int size)
     {
         var depth = int.Log2(size);
         var way = new int[depth];
 
         for (int i = 0; i < depth; i++)
         {
-            var octant = GetOctant(point, size);
+            var octant = GetOctant(position, size);
             way[i] = octant;
             var newOrigin = GetOctantCorner(octant, size);
-            point -= newOrigin;
+            position -= newOrigin;
             
             size >>= 1;
         }
