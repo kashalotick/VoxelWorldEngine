@@ -2,13 +2,14 @@
 
 public struct Voxel
 {
-    public byte Density;
+    public sbyte Density;
     
     
     // TODO: make equality operation
     
-    public Voxel(byte density)
+    public Voxel(sbyte density)
     {
         Density = density;
     }
+
 }

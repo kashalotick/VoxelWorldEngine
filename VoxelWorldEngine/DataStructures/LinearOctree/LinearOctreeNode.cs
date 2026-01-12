@@ -11,8 +11,8 @@ public struct LinearOctreeNode
     public bool IsSolid => ChildrenStartIndex == -2;
 
 
-    public static LinearOctreeNode Air => new(new(byte.MinValue), -1);
-    public static LinearOctreeNode Solid => new(new(byte.MaxValue), -2);
+    public static LinearOctreeNode Air => new(new(sbyte.MinValue), -1);
+    public static LinearOctreeNode Solid => new(new(sbyte.MaxValue), -2);
 
     
     public LinearOctreeNode(Voxel.Voxel voxel)
