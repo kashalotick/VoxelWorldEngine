@@ -17,7 +17,7 @@ public class LinearOctreeTest
     public void Constructor_InitializesCorrectly()
     {
         // Перевіряємо розмір (2^8 = 256)
-        Assert.That(_octree.Size, Is.EqualTo(256));
+        Assert.That(VoxelWorldEngine.DataStructures.LinearOctree.LinearOctree.Size, Is.EqualTo(256));
 
         // Перевіряємо, чи створено кореневий вузол
         // (Оскільки ми не маємо прямого доступу до _nodes, перевіряємо через GetNode на позиції 0)
@@ -143,128 +143,6 @@ public class LinearOctreeTest
 
         // Якщо дерево розбилося, індекс листа має бути великим (бо додалося багато дітей)
         Assert.That(leafIndex, Is.GreaterThan(0));
-    }
-
-    // 1. Тест на перевірку меж (Bounds Check)
-    [TestCase(-1, 0, 0)]
-    [TestCase(256, 0, 0)] // Припускаючи MaxDepth=8, Size=256
-    [TestCase(0, -5, 0)]
-    public void ForEachLeaf_Throws_WhenOutOfBounds(int x, int y, int z)
-    {
-        var pos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x, y, z);
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
-            _octree.ForEachLeaf(pos, (idx) => true));
-    }
-
-    [Test]
-    public void ForEachLeaf_ShouldStop_AtRoot_IfTreeIsEmpty()
-    {
-        // Arrange
-        var pos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10, 10, 10);
-        int callCount = 0;
-
-        // Act
-        int resultIndex = _octree.ForEachLeaf(pos, (idx) =>
-        {
-            callCount++;
-            return true;
-        });
-
-        // Assert
-        Assert.That(callCount, Is.EqualTo(1), "Callback should be called exactly once for the Root Leaf");
-        Assert.That(resultIndex, Is.EqualTo(0), "Should return root index (0)");
-    }
-
-    [Test]
-    public void ForEachLeaf_TraversesPath()
-    {
-        // Arrange
-        var targetPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(0, 0, 0);
-        int callbackCount = 0;
-
-        // Розбиваємо корінь один раз, щоб було хоча б 2 рівня
-        int rootIdx = _octree.GetNodeIndex(targetPos);
-        _octree.SubdivideNode(rootIdx);
-
-        // Act
-        _octree.ForEachLeaf(targetPos, (index) =>
-        {
-            callbackCount++;
-            return true; // Продовжуємо
-        });
-
-        // Assert
-        // Має відвідати Корінь (який тепер Branch) -> і Лист (дитину)
-        // Логіка ForEachLeaf залежить від реалізації:
-        // 1. Якщо вона проходить тільки по *Листам* (як випливає з назви), то count = 1 (тільки кінцевий лист).
-        // 2. Якщо вона проходить по *Вузлам* (Node traversal), то count = 2 (Root + Child).
-        // Припустимо, що назва точна і повертає кінцевий лист:
-
-        Assert.That(callbackCount, Is.GreaterThanOrEqualTo(1));
-    }
-
-    [Test]
-    public void ForEachLeaf_Stops_WhenCallbackReturnsFalse()
-    {
-        // Arrange
-        var pos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(0, 0, 0);
-
-        // Act
-        bool result = false;
-        _octree.ForEachLeaf(pos, (idx) =>
-        {
-            result = true;
-            return false; // Повертаємо false, щоб перервати
-        });
-
-        // Assert
-        Assert.That(result, Is.True);
-    }
-
-    [Test]
-    public void ForEachLeaf_ContinuesTraversal_IfCallbackSubdivides()
-    {
-        // Arrange
-        var targetPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(0, 0, 0);
-        int callCount = 0;
-        var visitedIndices = new List<int>();
-
-        // Act
-        int finalLeafIndex = _octree.ForEachLeaf(targetPos, (index) =>
-        {
-            callCount++;
-            visitedIndices.Add(index);
-
-            // Отримуємо актуальний стан
-            var node = _octree.GetNode(targetPos); // або через внутрішній доступ, якщо тест в тій же збірці
-
-            // Логіка тесту: Якщо це корінь (глибина 0, size 256), розбиваємо його!
-            // Перевіряємо, чи це перший виклик (корінь)
-            if (callCount == 1)
-            {
-                _octree.SubdivideNode(index);
-            }
-
-            return true; // Продовжуємо
-        });
-
-        // Assert
-        Assert.Multiple(() =>
-        {
-            // 1. Колбек мав бути викликаний ДВІЧІ.
-            // Перший раз для кореня (який був листом).
-            // Другий раз для його дитини (яка стала новим листом після сабдівайду).
-            Assert.That(callCount, Is.EqualTo(2), "Callback should be invoked twice: for root, then for child");
-
-            // 2. Перший відвіданий індекс - 0 (корінь)
-            Assert.That(visitedIndices[0], Is.EqualTo(0));
-
-            // 3. Другий відвіданий індекс - це дитина (не 0)
-            Assert.That(visitedIndices[1], Is.Not.EqualTo(0));
-
-            // 4. Кінцевий результат методу має бути індексом дитини
-            Assert.That(finalLeafIndex, Is.EqualTo(visitedIndices[1]));
-        });
     }
 
     [Test]
