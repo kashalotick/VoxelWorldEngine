@@ -4,16 +4,17 @@ using VoxelWorldEngine.DataStructures.Vector3Int;
 
 namespace VoxelWorldEngine.Core.Generator;
 
-public class DensityGenerator : IScalarFieldGenerator<Vector3Int, int>
+public class DensityGenerator : IScalarFieldGenerator<Vector3Int, sbyte>
 {
     private HeightMapGenerator _heightMap;
+    // TODO: remake with chunk (256x256) memoization; bring it in HeightMapGenerator
     private (Vector2Int Position, float Value) _previousHeight;
     private (Vector2Int a, Vector2Int b, (float min, float max) Value) _previousHeightMinMax;
 
 
     // temp constants
-    private const int Solid = 1;
-    private const int Air = 0;
+    private const sbyte Solid = sbyte.MaxValue;
+    private const sbyte Air = sbyte.MinValue;
 
 
     public DensityGenerator()
@@ -21,7 +22,7 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, int>
         _heightMap = new HeightMapGenerator();
     }
 
-    public int GetValue(Vector3Int position)
+    public sbyte GetValue(Vector3Int position)
     {
         var vec2 = new Vector2Int(position.X, position.Y);
         var height = GetHeightValue(vec2);
@@ -29,9 +30,8 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, int>
         var density = position.Z <= height ? Solid : Air;
         return density;
     }
-
-
-    public (int min, int max) GetMinMax(Vector3Int a, Vector3Int b)
+    
+    public (sbyte min, sbyte max) GetMinMax(Vector3Int a, Vector3Int b)
     {
         var vecA2 = new Vector2Int(a.X, a.Y);
         var vecB2 = new Vector2Int(b.X, b.Y);
