@@ -32,9 +32,9 @@ public struct LinearOctreeNode
         return ChildrenStartIndex + octantIndex;
     }
     
-    
     public void SetChildrenStartIndex(int startIndex)
     {
         ChildrenStartIndex = startIndex;
     }
+    
 }

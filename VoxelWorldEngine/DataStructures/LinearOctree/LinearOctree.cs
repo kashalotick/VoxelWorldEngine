@@ -2,11 +2,15 @@
 
 public class LinearOctree
 {
-    private readonly int _maxDepth = 8;
     private List<LinearOctreeNode> _nodes;
 
-    public int Size => 1 << _maxDepth;
+    public static readonly int MaxDepth = 8;
+    public int Size => 1 << MaxDepth;
 
+    public LinearOctree()
+    {
+        _nodes = [LinearOctreeNode.Air];
+    }
 
     /// <summary>
     ///     Compute the index of a node in the linear octree given its position.
@@ -129,5 +133,10 @@ public class LinearOctree
         }
 
         return startChildIndex;
+    }
+
+    public void UnsubdivideNode(int index)
+    {
+        
     }
 }

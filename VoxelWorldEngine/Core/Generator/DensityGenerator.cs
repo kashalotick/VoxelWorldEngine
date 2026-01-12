@@ -13,7 +13,7 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, int>
 
     // temp constants
     private const int Solid = 1;
-    private const int Air = 1;
+    private const int Air = 0;
 
 
     public DensityGenerator()
@@ -31,18 +31,32 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, int>
     }
 
 
-
     public (int min, int max) GetMinMax(Vector3Int a, Vector3Int b)
     {
         var vecA2 = new Vector2Int(a.X, a.Y);
         var vecB2 = new Vector2Int(b.X, b.Y);
-        
-        GetHeightMinMax(vecA2, vecB2);
 
+        var zMax = a.Z > b.Z ? a.Z : b.Z;
+        var zMin = a.Z < b.Z ? a.Z : b.Z;
+        (int min, int max) z = (zMin, zMax);
 
-        throw new NotImplementedException();
+        var height = GetHeightMinMax(vecA2, vecB2);
+
+        if (z.max < height.min) return (Solid, Solid);
+        if (z.min > height.max) return (Air, Air);
+        return (Solid, Air);
     }
-    
+
+    public bool IsHereAnySurface(Vector3Int a, Vector3Int b)
+    {
+        var density = GetMinMax(a, b);
+        
+        if (density.min >= 1) return false;
+        if (density.max <= 0) return false;
+
+        return true;
+    }
+
     private float GetHeightValue(Vector2Int vec2)
     {
         float height;
@@ -59,7 +73,8 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, int>
         return height;
     }
 
-    private void GetHeightMinMax(Vector2Int vecA2, Vector2Int vecB2)
+
+    private (float min, float max) GetHeightMinMax(Vector2Int vecA2, Vector2Int vecB2)
     {
         (float min, float max) heightMinMax;
         if (vecA2 == _previousHeightMinMax.a && vecB2 == _previousHeightMinMax.b)
@@ -71,5 +86,7 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, int>
             heightMinMax = _heightMap.GetMinMax(vecA2, vecB2);
             _previousHeightMinMax = (vecA2, vecB2, heightMinMax);
         }
+
+        return heightMinMax;
     }
 }
