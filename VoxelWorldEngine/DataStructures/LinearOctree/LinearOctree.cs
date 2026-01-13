@@ -15,7 +15,6 @@ public class LinearOctree
         _nodes = [LinearOctreeNode.Air];
     }
 
-    
 
     /// <summary>
     ///     Compute the index of a node in the linear octree given its position.
@@ -25,7 +24,7 @@ public class LinearOctree
     public int GetNodeIndex(Vector3Int.Vector3Int position)
     {
         if (!position.IsInBounds(Size)) throw new ArgumentOutOfRangeException(nameof(position));
-        
+
         var wayToPosition = OctreeMath.FindWayTo(position, Size);
 
         var nodeIndex = RootIndex;
@@ -40,7 +39,7 @@ public class LinearOctree
             var nexChildOctant = wayToPosition[i];
             nodeIndex = node.GetChildIndex(nexChildOctant);
         }
-        
+
         return nodeIndex;
     }
 
@@ -51,9 +50,10 @@ public class LinearOctree
     /// <returns>Node struct of the <b>first leaf node</b> according to position</returns>
     public LinearOctreeNode GetNode(Vector3Int.Vector3Int position)
     {
-
         return _nodes[GetNodeIndex(position)];
     }
+
+    // TODO: make GetNode by index??
 
     /// <summary>
     ///     Sets a new node at the specified position in the linear octree with subdividing leaves.
@@ -62,9 +62,8 @@ public class LinearOctree
     /// <param name="newNode">The new <see cref="LinearOctreeNode"/> to set.</param>
     public void SetNode(Vector3Int.Vector3Int position, LinearOctreeNode newNode)
     {
-
         if (!position.IsInBounds(Size)) throw new ArgumentOutOfRangeException(nameof(position));
-        
+
         var wayToPosition = OctreeMath.FindWayTo(position, Size);
 
         var nodeIndex = RootIndex;
@@ -80,18 +79,20 @@ public class LinearOctree
             var nexChildOctant = wayToPosition[i];
             nodeIndex = node.GetChildIndex(nexChildOctant);
         }
-        
+
         _nodes[nodeIndex] = newNode;
     }
 
     public void SetNodeVoxel(int index, Voxel.Voxel voxel)
     {
+        // TODO: Add doc; add test??
+
         var node = _nodes[index];
         node.Voxel = voxel;
         _nodes[index] = node;
     }
-    
-    
+
+
     /// <summary>
     ///     Mark node as parent and add child nodes into the list.
     /// </summary>
@@ -102,7 +103,7 @@ public class LinearOctree
     {
         var parent = _nodes[index];
         if (!parent.IsLeaf) throw new ArgumentException("Node is already subdivided", nameof(index));
-        
+
         var startChildIndex = _nodes.Count;
 
         for (int i = 0; i < 8; i++)
@@ -110,6 +111,7 @@ public class LinearOctree
             var child = new LinearOctreeNode(parent.Voxel);
             _nodes.Add(child);
         }
+
         parent.SetChildrenStartIndex(startChildIndex);
         _nodes[index] = parent;
 
@@ -124,8 +126,8 @@ public class LinearOctree
     {
         var parent = _nodes[index];
 
-        if (parent.IsLeaf) return; 
-    
+        if (parent.IsLeaf) return;
+
         parent.SetChildrenStartIndex(-2);
         _nodes[index] = parent;
     }
