@@ -4,7 +4,7 @@ using VoxelWorldEngine.DataStructures.LinearOctree;
 using VoxelWorldEngine.DataStructures.Vector3Int;
 using VoxelWorldEngine.DataStructures.Voxel;
 
-namespace VoxelWorldEngine.Core.Builder;
+namespace VoxelWorldEngine.Core.Builders;
 
 // TODO: make tests
 // TODO: add Observer class + observer field + distance check
