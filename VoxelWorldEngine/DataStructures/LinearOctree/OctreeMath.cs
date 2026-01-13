@@ -1,9 +1,9 @@
 ﻿namespace VoxelWorldEngine.DataStructures.LinearOctree;
 
 /// <summary>
-///     Class for working with linear octree. Provides methods for calculating octant index and position the octant. Octant indices are 0-7 in order 0b_ZYX.
+///     Class for working with octree data structure. Provides methods for calculating octant index and position the octant. Octant indices are 0-7 in order 0b_ZYX.
 /// </summary>
-public static class LinearOctreeMath
+public static class OctreeMath
 {
     /// <summary>
     ///     Calculate octant index for position in octree.
@@ -23,7 +23,6 @@ public static class LinearOctreeMath
         return octant;
     }
     
-    // size - повний розмір батьківського простору
     /// <summary>
     ///     Calculate position of 0's octant corner.
     /// </summary>

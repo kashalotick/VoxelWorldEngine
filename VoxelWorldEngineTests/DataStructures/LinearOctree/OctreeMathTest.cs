@@ -3,7 +3,7 @@ using VoxelWorldEngine.DataStructures.LinearOctree;
 
 namespace VoxelWorldEngineTests.DataStructures.LinearOctree;
 
-public class LinearOctreeMathTest
+public class OctreeMathTest
 {
     // ---------------------------------------------------------------------
     // Тести для GetOctant (Логіка 0b_ZYX)
@@ -26,7 +26,7 @@ public class LinearOctreeMathTest
     public int GetOctant_CalculatesCorrectly_ZYX(int x, int y, int z, int size)
     {
         var point = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x, y, z);
-        return LinearOctreeMath.GetOctant(point, size);
+        return OctreeMath.GetOctant(point, size);
     }
 
     [Test]
@@ -36,7 +36,7 @@ public class LinearOctreeMathTest
         int size = 16; // Half = 8
         var point = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(8, 8, 8);
 
-        int result = LinearOctreeMath.GetOctant(point, size);
+        int result = OctreeMath.GetOctant(point, size);
 
         // 111 -> 7
         Assert.That(result, Is.EqualTo(7));
@@ -59,7 +59,7 @@ public class LinearOctreeMathTest
     [TestCase(7, 32, 16, 16, 16)] // 111 -> All high
     public void GetOctantCorner_CalculatesCorrectly(int octantIndex, int size, int exX, int exY, int exZ)
     {
-        var result = LinearOctreeMath.GetOctantCorner(octantIndex, size);
+        var result = OctreeMath.GetOctantCorner(octantIndex, size);
 
         
         
@@ -83,7 +83,7 @@ public class LinearOctreeMathTest
         var point = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(3, 3, 3);
         int[] expected = new int[] { 7, 7 };
 
-        int[] result = LinearOctreeMath.FindWayTo(point, size);
+        int[] result = OctreeMath.FindWayTo(point, size);
 
         Assert.That(result, Is.EqualTo(expected).AsCollection);
     }
@@ -114,7 +114,7 @@ public class LinearOctreeMathTest
         var point = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 6, 2);
         int[] expected = new int[] { 2, 6, 1 };
 
-        int[] result = LinearOctreeMath.FindWayTo(point, size);
+        int[] result = OctreeMath.FindWayTo(point, size);
 
         Assert.That(result, Is.EqualTo(expected).AsCollection, "Шлях розраховано неправильно для ZYX");
     }

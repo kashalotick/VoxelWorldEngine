@@ -26,7 +26,7 @@ public class LinearOctree
     {
         if (!position.IsInBounds(Size)) throw new ArgumentOutOfRangeException(nameof(position));
         
-        var wayToPosition = LinearOctreeMath.FindWayTo(position, Size);
+        var wayToPosition = OctreeMath.FindWayTo(position, Size);
 
         var nodeIndex = RootIndex;
         for (int i = 0; i < wayToPosition.Length; i++)
@@ -65,7 +65,7 @@ public class LinearOctree
 
         if (!position.IsInBounds(Size)) throw new ArgumentOutOfRangeException(nameof(position));
         
-        var wayToPosition = LinearOctreeMath.FindWayTo(position, Size);
+        var wayToPosition = OctreeMath.FindWayTo(position, Size);
 
         var nodeIndex = RootIndex;
         for (int i = 0; i < wayToPosition.Length; i++)
