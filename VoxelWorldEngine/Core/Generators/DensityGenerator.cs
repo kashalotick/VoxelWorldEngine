@@ -29,7 +29,7 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, sbyte>
     {
         var vec2 = new Vector2Int(position.X, position.Y);
         var height = _heightMap.GetValue(vec2);
-
+        
         var density = position.Z <= height ? Solid : Air;
         return density;
     }
@@ -39,14 +39,13 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, sbyte>
         var vecA2 = new Vector2Int(a.X, a.Y);
         var vecB2 = new Vector2Int(b.X, b.Y);
 
-        var zMax = a.Z > b.Z ? a.Z : b.Z;
-        var zMin = a.Z < b.Z ? a.Z : b.Z;
-        (int min, int max) z = (zMin, zMax);
+        var zMax = Math.Max(a.Z, b.Z);
+        var zMin = Math.Min(a.Z, b.Z);
 
         var height = _heightMap.GetMinMax(vecA2, vecB2);
 
-        if (z.max < height.min) return (Solid, Solid);
-        if (z.min > height.max) return (Air, Air);
+        if (zMax < height.min) return (Solid, Solid);
+        if (zMin > height.max) return (Air, Air);
         return (Air, Solid);
     }
 

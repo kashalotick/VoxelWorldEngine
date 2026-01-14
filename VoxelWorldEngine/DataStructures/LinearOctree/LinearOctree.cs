@@ -15,6 +15,7 @@ public class LinearOctree
         _nodes = [LinearOctreeNode.Air];
     }
 
+    public List<LinearOctreeNode> GetNodes() => _nodes;
 
     /// <summary>
     ///     Compute the index of a node in the linear octree given its position.
@@ -88,8 +89,14 @@ public class LinearOctree
             var nexChildOctant = wayToPosition[i];
             nodeIndex = node.GetChildIndex(nexChildOctant);
         }
-
+        
         _nodes[nodeIndex] = newNode;
+    }
+
+    public void SetNodeVoxel(Vector3Int.Vector3Int position, Voxel.Voxel voxel)
+    {
+        var index = GetNodeIndex(position);
+        SetNodeVoxel(index, voxel);
     }
 
     public void SetNodeVoxel(int index, Voxel.Voxel voxel)
@@ -98,6 +105,12 @@ public class LinearOctree
 
         var node = _nodes[index];
         node.Voxel = voxel;
+        if (node.IsLeaf)
+        {
+            if (voxel.Density >= 0) node.SetSolid();
+            else node.SetAir();
+        }
+
         _nodes[index] = node;
     }
 

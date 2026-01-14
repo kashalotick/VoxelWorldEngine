@@ -27,6 +27,15 @@ public struct LinearOctreeNode
         ChildrenStartIndex = childrenStartIndex;
     }
 
+    public void SetSolid()
+    {
+        ChildrenStartIndex = -2;
+    }
+
+    public void SetAir()
+    {
+        ChildrenStartIndex = -1;
+    }
     public int GetChildIndex(int octantIndex)
     {
         return ChildrenStartIndex + octantIndex;

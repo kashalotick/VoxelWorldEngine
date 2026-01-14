@@ -1,28 +1,197 @@
-﻿using System.Diagnostics;
-using System.Numerics;
+﻿using System.Numerics;
+using System.Runtime.InteropServices;
 using DotnetNoise;
+using Raylib_cs;
+using VoxelWorldEngine.Core.Builders;
+using VoxelWorldEngine.Core.Generators;
+using VoxelWorldEngine.DataStructures.Chunk;
+using VoxelWorldEngine.DataStructures.LinearOctree;
+using VoxelWorldEngine.DataStructures.Vector3Int;
+using Mesh = VoxelWorldEngine.DataStructures.Mesh.Mesh;
 
 namespace ConsoleApp1;
 
-internal class Program
+public class Program
 {
-    private static readonly FastNoise _noise = new();
+    private const int GLSL_VERSION = 330;
 
-
-    private static void Main(string[] args)
+    public static void Main(string[] args)
     {
-  
-        var octant = 4;
-        var mask = 1 << octant;
-        var r = (byte)~mask;
-
-        Console.WriteLine($"for {octant}");
-        Console.WriteLine($"  {mask:b8}");
-        Console.WriteLine($"  {r:b8}");
-        
-
-        
+        Run();
     }
 
-  
+    public static unsafe void Run()
+    {
+
+        var chunkPosition = new Vector3Int(0, 0, 0);
+        var chunkRenderPosition = chunkPosition.ToVector3() * LinearOctree.Size;
+        var mesh = GenerateMesh(chunkPosition);
+        var mesh2 = GenerateMeshHeightmap();
+        Console.WriteLine($"Faces: {mesh.Triangles.Count / 6}");
+        Console.WriteLine($"Vertices: {mesh.Vertices.Count}");
+
+        // return;
+        Raylib.InitWindow(1920, 1080, "Voxel Octree Project");
+
+        var rayLibMesh = CreateRaylibMesh(mesh.Vertices, mesh.Triangles, mesh.Normals);
+        var rayLibMesh2 = CreateRaylibMesh(mesh2.Vertices, mesh2.Triangles, mesh2.Normals);
+
+        var model = Raylib.LoadModelFromMesh(rayLibMesh);
+        var model2 = Raylib.LoadModelFromMesh(rayLibMesh2);
+
+        Console.WriteLine("Перші 3 нормалі:");
+        for (int i = 0; i < 9; i += 3)
+        {
+            Console.WriteLine(
+                $"  {rayLibMesh.Normals[i]:F3}, {rayLibMesh.Normals[i + 1]:F3}, {rayLibMesh.Normals[i + 2]:F3}");
+        }
+
+        Raylib.SetWindowState(ConfigFlags.ResizableWindow);
+
+        var camera = new Camera3D
+        {
+            Position = new Vector3(25, 15, 25),
+            Target = new Vector3(0, 0, 0),
+            Up = new Vector3(0, 0, 1),
+            FovY = 45,
+            Projection = CameraProjection.Perspective
+        };
+        
+        
+        try
+        {
+            while (!Raylib.WindowShouldClose())
+            {
+                Raylib.UpdateCamera(ref camera, CameraMode.Free);
+                Raylib.BeginDrawing();
+                Raylib.ClearBackground(Color.SkyBlue);
+    
+                Raylib.BeginMode3D(camera);
+                Raylib.DrawModel(model, chunkRenderPosition, 0.25f, Color.White);
+                // Raylib.DrawModel(model2, Vector3.Zero, 1.0f, Color.Black);
+                Raylib.DrawGrid(100, 1.0f);
+                Raylib.EndMode3D();
+    
+                Raylib.DrawFPS(10, 10);
+                Raylib.EndDrawing();
+            }
+        }
+        finally
+        {
+            Raylib.UnloadModel(model);
+            Raylib.UnloadModel(model2);
+            Raylib.CloseWindow();
+        }
+    }
+
+    public static Mesh GenerateMeshHeightmap()
+    {
+        var heightmapMeshBuilder = new HeightMapMeshBuilder();
+        var hmMesh = heightmapMeshBuilder.RunFast();
+        var mesh = new Mesh
+        {
+            Vertices = hmMesh.vertices,
+            Triangles = hmMesh.triangles,
+            Normals = hmMesh.normals
+        };
+        return mesh;
+    }
+
+    public static Mesh GenerateMesh(Vector3Int chunkPosition)
+    {
+        var chunk = new Chunk(chunkPosition);
+
+        var fastNoise = new FastNoise(123);
+        var heightMapGenerator = new HeightMapGenerator(fastNoise);
+        
+        
+        var densityGenerator = new DensityGenerator(heightMapGenerator);
+        
+        
+
+        var octreeBuilder = new OctreeBuilder(densityGenerator);
+        var meshBuilder = new MeshBuilder();
+
+        var octree = octreeBuilder.Build(chunk);
+        
+        var testPos = new Vector3Int(234, 161, 6);
+        
+        
+        try 
+        {
+            var nodeIndex = octree.GetNodeIndex(testPos);
+            var node = octree.GetNode(testPos);
+            Console.WriteLine($"Node at {testPos}:");
+            Console.WriteLine($"  Index: {nodeIndex}");
+            Console.WriteLine($"  IsLeaf: {node.IsLeaf}");
+            Console.WriteLine($"  IsAir: {node.IsAir}");
+            Console.WriteLine($"  IsSolid: {node.IsSolid}");
+            Console.WriteLine($"  Debsity: {node.Voxel.Density}");
+            Console.WriteLine("------------------------------------");
+            var currentDensity = densityGenerator.GetValue(testPos);
+
+            Console.WriteLine($"Node at {testPos}:");
+            Console.WriteLine($"  IsAir: {node.IsAir}");
+            Console.WriteLine($"  Density NOW: {currentDensity}");
+            Console.WriteLine($"  Should be solid: {currentDensity > 0}");
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"ERROR getting node at {testPos}: {e.Message}");
+        }
+        
+        chunk.Octree = octree;
+        var mesh = meshBuilder.Build(octree);
+
+        return mesh;
+    }
+
+    public static unsafe Raylib_cs.Mesh CreateRaylibMesh(
+        List<Vector3> vertices,
+        List<int> triangles,
+        List<Vector3> normals
+    )
+    {
+        Console.WriteLine($"Vertices: {vertices.Count}, Triangles: {triangles.Count}, Normals: {normals.Count}");
+
+        var mesh = new Raylib_cs.Mesh();
+
+        mesh.VertexCount = vertices.Count;
+        mesh.TriangleCount = triangles.Count / 3;
+
+        // Вертекси
+        mesh.Vertices = (float*)Marshal.AllocHGlobal((vertices.Count * 3 * sizeof(float)));
+        for (var i = 0; i < vertices.Count; i++)
+        {
+            mesh.Vertices[i * 3 + 0] = vertices[i].X;
+            mesh.Vertices[i * 3 + 1] = vertices[i].Y;
+            mesh.Vertices[i * 3 + 2] = vertices[i].Z;
+        }
+
+        // Індекси
+        mesh.Indices = (ushort*)Marshal.AllocHGlobal((triangles.Count * sizeof(ushort)));
+        for (var i = 0; i < triangles.Count; i++)
+        {
+            mesh.Indices[i] = (ushort)triangles[i];
+        }
+
+        // Нормалі
+        mesh.Normals = (float*)Marshal.AllocHGlobal((normals.Count * 3 * sizeof(float)));
+        for (var i = 0; i < normals.Count; i++)
+        {
+            mesh.Normals[i * 3 + 0] = normals[i].X;
+            mesh.Normals[i * 3 + 1] = normals[i].Y;
+            mesh.Normals[i * 3 + 2] = normals[i].Z;
+        }
+
+        // Додай texcoords (UV) - просто нулі
+        mesh.TexCoords = (float*)Marshal.AllocHGlobal((vertices.Count * 2 * sizeof(float)));
+        for (var i = 0; i < vertices.Count * 2; i++)
+        {
+            mesh.TexCoords[i] = 0f;
+        }
+
+        Raylib.UploadMesh(ref mesh, false);
+        return mesh;
+    }
 }
