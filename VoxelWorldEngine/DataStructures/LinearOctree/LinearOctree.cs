@@ -53,7 +53,16 @@ public class LinearOctree
         return _nodes[GetNodeIndex(position)];
     }
 
-    // TODO: make GetNode by index??
+    // TODO: make tests
+    /// <summary>
+    ///     Returns a node in the linear octree.
+    /// </summary>
+    /// <param name="index">The index in the node list.</param>
+    /// <returns>Node struct.</returns>
+    public LinearOctreeNode GetNode(int index)
+    {
+        return _nodes[index];
+    }
 
     /// <summary>
     ///     Sets a new node at the specified position in the linear octree with subdividing leaves.
