@@ -24,7 +24,8 @@ public class Program
     {
 
         var chunkPosition = new Vector3Int(0, 0, 0);
-        var chunkRenderPosition = chunkPosition.ToVector3() * LinearOctree.Size;
+        var scale = 0.25f;
+        var chunkRenderPosition = chunkPosition.ToVector3() * LinearOctree.Size * scale;
         var mesh = GenerateMesh(chunkPosition);
         var mesh2 = GenerateMeshHeightmap();
         Console.WriteLine($"Faces: {mesh.Triangles.Count / 6}");
@@ -67,7 +68,7 @@ public class Program
                 Raylib.ClearBackground(Color.SkyBlue);
     
                 Raylib.BeginMode3D(camera);
-                Raylib.DrawModel(model, chunkRenderPosition, 0.25f, Color.White);
+                Raylib.DrawModel(model, chunkRenderPosition, scale, Color.White);
                 // Raylib.DrawModel(model2, Vector3.Zero, 1.0f, Color.Black);
                 Raylib.DrawGrid(100, 1.0f);
                 Raylib.EndMode3D();

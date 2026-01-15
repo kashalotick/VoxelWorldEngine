@@ -90,7 +90,7 @@ public class MeshBuilder
         else if (direction.Y != 0)
         {
             var checkY = node.Position.Y + (direction.Y > 0 ? size : -1);
-        
+            
             for (int x = 0; x < size; x++)
             for (int z = 0; z < size; z++)
             {
@@ -99,7 +99,7 @@ public class MeshBuilder
                     return true;
             }
         }
-        else // direction.Z != 0
+        else if (direction.Z != 0)
         {
             var checkZ = node.Position.Z + (direction.Z > 0 ? size : -1);
         

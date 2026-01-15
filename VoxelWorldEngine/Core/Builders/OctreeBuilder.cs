@@ -92,7 +92,7 @@ public class OctreeBuilder
     private void ProcessLeaf(int nodeIndex, int nodeSize, LinearOctree octree, Vector3Int octantCorner)
     {
         // TODO: remaker with avg density ???
-        var octantLastCorner = octantCorner + Vector3Int.One * nodeSize;
+        var octantLastCorner = octantCorner + Vector3Int.One * (nodeSize - 1);
 
         // var center = nodeSize > 1 ? octantCorner + Vector3Int.One * (nodeSize / 2) : octantCorner;
         var density = _densityGenerator.GetMinMax(octantCorner, octantLastCorner);
@@ -110,7 +110,7 @@ public class OctreeBuilder
     /// <returns>True if should subdivide.</returns>
     private bool ShouldSubdivideNode(int nodeSize, Vector3Int octantCorner)
     {
-        var octantLastCorner = octantCorner + Vector3Int.One * nodeSize;
+        var octantLastCorner = octantCorner + Vector3Int.One * (nodeSize - 1);
 
         if (nodeSize > 1)
         {
