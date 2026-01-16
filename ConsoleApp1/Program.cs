@@ -49,6 +49,7 @@ public class Program
 
         Raylib.SetWindowState(ConfigFlags.ResizableWindow);
 
+        Raylib.DisableCursor();
         var camera = new Camera3D
         {
             Position = new Vector3(25, 15, 25),
@@ -114,32 +115,6 @@ public class Program
         var meshBuilder = new MeshBuilder();
 
         var octree = octreeBuilder.Build(chunk);
-        
-        var testPos = new Vector3Int(234, 161, 6);
-        
-        
-        try 
-        {
-            var nodeIndex = octree.GetNodeIndex(testPos);
-            var node = octree.GetNode(testPos);
-            Console.WriteLine($"Node at {testPos}:");
-            Console.WriteLine($"  Index: {nodeIndex}");
-            Console.WriteLine($"  IsLeaf: {node.IsLeaf}");
-            Console.WriteLine($"  IsAir: {node.IsAir}");
-            Console.WriteLine($"  IsSolid: {node.IsSolid}");
-            Console.WriteLine($"  Debsity: {node.Voxel.Density}");
-            Console.WriteLine("------------------------------------");
-            var currentDensity = densityGenerator.GetValue(testPos);
-
-            Console.WriteLine($"Node at {testPos}:");
-            Console.WriteLine($"  IsAir: {node.IsAir}");
-            Console.WriteLine($"  Density NOW: {currentDensity}");
-            Console.WriteLine($"  Should be solid: {currentDensity > 0}");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"ERROR getting node at {testPos}: {e.Message}");
-        }
         
         chunk.Octree = octree;
         var mesh = meshBuilder.Build(octree);
