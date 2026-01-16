@@ -89,10 +89,11 @@ public class MeshBuilder
         //     return true;
         // }
         //
+        var localZ = Vector3Int.Dot(direction, Vector3Int.One) > 0 ? size : -1;
         for (int x = 0; x < size; x++)
         for (int y = 0; y < size; y++)
         {
-            var checkPos = new Vector3Int(x, y, size);
+            var checkPos = new Vector3Int(x, y, localZ);
             checkPos = VectorHelper.Transform(checkPos, transformMatrix);
             if (IsPositionAir(checkPos, octree))
                 return true; 
