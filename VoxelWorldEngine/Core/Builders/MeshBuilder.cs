@@ -88,55 +88,55 @@ public class MeshBuilder
         // {
         //     return true;
         // }
-        //
-        var localZ = Vector3Int.Dot(direction, Vector3Int.One) > 0 ? size : -1;
-        for (int x = 0; x < size; x++)
-        for (int y = 0; y < size; y++)
-        {
-            var checkPos = new Vector3Int(x, y, localZ);
-            checkPos = VectorHelper.Transform(checkPos, transformMatrix);
-            if (IsPositionAir(checkPos, octree))
-                return true; 
-        }
         
-        // // Визначаємо по якій осі йде напрямок
-        // if (direction.X != 0)
+        // var localZ = Vector3Int.Dot(direction, Vector3Int.One) > 0 ? size : -1;
+        // for (int x = 0; x < size; x++)
+        // for (int y = 0; y < size; y++)
         // {
-        //     // Грань перпендикулярна X
-        //     var checkX = node.Position.X + (direction.X > 0 ? size : -1);
-        //
-        //     for (int y = 0; y < size; y++)
-        //     for (int z = 0; z < size; z++)
-        //     {
-        //         var checkPos = new Vector3Int(checkX, node.Position.Y + y, node.Position.Z + z);
-        //         if (IsPositionAir(checkPos, octree))
-        //             return true; // Хоч одна точка грані видима
-        //     }
+        //     var checkPos = new Vector3Int(x, y, localZ);
+        //     checkPos = VectorHelper.Transform(checkPos, transformMatrix);
+        //     if (IsPositionAir(checkPos, octree))
+        //         return true; 
         // }
-        // else if (direction.Y != 0)
-        // {
-        //     var checkY = node.Position.Y + (direction.Y > 0 ? size : -1);
         //
-        //     for (int x = 0; x < size; x++)
-        //     for (int z = 0; z < size; z++)
-        //     {
-        //         var checkPos = new Vector3Int(node.Position.X + x, checkY, node.Position.Z + z);
-        //         if (IsPositionAir(checkPos, octree))
-        //             return true;
-        //     }
-        // }
-        // else if (direction.Z != 0)
-        // {
-        //     var checkZ = node.Position.Z + (direction.Z > 0 ? size : -1);
-        //
-        //     for (int x = 0; x < size; x++)
-        //     for (int y = 0; y < size; y++)
-        //     {
-        //         var checkPos = new Vector3Int(node.Position.X + x, node.Position.Y + y, checkZ);
-        //         if (IsPositionAir(checkPos, octree))
-        //             return true;
-        //     }
-        // }
+        // Визначаємо по якій осі йде напрямок
+        if (direction.X != 0)
+        {
+            // Грань перпендикулярна X
+            var checkX = node.Position.X + (direction.X > 0 ? size : -1);
+        
+            for (int y = 0; y < size; y++)
+            for (int z = 0; z < size; z++)
+            {
+                var checkPos = new Vector3Int(checkX, node.Position.Y + y, node.Position.Z + z);
+                if (IsPositionAir(checkPos, octree))
+                    return true; // Хоч одна точка грані видима
+            }
+        }
+        else if (direction.Y != 0)
+        {
+            var checkY = node.Position.Y + (direction.Y > 0 ? size : -1);
+        
+            for (int x = 0; x < size; x++)
+            for (int z = 0; z < size; z++)
+            {
+                var checkPos = new Vector3Int(node.Position.X + x, checkY, node.Position.Z + z);
+                if (IsPositionAir(checkPos, octree))
+                    return true;
+            }
+        }
+        else if (direction.Z != 0)
+        {
+            var checkZ = node.Position.Z + (direction.Z > 0 ? size : -1);
+        
+            for (int x = 0; x < size; x++)
+            for (int y = 0; y < size; y++)
+            {
+                var checkPos = new Vector3Int(node.Position.X + x, node.Position.Y + y, checkZ);
+                if (IsPositionAir(checkPos, octree))
+                    return true;
+            }
+        }
 
         return false; // Вся грань закрита
     }

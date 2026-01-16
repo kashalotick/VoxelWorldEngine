@@ -45,17 +45,66 @@ public class Mesh
         float s = size;
         var halfSize = size / 2;
 
-        var transformMatrix = VectorHelper.GetTransformMatrix(pos, normal.ToVector3());
+        // Передня грань (Z+)
+        if (normal.Z == 1)
+        {
+            vertices[0] = pos + new Vector3(0, 0, s);
+            vertices[1] = pos + new Vector3(s, 0, s);
+            vertices[2] = pos + new Vector3(s, s, s);
+            vertices[3] = pos + new Vector3(0, s, s);
+        }
+        // Задня грань (Z-)
+        else if (normal.Z == -1)
+        {
+            vertices[0] = pos + new Vector3(s, 0, 0);
+            vertices[1] = pos + new Vector3(0, 0, 0);
+            vertices[2] = pos + new Vector3(0, s, 0);
+            vertices[3] = pos + new Vector3(s, s, 0);
+        }
+        // Права грань (X+)
+        else if (normal.X == 1)
+        {
+            vertices[0] = pos + new Vector3(s, 0, s);
+            vertices[1] = pos + new Vector3(s, 0, 0);
+            vertices[2] = pos + new Vector3(s, s, 0);
+            vertices[3] = pos + new Vector3(s, s, s);
+        }
+        // Ліва грань (X-)
+        else if (normal.X == -1)
+        {
+            vertices[0] = pos + new Vector3(0, 0, 0);
+            vertices[1] = pos + new Vector3(0, 0, s);
+            vertices[2] = pos + new Vector3(0, s, s);
+            vertices[3] = pos + new Vector3(0, s, 0);
+        }
+        // Верхня грань (Y+)
+        else if (normal.Y == 1)
+        {
+            vertices[0] = pos + new Vector3(0, s, s);
+            vertices[1] = pos + new Vector3(s, s, s);
+            vertices[2] = pos + new Vector3(s, s, 0);
+            vertices[3] = pos + new Vector3(0, s, 0);
+        }
+        // Нижня грань (Y-)
+        else if (normal.Y == -1)
+        {
+            vertices[0] = pos + new Vector3(0, 0, 0);
+            vertices[1] = pos + new Vector3(s, 0, 0);
+            vertices[2] = pos + new Vector3(s, 0, s);
+            vertices[3] = pos + new Vector3(0, 0, s);
+        }
         
-        var localVertex0 = new Vector3(-halfSize, -halfSize, halfSize);
-        var localVertex1 = new Vector3(halfSize, -halfSize, halfSize);
-        var localVertex2 = new Vector3(halfSize, halfSize, halfSize);
-        var localVertex3 = new Vector3(-halfSize, halfSize, halfSize);
-
-        vertices[0] = Vector3.Transform(localVertex0, transformMatrix);
-        vertices[1] = Vector3.Transform(localVertex1, transformMatrix);
-        vertices[2] = Vector3.Transform(localVertex2, transformMatrix);
-        vertices[3] = Vector3.Transform(localVertex3, transformMatrix);
+        // var transformMatrix = VectorHelper.GetTransformMatrix(pos, normal.ToVector3());
+        //
+        // var localVertex0 = new Vector3(-halfSize, -halfSize, halfSize);
+        // var localVertex1 = new Vector3(halfSize, -halfSize, halfSize);
+        // var localVertex2 = new Vector3(halfSize, halfSize, halfSize);
+        // var localVertex3 = new Vector3(-halfSize, halfSize, halfSize);
+        //
+        // vertices[0] = Vector3.Transform(localVertex0, transformMatrix);
+        // vertices[1] = Vector3.Transform(localVertex1, transformMatrix);
+        // vertices[2] = Vector3.Transform(localVertex2, transformMatrix);
+        // vertices[3] = Vector3.Transform(localVertex3, transformMatrix);
 
         return vertices;
     }

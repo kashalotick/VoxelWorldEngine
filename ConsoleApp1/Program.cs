@@ -115,11 +115,40 @@ public class Program
         var meshBuilder = new MeshBuilder();
 
         var octree = octreeBuilder.Build(chunk);
+
+        // PrintOctree();
         
         chunk.Octree = octree;
         var mesh = meshBuilder.Build(octree);
 
         return mesh;
+
+        void PrintOctree()
+        {
+            var line = "";
+            var min = new Vector3Int(0, 0, 0);
+            var max = new Vector3Int(80, 80, 16);
+            
+            
+            for (int z = min.Z; z < max.Z; z++)
+            {
+                for (int x = min.X; x < max.X; x++)
+                {
+                    for (int y = min.Y; y < max.Y; y++)
+                    {
+                        var position = new Vector3Int(x, y, z);
+                        var node = octree.GetNode(position);
+                        var isSolid = node.IsSolid;
+                        line += isSolid ? " 1 " : " · ";
+                    }
+                    line += "\n";
+                }
+                line += "\n\n";
+            }
+
+            Console.WriteLine(line);
+
+        }
     }
 
     public static unsafe Raylib_cs.Mesh CreateRaylibMesh(
