@@ -92,13 +92,15 @@ public class OctreeBuilder
     private void ProcessLeaf(int nodeIndex, int nodeSize, LinearOctree octree, Vector3Int octantCorner)
     {
         // TODO: remaker with avg density ???
-        var octantLastCorner = octantCorner + Vector3Int.One * (nodeSize - 1);
+        // var octantLastCorner = octantCorner + Vector3Int.One * (nodeSize - 1);
 
         // var center = nodeSize > 1 ? octantCorner + Vector3Int.One * (nodeSize / 2) : octantCorner;
-        var density = _densityGenerator.GetMinMax(octantCorner, octantLastCorner);
-        var avg = (density.min + density.max)/2;
-        avg = avg == 0 ? sbyte.MinValue : avg;
-        var voxel = new Voxel((sbyte)avg);
+        // var density = _densityGenerator.GetMinMax(octantCorner, octantLastCorner);
+        // var avg = (density.min + density.max)/2;
+
+        // avg = avg == 0 ? sbyte.MinValue : avg;
+        var density = _densityGenerator.GetValue(octantCorner);
+        var voxel = new Voxel(density);
         octree.SetNodeVoxel(nodeIndex, voxel);
     }
 

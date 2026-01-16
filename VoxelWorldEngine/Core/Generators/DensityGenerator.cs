@@ -38,21 +38,20 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, sbyte>
     {
         var vecA2 = new Vector2Int(a.X, a.Y);
         var vecB2 = new Vector2Int(b.X, b.Y);
-        
         // TODO: working but still disappearing faces
-        if (Vector3Int.Abs(a - b) == Vector3Int.One)
-        {
-            var density = GetValue(a);
-            return (density, density);
-        }
-        
+        // if (Vector3Int.Abs(a - b) == Vector3Int.One)
+        // {
+        //     var density = GetValue(a);
+        //     return (density, density);
+        // }
+      
 
         var zMax = Math.Max(a.Z, b.Z);
         var zMin = Math.Min(a.Z, b.Z);
 
         var height = _heightMap.GetMinMax(vecA2, vecB2);
 
-        if (zMax < height.min) return (Solid, Solid);
+        if (zMax <= height.min) return (Solid, Solid);
         if (zMin > height.max) return (Air, Air);
         return (Air, Solid);
     }
@@ -61,8 +60,8 @@ public class DensityGenerator : IScalarFieldGenerator<Vector3Int, sbyte>
     {
         var density = GetMinMax(a, b);
         
-        if (density.min >= 1) return false;
-        if (density.max <= 0) return false;
+        if (density.min >= 0) return false;
+        if (density.max < 0) return false;
 
         return true;
     }
