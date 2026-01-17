@@ -38,7 +38,7 @@ public class MeshBuilder
             if (meshNode.Size == SubMeshResolution)
             {
                 var submesh = CreateSubmesh(meshNode, octree);
-                if (submesh != null) meshList.Add(submesh);
+                meshList.Add(submesh);
             }
             else
             {
@@ -60,10 +60,11 @@ public class MeshBuilder
         return meshList;
     }
 
-    private Mesh? CreateSubmesh(MeshNode node, LinearOctree octree)
+    private Mesh CreateSubmesh(MeshNode node, LinearOctree octree)
     {
         var nodeQueue = new Queue<MeshNode>();
-        var mesh = new Mesh(node.Position);;
+        var positionOffset = node.Position;
+        var mesh = new Mesh(positionOffset);
         
         nodeQueue.Enqueue(node);
         
@@ -71,7 +72,6 @@ public class MeshBuilder
         {
             var meshNode = nodeQueue.Dequeue();
             var octreeNode = octree.GetNode(meshNode.Index);
-
             if (octreeNode.IsLeaf)
             {
                 ProcessLeaf(meshNode, mesh, octree);

@@ -59,6 +59,7 @@ public class Program
             Projection = CameraProjection.Perspective
         };
 
+        // Raylib.SetTargetFPS(165);
 
         try
         {
@@ -74,8 +75,8 @@ public class Program
                 {
                     var model = rlModels[i];
                     var mesh = meshes[i];
-                    var position = chunkRenderPosition + mesh.PositionOffset;
-                    Raylib.DrawModel(model, chunkRenderPosition, scale, Color.White);
+                    var position = chunkRenderPosition  + mesh.PositionOffset;
+                    Raylib.DrawModel(model, position * scale, scale, Color.White);
                 }
 
                 // Raylib.DrawModel(model2, Vector3.Zero, 1.0f, Color.Black);
@@ -131,6 +132,7 @@ public class Program
 
         chunk.Octree = octree;
         var meshes = meshBuilder.BuildMeshList(octree);
+        // var meshes = new List<Mesh> {meshBuilder.Build(octree)};
 
         return meshes;
 

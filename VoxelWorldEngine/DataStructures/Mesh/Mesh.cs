@@ -20,6 +20,7 @@ public class Mesh
 
     public void AddFace(Vector3Int.Vector3Int position, Vector3Int.Vector3Int normal, int size)
     {
+        position -= PositionOffset.ToVector3Int();
         int verticesCount = Vertices.Count;
         
         var faceVertices = GetFaceVertices(position, normal, size);
