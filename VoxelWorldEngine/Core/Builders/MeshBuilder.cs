@@ -8,17 +8,98 @@ namespace VoxelWorldEngine.Core.Builders;
 
 public class MeshBuilder
 {
+    public const int SubMeshResolution = 16;
+    
+    
     private Vector3Int[] _directions =
     [
         Vector3Int.UnitX, Vector3Int.UnitY, Vector3Int.UnitZ,
         -Vector3Int.UnitX, -Vector3Int.UnitY, -Vector3Int.UnitZ
     ];
 
+    public List<Mesh> BuildMeshList(LinearOctree octree)
+    {
+        var nodeQueue = new Queue<MeshNode>();
+        var meshList = new List<Mesh>();
+
+        var rootMeshNode = new MeshNode(octree.RootIndex, LinearOctree.Size, Vector3Int.Zero);
+        nodeQueue.Enqueue(rootMeshNode);
+
+        while (nodeQueue.Count > 0)
+        {
+            var meshNode = nodeQueue.Dequeue();
+            var octreeNode = octree.GetNode(meshNode.Index);
+
+            if (octreeNode.IsAir)
+            {
+                continue;
+            }
+            
+            if (meshNode.Size == SubMeshResolution)
+            {
+                var submesh = CreateSubmesh(meshNode, octree);
+                if (submesh != null) meshList.Add(submesh);
+            }
+            else
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    var childIndex = octreeNode.GetChildIndex(i);
+                    var childSize = meshNode.Size >> 1;
+                    
+                    var localOffset = OctreeMath.GetOctantCorner(i, meshNode.Size);
+                    var position = meshNode.Position + localOffset;
+
+                    var childMeshNode = new MeshNode(childIndex, childSize, position);
+                    nodeQueue.Enqueue(childMeshNode);
+                }
+            }
+        }
+        
+        
+        return meshList;
+    }
+
+    private Mesh? CreateSubmesh(MeshNode node, LinearOctree octree)
+    {
+        var nodeQueue = new Queue<MeshNode>();
+        var mesh = new Mesh(node.Position);;
+        
+        nodeQueue.Enqueue(node);
+        
+        while (nodeQueue.Count > 0)
+        {
+            var meshNode = nodeQueue.Dequeue();
+            var octreeNode = octree.GetNode(meshNode.Index);
+
+            if (octreeNode.IsLeaf)
+            {
+                ProcessLeaf(meshNode, mesh, octree);
+            }
+            else
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    var childIndex = octreeNode.GetChildIndex(i);
+                    var childSize = meshNode.Size >> 1;
+                    
+                    var localOffset = OctreeMath.GetOctantCorner(i, meshNode.Size);
+                    var position = meshNode.Position + localOffset;
+
+                    var childMeshNode = new MeshNode(childIndex, childSize, position);
+                    nodeQueue.Enqueue(childMeshNode);
+                }
+            }
+        }
+        
+        return mesh;
+    }
 
     public Mesh Build(LinearOctree octree)
     {
         var queue = new Queue<MeshNode>();
-        var mesh = new Mesh();
+
+        var mesh = new Mesh(Vector3Int.Zero);
 
         var rootMeshNode = new MeshNode(octree.RootIndex, LinearOctree.Size, Vector3Int.Zero);
         queue.Enqueue(rootMeshNode);
@@ -30,7 +111,7 @@ public class MeshBuilder
 
             if (octreeNode.IsLeaf)
             {
-                ProcessLeaf(meshNode, octree, mesh);
+                ProcessLeaf(meshNode, mesh, octree);
             }
             else
             {
@@ -42,17 +123,21 @@ public class MeshBuilder
                     var localOffset = OctreeMath.GetOctantCorner(i, meshNode.Size);
                     var position = meshNode.Position + localOffset;
 
+
                     var childMeshNode = new MeshNode(childIndex, childSize, position);
+
+       
                     queue.Enqueue(childMeshNode);
+                    
                 }
             }
         }
-        
+
         return mesh;
     }
 
 
-    private void ProcessLeaf(MeshNode node, LinearOctree octree, Mesh mesh)
+    private void ProcessLeaf(MeshNode node, Mesh mesh, LinearOctree octree)
     {
         var octreeNode = octree.GetNode(node.Index);
         if (octreeNode.IsAir) return;

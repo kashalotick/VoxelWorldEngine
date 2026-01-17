@@ -5,15 +5,17 @@ namespace VoxelWorldEngine.DataStructures.Mesh;
 
 public class Mesh
 {
+    public Vector3 PositionOffset;
     public List<Vector3> Vertices;
-    public List<int> Triangles;
     public List<Vector3> Normals;
+    public List<int> Triangles;
 
-    public Mesh()
+    public Mesh(Vector3Int.Vector3Int positionOffset)
     {
+        PositionOffset = positionOffset.ToVector3();
         Vertices = [];
-        Triangles = [];
         Normals = [];
+        Triangles = [];
     }
 
     public void AddFace(Vector3Int.Vector3Int position, Vector3Int.Vector3Int normal, int size)
@@ -30,7 +32,7 @@ public class Mesh
         Triangles.Add(verticesCount + 2); 
         Triangles.Add(verticesCount + 3);
         
-        var normalVector = new Vector3(normal.X, normal.Y, normal.Z);;
+        var normalVector = new Vector3(normal.X, normal.Y, normal.Z);
         Normals.Add(normalVector);
         Normals.Add(normalVector);
         Normals.Add(normalVector);

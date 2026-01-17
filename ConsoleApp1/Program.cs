@@ -91,7 +91,7 @@ public class Program
     {
         var heightmapMeshBuilder = new HeightMapMeshBuilder();
         var hmMesh = heightmapMeshBuilder.RunFast();
-        var mesh = new Mesh
+        var mesh = new Mesh(Vector3Int.Zero)
         {
             Vertices = hmMesh.vertices,
             Triangles = hmMesh.triangles,
