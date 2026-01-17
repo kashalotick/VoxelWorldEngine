@@ -23,11 +23,8 @@ public class MeshBuilder
         var rootMeshNode = new MeshNode(octree.RootIndex, LinearOctree.Size, Vector3Int.Zero);
         queue.Enqueue(rootMeshNode);
 
-        var cycleCount = 0;
         while (queue.Count > 0)
         {
-            cycleCount++;
-
             var meshNode = queue.Dequeue();
             var octreeNode = octree.GetNode(meshNode.Index);
 
@@ -71,6 +68,7 @@ public class MeshBuilder
     // TODO: test new impl; remake with bounds; impl bounds iterator in octree
     private bool IsFaceVisible(MeshNode node, Vector3Int direction, LinearOctree octree)
     {
+        
         // Перевіряємо всю грань, а не одну точку
         var size = node.Size;
         // var halfSize = size >> 1;

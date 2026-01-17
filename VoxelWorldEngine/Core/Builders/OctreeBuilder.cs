@@ -49,7 +49,7 @@ public class OctreeBuilder
     /// <param name="octantCorner">Position of 0's corner of octant.</param>
     private void ProcessNode(int nodeIndex, int nodeSize, LinearOctree octree, Vector3Int octantCorner)
     {
-        if (ShouldSubdivideNode(nodeSize, octantCorner) && nodeSize > 1)
+        if (ShouldSubdivideNode(nodeSize, octantCorner))
         {
             ProcessSubdivide(nodeIndex, nodeSize, octree, octantCorner);
         }
@@ -112,14 +112,12 @@ public class OctreeBuilder
     /// <returns>True if should subdivide.</returns>
     private bool ShouldSubdivideNode(int nodeSize, Vector3Int octantCorner)
     {
-        var octantLastCorner = octantCorner + Vector3Int.One * (nodeSize - 1);
-
         if (nodeSize > 1)
         {
             // var indent = int.Log2(regionSize);
             // out density?
             // TODO: add distance to observer check
-
+            var octantLastCorner = octantCorner + Vector3Int.One * (nodeSize - 1);
             var isHereSurface = _densityGenerator.IsHereAnySurface(octantCorner, octantLastCorner);
 
             return isHereSurface;
