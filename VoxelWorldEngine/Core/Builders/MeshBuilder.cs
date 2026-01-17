@@ -23,7 +23,6 @@ public class MeshBuilder
         var rootMeshNode = new MeshNode(octree.RootIndex, LinearOctree.Size, Vector3Int.Zero);
         queue.Enqueue(rootMeshNode);
 
-        var voxelCount1 = 0;
         while (queue.Count > 0)
         {
             var meshNode = queue.Dequeue();
@@ -31,10 +30,6 @@ public class MeshBuilder
 
             if (octreeNode.IsLeaf)
             {
-                if (meshNode.Size == 1 && octreeNode.IsSolid)
-                {
-                    voxelCount1++;
-                }
                 ProcessLeaf(meshNode, octree, mesh);
             }
             else
@@ -43,8 +38,8 @@ public class MeshBuilder
                 {
                     var childIndex = octreeNode.GetChildIndex(i);
                     var childSize = meshNode.Size >> 1;
-                    
-                    var localOffset = OctreeMath.GetOctantCorner(i, childSize);
+
+                    var localOffset = OctreeMath.GetOctantCorner(i, meshNode.Size);
                     var position = meshNode.Position + localOffset;
 
                     var childMeshNode = new MeshNode(childIndex, childSize, position);
@@ -52,9 +47,7 @@ public class MeshBuilder
                 }
             }
         }
-
-        Console.WriteLine(voxelCount1);
-
+        
         return mesh;
     }
 
@@ -64,7 +57,6 @@ public class MeshBuilder
         var octreeNode = octree.GetNode(node.Index);
         if (octreeNode.IsAir) return;
 
-        
         foreach (var direction in _directions)
         {
             if (IsFaceVisible(node, direction, octree))
@@ -77,11 +69,9 @@ public class MeshBuilder
     // TODO: test new impl; remake with bounds; impl bounds iterator in octree
     private bool IsFaceVisible(MeshNode node, Vector3Int direction, LinearOctree octree)
     {
-        
         // Перевіряємо всю грань, а не одну точку
         var size = node.Size;
         // var halfSize = size >> 1;
-
 
 
         var newOrigin = (node.Position.ToVector3() + Vector3.One * (size - 1)) / 2;
@@ -95,7 +85,7 @@ public class MeshBuilder
         // {
         //     return true;
         // }
-        
+
         // var localZ = Vector3Int.Dot(direction, Vector3Int.One) > 0 ? size : -1;
         // for (int x = 0; x < size; x++)
         // for (int y = 0; y < size; y++)
@@ -111,7 +101,7 @@ public class MeshBuilder
         {
             // Грань перпендикулярна X
             var checkX = node.Position.X + (direction.X > 0 ? size : -1);
-        
+
             for (int y = 0; y < size; y++)
             for (int z = 0; z < size; z++)
             {
@@ -123,7 +113,7 @@ public class MeshBuilder
         else if (direction.Y != 0)
         {
             var checkY = node.Position.Y + (direction.Y > 0 ? size : -1);
-        
+
             for (int x = 0; x < size; x++)
             for (int z = 0; z < size; z++)
             {
@@ -135,7 +125,7 @@ public class MeshBuilder
         else if (direction.Z != 0)
         {
             var checkZ = node.Position.Z + (direction.Z > 0 ? size : -1);
-        
+
             for (int x = 0; x < size; x++)
             for (int y = 0; y < size; y++)
             {
