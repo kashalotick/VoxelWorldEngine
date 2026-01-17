@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using DotnetNoise;
@@ -23,31 +24,28 @@ public class Program
 
     public static unsafe void Run()
     {
-
+        var sw = Stopwatch.StartNew(); //**
         var chunkPosition = new Vector3Int(0, 0, 0);
         var scale = 0.25f;
         var chunkRenderPosition = chunkPosition.ToVector3() * LinearOctree.Size * scale;
-        var mesh = GenerateMesh(chunkPosition);
-        var mesh2 = GenerateMeshHeightmap();
-        Console.WriteLine($"Faces: {mesh.Triangles.Count / 6}");
-        Console.WriteLine($"Vertices: {mesh.Vertices.Count}");
+        Console.WriteLine($"Етап 1. Початок: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
+        var meshes = GenerateMesh(chunkPosition);
+        Console.WriteLine($"Етап 2. Генерація чанка та меша: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
 
         // return;
         Raylib.InitWindow(1920, 1080, "Voxel Octree Project");
 
-        var rayLibMesh = CreateRaylibMesh(mesh.Vertices, mesh.Triangles, mesh.Normals);
-        var rayLibMesh2 = CreateRaylibMesh(mesh2.Vertices, mesh2.Triangles, mesh2.Normals);
+        Console.WriteLine($"Етап 3. Створення вікна: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
 
-        var model = Raylib.LoadModelFromMesh(rayLibMesh);
-        var model2 = Raylib.LoadModelFromMesh(rayLibMesh2);
-
-        Console.WriteLine("Перші 3 нормалі:");
-        for (int i = 0; i < 9; i += 3)
+        var rlModels = new List<Model>();
+        foreach (var mesh in meshes)
         {
-            Console.WriteLine(
-                $"  {rayLibMesh.Normals[i]:F3}, {rayLibMesh.Normals[i + 1]:F3}, {rayLibMesh.Normals[i + 2]:F3}");
+            var rayLibMesh = CreateRaylibMesh(mesh.Vertices, mesh.Triangles, mesh.Normals);
+            var model = Raylib.LoadModelFromMesh(rayLibMesh);
+            rlModels.Add(model);
         }
-
+        Console.WriteLine($"Етап 4. Конвертація в рейліб: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
+        sw.Stop();
         Raylib.SetWindowState(ConfigFlags.ResizableWindow);
 
         Raylib.DisableCursor();
@@ -59,8 +57,8 @@ public class Program
             FovY = 45,
             Projection = CameraProjection.Perspective
         };
-        
-        
+
+
         try
         {
             while (!Raylib.WindowShouldClose())
@@ -68,21 +66,33 @@ public class Program
                 Raylib.UpdateCamera(ref camera, CameraMode.Free);
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.SkyBlue);
-    
+
                 Raylib.BeginMode3D(camera);
-                Raylib.DrawModel(model, chunkRenderPosition, scale, Color.White);
+
+                for (int i = 0; i < rlModels.Count; i++)
+                {
+                    var model = rlModels[i];
+                    var mesh = meshes[i];
+                    var position = chunkRenderPosition + mesh.PositionOffset;
+                    Raylib.DrawModel(model, chunkRenderPosition, scale, Color.White);
+                }
+
                 // Raylib.DrawModel(model2, Vector3.Zero, 1.0f, Color.Black);
                 Raylib.DrawGrid(100, 1.0f);
                 Raylib.EndMode3D();
-    
+
                 Raylib.DrawFPS(10, 10);
                 Raylib.EndDrawing();
             }
         }
         finally
         {
-            Raylib.UnloadModel(model);
-            Raylib.UnloadModel(model2);
+            for (int i = 0; i < rlModels.Count; i++)
+            {
+                var model = rlModels[i];
+                Raylib.UnloadModel(model);
+            }
+
             Raylib.CloseWindow();
         }
     }
@@ -100,17 +110,16 @@ public class Program
         return mesh;
     }
 
-    public static Mesh GenerateMesh(Vector3Int chunkPosition)
+    public static List<Mesh> GenerateMesh(Vector3Int chunkPosition)
     {
         var chunk = new Chunk(chunkPosition);
 
         var fastNoise = new FastNoise(123);
         var heightMapGenerator = new HeightMapGenerator(fastNoise);
-        
-        
+
+
         var densityGenerator = new DensityGenerator(heightMapGenerator);
-        
-        
+
 
         var octreeBuilder = new OctreeBuilder(densityGenerator);
         var meshBuilder = new MeshBuilder();
@@ -118,11 +127,11 @@ public class Program
         var octree = octreeBuilder.Build(chunk);
 
         // PrintOctree();
-        
-        chunk.Octree = octree;
-        var mesh = meshBuilder.Build(octree);
 
-        return mesh;
+        chunk.Octree = octree;
+        var meshes = meshBuilder.BuildMeshList(octree);
+
+        return meshes;
 
         void PrintOctree()
         {
@@ -144,8 +153,10 @@ public class Program
                         var isSolid = node.IsSolid;
                         writer.Write(isSolid ? " 1 " : " · ");
                     }
+
                     writer.Write('\n');
                 }
+
                 writer.Write("\n\n");
             }
 
@@ -159,8 +170,6 @@ public class Program
         List<Vector3> normals
     )
     {
-        Console.WriteLine($"Vertices: {vertices.Count}, Triangles: {triangles.Count}, Normals: {normals.Count}");
-
         var mesh = new Raylib_cs.Mesh();
 
         mesh.VertexCount = vertices.Count;
