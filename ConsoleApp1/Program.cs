@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Text;
 using DotnetNoise;
 using Raylib_cs;
 using VoxelWorldEngine.Core.Builders;
@@ -125,11 +126,13 @@ public class Program
 
         void PrintOctree()
         {
-            var line = "";
+            // var sb = new StringBuilder(4000000); 
+
             var min = new Vector3Int(0, 0, 0);
-            var max = new Vector3Int(80, 80, 16);
-            
-            
+            var max = new Vector3Int(256, 256, 16);
+
+            using StreamWriter writer = new StreamWriter("here.txt");
+
             for (int z = min.Z; z < max.Z; z++)
             {
                 for (int x = min.X; x < max.X; x++)
@@ -139,15 +142,14 @@ public class Program
                         var position = new Vector3Int(x, y, z);
                         var node = octree.GetNode(position);
                         var isSolid = node.IsSolid;
-                        line += isSolid ? " 1 " : " · ";
+                        writer.Write(isSolid ? " 1 " : " · ");
                     }
-                    line += "\n";
+                    writer.Write('\n');
                 }
-                line += "\n\n";
+                writer.Write("\n\n");
             }
 
-            Console.WriteLine(line);
-
+            // Console.WriteLine(sb.ToString());
         }
     }
 

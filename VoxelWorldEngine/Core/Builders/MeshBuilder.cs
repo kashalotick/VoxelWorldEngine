@@ -23,6 +23,7 @@ public class MeshBuilder
         var rootMeshNode = new MeshNode(octree.RootIndex, LinearOctree.Size, Vector3Int.Zero);
         queue.Enqueue(rootMeshNode);
 
+        var voxelCount1 = 0;
         while (queue.Count > 0)
         {
             var meshNode = queue.Dequeue();
@@ -30,6 +31,10 @@ public class MeshBuilder
 
             if (octreeNode.IsLeaf)
             {
+                if (meshNode.Size == 1 && octreeNode.IsSolid)
+                {
+                    voxelCount1++;
+                }
                 ProcessLeaf(meshNode, octree, mesh);
             }
             else
@@ -38,7 +43,8 @@ public class MeshBuilder
                 {
                     var childIndex = octreeNode.GetChildIndex(i);
                     var childSize = meshNode.Size >> 1;
-                    var localOffset = OctreeMath.GetOctantCorner(i, meshNode.Size);
+                    
+                    var localOffset = OctreeMath.GetOctantCorner(i, childSize);
                     var position = meshNode.Position + localOffset;
 
                     var childMeshNode = new MeshNode(childIndex, childSize, position);
@@ -46,6 +52,8 @@ public class MeshBuilder
                 }
             }
         }
+
+        Console.WriteLine(voxelCount1);
 
         return mesh;
     }
@@ -56,6 +64,7 @@ public class MeshBuilder
         var octreeNode = octree.GetNode(node.Index);
         if (octreeNode.IsAir) return;
 
+        
         foreach (var direction in _directions)
         {
             if (IsFaceVisible(node, direction, octree))
