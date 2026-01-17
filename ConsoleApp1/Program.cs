@@ -33,6 +33,7 @@ public class Program
         Console.WriteLine($"Етап 2. Генерація чанка та меша: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
 
         // return;
+        Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
         Raylib.InitWindow(1920, 1080, "Voxel Octree Project");
 
         Console.WriteLine($"Етап 3. Створення вікна: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **

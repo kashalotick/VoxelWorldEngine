@@ -12,8 +12,9 @@ public class HeightMapGenerator : IScalarFieldGenerator<Vector2Int, float>
 {
     
     private readonly FastNoise _noise;
-    private readonly float _multiplier;
-    
+    private const float Multiplier = 25f;
+    private const float Horizon = 0f;
+
     public HeightMapGenerator(FastNoise noise)
     {
         _noise = noise;
@@ -23,21 +24,19 @@ public class HeightMapGenerator : IScalarFieldGenerator<Vector2Int, float>
         _noise.Frequency = 0.01f;
         _noise.Gain = 0.5f;
         _noise.Lacunarity = 2f;
-        
-        _multiplier = 25f;
     }
 
     public float GetValue(Vector2Int position)
     {
         var height = _noise.GetNoise(position.X, position.Y);
 
-        return height * _multiplier;
+        return height * Multiplier + Horizon;
     }
 
     public (float min, float max) GetMinMax(Vector2Int a, Vector2Int b)
     {
         var height = _noise.GetNoiseMinMax(a, b);
-        return (height.min * _multiplier, height.max * _multiplier);
+        return (height.min * Multiplier + Horizon, height.max * Multiplier + Horizon);
     }
 
     public bool IsHereAnySurface(Vector2Int a, Vector2Int b)
