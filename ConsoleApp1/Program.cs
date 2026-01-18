@@ -41,7 +41,7 @@ public class Program
         // Console.WriteLine($"Етап 4. Конвертація в рейліб: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
         // sw.Stop();
 
-        var chunkRegion = GenerateChunkRegion(Vector3Int.Zero, 1);
+        var chunkRegion = GenerateChunkRegion(new Vector3Int(0, 0, 0), 2);
 
 
         Raylib.SetWindowState(ConfigFlags.ResizableWindow);
@@ -112,7 +112,7 @@ public class Program
             for (int i = 0; i < RayLibModels.Count; i++)
             {
                 var chunk = Chunks[i];
-                var chunkRenderPosition = chunk.Position.ToVector3() * LinearOctree.Size * Scale;
+                var chunkRenderPosition = chunk.Position.ToVector3() * LinearOctree.Size;
 
                 for (int j = 0; j < RayLibModels[i].Count; j++)
                 {
