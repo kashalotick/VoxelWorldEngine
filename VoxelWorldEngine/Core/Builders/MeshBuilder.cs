@@ -9,8 +9,8 @@ namespace VoxelWorldEngine.Core.Builders;
 public class MeshBuilder
 {
     public const int SubMeshResolution = 16;
-    
-    
+
+
     private Vector3Int[] _directions =
     [
         Vector3Int.UnitX, Vector3Int.UnitY, Vector3Int.UnitZ,
@@ -34,7 +34,7 @@ public class MeshBuilder
             {
                 continue;
             }
-            
+
             if (meshNode.Size == SubMeshResolution)
             {
                 var submesh = CreateSubmesh(meshNode, octree);
@@ -46,7 +46,7 @@ public class MeshBuilder
                 {
                     var childIndex = octreeNode.GetChildIndex(i);
                     var childSize = meshNode.Size >> 1;
-                    
+
                     var localOffset = OctreeMath.GetOctantCorner(i, meshNode.Size);
                     var position = meshNode.Position + localOffset;
 
@@ -55,9 +55,47 @@ public class MeshBuilder
                 }
             }
         }
-        
-        
+        meshList = BuildMergedMeshList(meshList);
+
         return meshList;
+    }
+
+    private List<Mesh> BuildMergedMeshList(List<Mesh> meshList)
+    {
+        var mergedMeshList = new List<Mesh>();
+
+        var batch = new Mesh(Vector3Int.Zero);
+        mergedMeshList.Add(batch);
+
+        var maxVertices = ushort.MaxValue - 4;
+
+        foreach (var mesh in meshList)
+        {
+            if (batch.Vertices.Count + mesh.Vertices.Count > maxVertices)
+            {
+                batch = new Mesh(Vector3Int.Zero);
+                mergedMeshList.Add(batch);
+            }
+            MergeMesh(mesh, batch);
+        }
+
+        return mergedMeshList;
+    }
+
+    private void MergeMesh(Mesh mesh, Mesh batch)
+    {
+        var startIndex = batch.Vertices.Count;
+        foreach (var vertex in mesh.Vertices)
+        {
+            batch.Vertices.Add(vertex + mesh.PositionOffset);
+        }
+
+        foreach (var index in mesh.Triangles)
+        {
+            batch.Triangles.Add(startIndex + index);
+        }
+
+        batch.Normals.AddRange(mesh.Normals);
     }
 
     private Mesh CreateSubmesh(MeshNode node, LinearOctree octree)
@@ -65,9 +103,9 @@ public class MeshBuilder
         var nodeQueue = new Queue<MeshNode>();
         var positionOffset = node.Position;
         var mesh = new Mesh(positionOffset);
-        
+
         nodeQueue.Enqueue(node);
-        
+
         while (nodeQueue.Count > 0)
         {
             var meshNode = nodeQueue.Dequeue();
@@ -82,7 +120,7 @@ public class MeshBuilder
                 {
                     var childIndex = octreeNode.GetChildIndex(i);
                     var childSize = meshNode.Size >> 1;
-                    
+
                     var localOffset = OctreeMath.GetOctantCorner(i, meshNode.Size);
                     var position = meshNode.Position + localOffset;
 
@@ -91,7 +129,7 @@ public class MeshBuilder
                 }
             }
         }
-        
+
         return mesh;
     }
 
@@ -126,9 +164,8 @@ public class MeshBuilder
 
                     var childMeshNode = new MeshNode(childIndex, childSize, position);
 
-       
+
                     queue.Enqueue(childMeshNode);
-                    
                 }
             }
         }
