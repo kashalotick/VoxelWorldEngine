@@ -25,7 +25,8 @@ public class Program
     public static unsafe void Run()
     {
         Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
-        
+        Raylib.InitWindow(1920, 1080, "Voxel Octree Project");
+
         // TODO: move to chunk region;
         // var sw = Stopwatch.StartNew(); //**
         //
@@ -33,16 +34,16 @@ public class Program
         // Console.WriteLine($"Етап 2. Генерація чанка та меша: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
         //
         // // return;
-        // Raylib.InitWindow(1920, 1080, "Voxel Octree Project");
         //
         // Console.WriteLine($"Етап 3. Створення вікна: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
         //
         //
         // Console.WriteLine($"Етап 4. Конвертація в рейліб: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
         // sw.Stop();
-        
-        
-        
+
+        var chunkRegion = GenerateChunkRegion(Vector3Int.Zero, 1);
+
+
         Raylib.SetWindowState(ConfigFlags.ResizableWindow);
 
         Raylib.DisableCursor();
@@ -67,7 +68,7 @@ public class Program
 
                 Raylib.BeginMode3D(camera);
 
-                // chunkRegion.Draw();
+                chunkRegion.Draw();
 
                 // Raylib.DrawModel(model2, Vector3.Zero, 1.0f, Color.Black);
                 Raylib.DrawGrid(100, 1.0f);
@@ -79,7 +80,7 @@ public class Program
         }
         finally
         {
-            // chunkRegion.Unload();
+            chunkRegion.Unload();
 
             Raylib.CloseWindow();
         }
@@ -101,7 +102,7 @@ public class Program
     public class ChunkRegion
     {
         public const float Scale = 0.25f;
-        
+
         public List<Chunk> Chunks = [];
         public List<List<Model>> RayLibModels = [];
         public List<List<Mesh>> Meshes = [];
@@ -113,15 +114,14 @@ public class Program
                 var chunk = Chunks[i];
                 var chunkRenderPosition = chunk.Position.ToVector3() * LinearOctree.Size * Scale;
 
-                for (int j = 0; j < RayLibModels.Count; j++)
+                for (int j = 0; j < RayLibModels[i].Count; j++)
                 {
                     var model = RayLibModels[i][j];
                     var mesh = Meshes[i][j];
-                    var position = chunkRenderPosition  + mesh.PositionOffset;
+                    var position = chunkRenderPosition + mesh.PositionOffset;
                     Raylib.DrawModel(model, position * Scale, Scale, Color.White);
                 }
             }
-           
         }
 
         public void Unload()
@@ -143,25 +143,31 @@ public class Program
         radius -= 1;
 
         var chunkCounter = 0;
-        for (int x = -radius; x < radius; x++)
-        for (int y = -radius; y < radius; y++)
+        for (int x = -radius; x < radius + 1; x++)
+        for (int y = -radius; y < radius + 1; y++)
         {
             var position = observer + new Vector3Int(x, y, 0);
             var chunk = new Chunk(position);
             chunkRegion.Chunks.Add(chunk);
+            chunkRegion.Meshes.Add([]);
+            chunkRegion.RayLibModels.Add([]);
 
             var meshes = GenerateMesh(position);
             foreach (var mesh in meshes)
             {
                 var rayLibMesh = CreateRaylibMesh(mesh.Vertices, mesh.Triangles, mesh.Normals);
                 var model = Raylib.LoadModelFromMesh(rayLibMesh);
+         
+                chunkRegion.Meshes[chunkCounter].Add(mesh);
                 chunkRegion.RayLibModels[chunkCounter].Add(model);
             }
-            
+
             chunkCounter++;
         }
+
+        Console.WriteLine(chunkRegion.Meshes[0].Count);
+        Console.WriteLine(chunkCounter);
         return chunkRegion;
-        
     }
 
     public static List<Mesh> GenerateMesh(Vector3Int chunkPosition)
