@@ -80,3 +80,35 @@ public class LinearOctreeIterator : IEnumerator<LinearOctreeNode>, IEnumerable<L
         return GetEnumerator();
     }
 }
+public class LinearOctreeIterator123(LinearOctree octree)
+{
+    public IEnumerable<ExtendedLinearOctreeNode> ExtendedBreadthFirst()
+    {
+        const int children = 8;
+
+        var queue = new Queue<ExtendedLinearOctreeNode>();
+        var extendedNodeRoot
+            = new ExtendedLinearOctreeNode(octree.Root, octree.RootIndex, 1, Vector3Int.Vector3Int.Zero);
+
+        queue.Enqueue(extendedNodeRoot);
+
+        while (queue.Count > 0)
+        {
+            var extendedNode = queue.Dequeue();
+
+            if (extendedNode.Node.IsLeaf) yield return extendedNode;
+
+            for (int i = 0; i < children; i++)
+            {
+                var childIndex = extendedNode.Node.GetChildIndex(i);
+                var childNode = octree.GetNode(childIndex);
+                var childDepth = extendedNode.Depth + 1;
+                var childPosition = extendedNode.Position + OctreeMath.GetOctantCorner(i, 1 << childDepth);
+
+                var extendedNodeChild = new ExtendedLinearOctreeNode(childNode, childIndex, childDepth, childPosition);
+
+                queue.Enqueue(extendedNodeChild);
+            }
+        }
+    }
+}

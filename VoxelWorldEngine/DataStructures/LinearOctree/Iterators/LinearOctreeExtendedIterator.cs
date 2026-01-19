@@ -3,28 +3,28 @@ using VoxelWorldEngine.DataStructures.LinearOctree.Iterators.StorageAdapters;
 
 namespace VoxelWorldEngine.DataStructures.LinearOctree.Iterators;
 
-public class LinearOctreeExtendedIterator : IEnumerator<LinearOctreeNode>, IEnumerable<LinearOctreeNode>
+public class LinearOctreeExtendedIterator : IEnumerator<ExtendedLinearOctreeNode>, IEnumerable<ExtendedLinearOctreeNode>
 {
     private const int Children = 8;
 
     private readonly LinearOctree _octree;
-    private INodeStorageAdapter<int> _storage;
+    private INodeStorageAdapter<ExtendedLinearOctreeNode> _storage;
 
-    private LinearOctreeNode _current;
-    private LinearOctreeNode Current => _current;
+    private ExtendedLinearOctreeNode _current;
+    private ExtendedLinearOctreeNode Current => _current;
 
 
-    public static IEnumerator<LinearOctreeNode> GetBreathFirstIterator(LinearOctree octree)
+    public static IEnumerator<ExtendedLinearOctreeNode> GetBreathFirstIterator(LinearOctree octree)
     {
-        return new LinearOctreeExtendedIterator(octree, new QueueAdapter<int>());
+        return new LinearOctreeExtendedIterator(octree, new QueueAdapter<ExtendedLinearOctreeNode>());
     }
 
-    public IEnumerator<LinearOctreeNode> GetDepthFirstIterator(LinearOctree octree)
+    public IEnumerator<ExtendedLinearOctreeNode> GetDepthFirstIterator(LinearOctree octree)
     {
-        return new LinearOctreeExtendedIterator(octree, new StackAdapter<int>());
+        return new LinearOctreeExtendedIterator(octree, new StackAdapter<ExtendedLinearOctreeNode>());
     }
 
-    private LinearOctreeExtendedIterator(LinearOctree octree, INodeStorageAdapter<int> storageAdapter)
+    private LinearOctreeExtendedIterator(LinearOctree octree, INodeStorageAdapter<ExtendedLinearOctreeNode> storageAdapter)
     {
         _octree = octree;
         _storage = storageAdapter;
@@ -35,19 +35,24 @@ public class LinearOctreeExtendedIterator : IEnumerator<LinearOctreeNode>, IEnum
     {
         while (!_storage.IsEmpty())
         {
-            var index = _storage.GetAndRemove();
-            var node = _octree.GetNode(index);
+            var extendedNode = _storage.GetAndRemove();
 
-            if (node.IsLeaf)
+            if (extendedNode.Node.IsLeaf)
             {
-                _current = node;
+                _current = extendedNode;
                 return true;
             }
 
             for (int i = 0; i < Children; i++)
             {
-                var childIndex = node.GetChildIndex(i);
-                _storage.Add(childIndex);
+                var childIndex = extendedNode.Node.GetChildIndex(i);
+                var childNode = _octree.GetNode(childIndex);
+                var childDepth = extendedNode.Depth + 1;
+                var childPosition = extendedNode.Position + OctreeMath.GetOctantCorner(i, 1 << childDepth);
+
+                var extendedNodeChild = new ExtendedLinearOctreeNode(childNode, childIndex, childDepth, childPosition);
+
+                _storage.Add(extendedNodeChild);
             }
         }
 
@@ -57,11 +62,13 @@ public class LinearOctreeExtendedIterator : IEnumerator<LinearOctreeNode>, IEnum
     public void Reset()
     {
         _storage.Clear();
-        _storage.Add(_octree.RootIndex);
+        var extendedNodeRoot
+            = new ExtendedLinearOctreeNode(_octree.Root, _octree.RootIndex, 1, Vector3Int.Vector3Int.Zero);
+        _storage.Add(extendedNodeRoot);
         _current = default;
     }
 
-    LinearOctreeNode IEnumerator<LinearOctreeNode>.Current => _current;
+    ExtendedLinearOctreeNode IEnumerator<ExtendedLinearOctreeNode>.Current => _current;
 
     object IEnumerator.Current => _current;
 
@@ -70,7 +77,7 @@ public class LinearOctreeExtendedIterator : IEnumerator<LinearOctreeNode>, IEnum
         _storage.Clear();
     }
 
-    public IEnumerator<LinearOctreeNode> GetEnumerator()
+    public IEnumerator<ExtendedLinearOctreeNode> GetEnumerator()
     {
         return this;
     }
@@ -81,35 +88,3 @@ public class LinearOctreeExtendedIterator : IEnumerator<LinearOctreeNode>, IEnum
     }
 }
 
-public class LinearOctreeIterator123(LinearOctree octree)
-{
-    public IEnumerable<ExtendedLinearOctreeNode> ExtendedBreadthFirst()
-    {
-        const int children = 8;
-
-        var queue = new Queue<ExtendedLinearOctreeNode>();
-        var extendedNodeRoot
-            = new ExtendedLinearOctreeNode(octree.Root, octree.RootIndex, 1, Vector3Int.Vector3Int.Zero);
-
-        queue.Enqueue(extendedNodeRoot);
-
-        while (queue.Count > 0)
-        {
-            var extendedNode = queue.Dequeue();
-
-            if (extendedNode.Node.IsLeaf) yield return extendedNode;
-
-            for (int i = 0; i < children; i++)
-            {
-                var childIndex = extendedNode.Node.GetChildIndex(i);
-                var childNode = octree.GetNode(childIndex);
-                var childDepth = extendedNode.Depth + 1;
-                var childPosition = extendedNode.Position + OctreeMath.GetOctantCorner(i, 1 << childDepth);
-
-                var extendedNodeChild = new ExtendedLinearOctreeNode(childNode, childIndex, childDepth, childPosition);
-
-                queue.Enqueue(extendedNodeChild);
-            }
-        }
-    }
-}
