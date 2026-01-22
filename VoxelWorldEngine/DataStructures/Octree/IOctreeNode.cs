@@ -2,8 +2,12 @@
 
 public interface IOctreeNode
 {
-    IOctreeNode FindNode(Vector3Int.Vector3Int position);
-    void SetNodeData(Vector3Int.Vector3Int position, NodeData node);
+    NodeData Data { get; set; }
+    
+    IOctreeNode FindFirstLeaf(Vector3Int.Vector3Int position);
+    void SetFirstLeafData(Vector3Int.Vector3Int position, NodeData node);
+    
+    
     // void Subdivide();
     
     

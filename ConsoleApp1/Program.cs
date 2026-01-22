@@ -22,7 +22,7 @@ public class Program
         Run();
     }
 
-    public static unsafe void Run()
+    public static void Run()
     {
         Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
         Raylib.InitWindow(1920, 1080, "Voxel Octree Project");
