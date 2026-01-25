@@ -1,176 +1,169 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Text;
-using DotnetNoise;
-using Raylib_cs;
+﻿using DotnetNoise;
+using LearningOpenTK;
+using LearningOpenTK.Entities.UI;
+using LearningOpenTK.Entities.World;
+using LearningOpenTK.Entities.World.LightSources;
+using LearningOpenTK.Meshes;
+using LearningOpenTK.Resources;
+using LearningOpenTK.UI;
+using LearningOpenTK.Utils;
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using VoxelWorldEngine.Core.Builders;
 using VoxelWorldEngine.Core.Generators;
 using VoxelWorldEngine.DataStructures.Chunk;
-using VoxelWorldEngine.DataStructures.LinearOctree;
 using VoxelWorldEngine.DataStructures.Vector3Int;
-using Mesh = VoxelWorldEngine.DataStructures.Mesh.Mesh;
+using VoxelMesh = VoxelWorldEngine.DataStructures.Mesh.Mesh;
 
 namespace ConsoleApp1;
 
 public class Program
 {
-    private const int GLSL_VERSION = 330;
-
     public static void Main(string[] args)
     {
-        Run();
+        var game = new VoxelGame(1200, 900, "Voxel engine test");
+        game.Run();
     }
 
-    public static void Run()
+    public class VoxelGame(int width, int height, string title) : Game(width, height, title)
     {
-        Raylib.SetTraceLogLevel(TraceLogLevel.Warning);
-        Raylib.InitWindow(1920, 1080, "Voxel Octree Project");
-
-        // TODO: move to chunk region;
-        // var sw = Stopwatch.StartNew(); //**
-        //
-        // Console.WriteLine($"Етап 1. Початок: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
-        // Console.WriteLine($"Етап 2. Генерація чанка та меша: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
-        //
-        // // return;
-        //
-        // Console.WriteLine($"Етап 3. Створення вікна: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
-        //
-        //
-        // Console.WriteLine($"Етап 4. Конвертація в рейліб: {sw.ElapsedMilliseconds} мс"); sw.Restart(); // **
-        // sw.Stop();
-
-        var chunkRegion = GenerateChunkRegion(new Vector3Int(0, 0, 0), 2);
-
-
-        Raylib.SetWindowState(ConfigFlags.ResizableWindow);
-
-        Raylib.DisableCursor();
-        var camera = new Camera3D
+        protected override void OnLoad()
         {
-            Position = new Vector3(25, 15, 25),
-            Target = new Vector3(0, 0, 0),
-            Up = new Vector3(0, 0, 1),
-            FovY = 45,
-            Projection = CameraProjection.Perspective
-        };
+            DefaultOnLoad();
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.CullFace);
 
-        // Raylib.SetTargetFPS(165);
-
-        try
-        {
-            while (!Raylib.WindowShouldClose())
+            foreach (var gameObject in GameObjectLayout.GameObjects)
             {
-                Raylib.UpdateCamera(ref camera, CameraMode.Free);
-                Raylib.BeginDrawing();
-                Raylib.ClearBackground(Color.SkyBlue);
-
-                Raylib.BeginMode3D(camera);
-
-                chunkRegion.Draw();
-
-                // Raylib.DrawModel(model2, Vector3.Zero, 1.0f, Color.Black);
-                Raylib.DrawGrid(100, 1.0f);
-                Raylib.EndMode3D();
-
-                Raylib.DrawFPS(10, 10);
-                Raylib.EndDrawing();
+                gameObject.Load();
+                gameObject.Transform.Position /= 2;
             }
-        }
-        finally
-        {
-            chunkRegion.Unload();
+        
+            var shader = new Shader("shader");
+            var texture = new Texture("Diamond.png");
+            var generateWorldObjectList = GenerateWorldObjectList(shader, texture);
 
-            Raylib.CloseWindow();
+            foreach (var worldObject in generateWorldObjectList)
+            {
+                GameObjectLayout.GameObjects.Add(worldObject);
+
+                worldObject.Load();
+            }
+            
+            // Light Scene
+        
+            var sun = new Sun(shader, texture);
+            sun.Transform.Position = new Vector3(0, 10, 0);
+            sun.LightColor = new Vector3(1.0f, 1.0f, 0.95f);
+            sun.LightDirection = Vector3.Normalize(new Vector3(-1, -2, -1));
+        
+            shader.SetVector3("lightColor", sun.LightColor);
+            shader.SetVector3("lightDirection", sun.LightDirection);
+        
+            var ambientColor = new Vector4(0.95f, 0.95f, 1, 0.3f);
+            shader.SetVector4("ambientColor", ambientColor);
+            // UI
+
+            var rect = new Rect
+            {
+                Width = 16,
+                Height = 16,
+                Anchor = Align.Center,
+                Pivot = Align.Center,
+                Offset = new Vector2(0, 0),
+                Scale = 1
+            };
+            var shaderUi = new Shader("interface");
+            var textureUi = new Texture("Diamond.png");
+
+            var el = new UIObject(rect, shaderUi, textureUi, Size.X, Size.Y);
+            UiLayout.UIElements.Add(el);
+            foreach (var uiObject in UiLayout.UIElements)
+            {
+                uiObject.Load();
+            }
+        
+            InitCamera();
         }
     }
 
-    public static Mesh GenerateMeshHeightmap()
+    private static List<WorldObject> GenerateWorldObjectList(Shader shader, Texture texture)
     {
-        var heightmapMeshBuilder = new HeightMapMeshBuilder();
-        var hmMesh = heightmapMeshBuilder.RunFast();
-        var mesh = new Mesh(Vector3Int.Zero)
+        var chunkMeshes = GenerateVoxelMesh(new Vector3Int(0, 0, 0));
+        var worldObjectList = new List<WorldObject>();
+        foreach (var mesh in chunkMeshes)
         {
-            Vertices = hmMesh.vertices,
-            Triangles = hmMesh.triangles,
-            Normals = hmMesh.normals
-        };
+            var worldObject = CreateWorldObject(mesh, shader, texture);
+            worldObjectList.Add(worldObject);
+        }
+
+        return worldObjectList;
+    }
+
+
+    public static WorldObject CreateWorldObject(VoxelMesh voxelMesh, Shader shader, Texture texture)
+    {
+        var mesh = GenerateVoxelMesh(voxelMesh);
+        var obj = new WorldObject(mesh, shader, texture);
+        obj.Transform.Position = (Vector3)voxelMesh.PositionOffset;
+        obj.Transform.Position -= Vector3.UnitY * 10;
+        obj.Transform.Rotation = new Vector3(-MathHelper.PiOver2, 0, 0);
+        return obj;
+    }
+
+    private static WorldObjectMesh GenerateVoxelMesh(VoxelMesh voxelMesh)
+    {
+        const int stride = 11;
+        var vertices = new float[voxelMesh.Vertices.Count * stride];
+        for (int i = 0; i < vertices.Length; i += stride)
+        {
+            var normalizedIndex = i / stride;
+            var position = voxelMesh.Vertices[normalizedIndex];
+            var normal = voxelMesh.Normals[normalizedIndex];
+            var color = new Vector3(0.41f, 0.69f, 0.89f);
+            vertices[i] = position.X;
+            vertices[i+1] = position.Y;
+            vertices[i+2] = position.Z;
+            
+            vertices[i+3] = normal.X;
+            vertices[i+4] = normal.Y;
+            vertices[i+5] = normal.Z;
+            
+            vertices[i+6] = color.X;
+            vertices[i+7] = color.Y;
+            vertices[i+8] = color.Z;
+            
+            var uv = GetUv(i % 4);
+            
+            vertices[i+9] = uv.X;
+            vertices[i+10] = uv.X;
+        }
+        
+
+        var indices = new ushort[voxelMesh.Triangles.Count];
+        for (int i = 0; i < indices.Length; i++)
+        {
+            indices[i] = (ushort)voxelMesh.Triangles[i];
+        }
+
+        var mesh = new WorldObjectMesh(vertices, indices);
         return mesh;
-    }
 
-    public class ChunkRegion
-    {
-        public const float Scale = 0.25f;
-
-        public List<Chunk> Chunks = [];
-        public List<List<Model>> RayLibModels = [];
-        public List<List<Mesh>> Meshes = [];
-
-        public void Draw()
+        Vector2 GetUv(int localIndex)
         {
-            for (int i = 0; i < RayLibModels.Count; i++)
+            return localIndex switch
             {
-                var chunk = Chunks[i];
-                var chunkRenderPosition = chunk.Position.ToVector3() * LinearOctree.Size;
-
-                for (int j = 0; j < RayLibModels[i].Count; j++)
-                {
-                    var model = RayLibModels[i][j];
-                    var mesh = Meshes[i][j];
-                    var position = chunkRenderPosition + mesh.PositionOffset;
-                    Raylib.DrawModel(model, position * Scale, Scale, Color.White);
-                }
-            }
-        }
-
-        public void Unload()
-        {
-            for (int i = 0; i < RayLibModels.Count; i++)
-            {
-                var modelList = RayLibModels[i];
-                foreach (var model2 in modelList)
-                {
-                    Raylib.UnloadModel(model2);
-                }
-            }
+                0 => new Vector2(1, 1),
+                1 => new Vector2(0, 1),
+                2 => new Vector2(0, 0),
+                3 => new Vector2(1, 0),
+                _ => new Vector2(0, 0)
+            };
         }
     }
 
-    public static ChunkRegion GenerateChunkRegion(Vector3Int observer, int radius)
-    {
-        var chunkRegion = new ChunkRegion();
-        radius -= 1;
 
-        var chunkCounter = 0;
-        for (int x = -radius; x < radius + 1; x++)
-        for (int y = -radius; y < radius + 1; y++)
-        {
-            var position = observer + new Vector3Int(x, y, 0);
-            var chunk = new Chunk(position);
-            chunkRegion.Chunks.Add(chunk);
-            chunkRegion.Meshes.Add([]);
-            chunkRegion.RayLibModels.Add([]);
-
-            var meshes = GenerateMesh(position);
-            foreach (var mesh in meshes)
-            {
-                var rayLibMesh = CreateRaylibMesh(mesh.Vertices, mesh.Triangles, mesh.Normals);
-                var model = Raylib.LoadModelFromMesh(rayLibMesh);
-         
-                chunkRegion.Meshes[chunkCounter].Add(mesh);
-                chunkRegion.RayLibModels[chunkCounter].Add(model);
-            }
-
-            chunkCounter++;
-        }
-
-        Console.WriteLine(chunkRegion.Meshes[0].Count);
-        Console.WriteLine(chunkCounter);
-        return chunkRegion;
-    }
-
-    public static List<Mesh> GenerateMesh(Vector3Int chunkPosition)
+    public static List<VoxelMesh> GenerateVoxelMesh(Vector3Int chunkPosition)
     {
         var chunk = new Chunk(chunkPosition);
 
@@ -220,55 +213,6 @@ public class Program
 
                 writer.Write("\n\n");
             }
-
-            // Console.WriteLine(sb.ToString());
         }
-    }
-
-    public static unsafe Raylib_cs.Mesh CreateRaylibMesh(
-        List<Vector3> vertices,
-        List<int> triangles,
-        List<Vector3> normals
-    )
-    {
-        var mesh = new Raylib_cs.Mesh();
-
-        mesh.VertexCount = vertices.Count;
-        mesh.TriangleCount = triangles.Count / 3;
-
-        // Вертекси
-        mesh.Vertices = (float*)Marshal.AllocHGlobal((vertices.Count * 3 * sizeof(float)));
-        for (var i = 0; i < vertices.Count; i++)
-        {
-            mesh.Vertices[i * 3 + 0] = vertices[i].X;
-            mesh.Vertices[i * 3 + 1] = vertices[i].Y;
-            mesh.Vertices[i * 3 + 2] = vertices[i].Z;
-        }
-
-        // Індекси
-        mesh.Indices = (ushort*)Marshal.AllocHGlobal((triangles.Count * sizeof(ushort)));
-        for (var i = 0; i < triangles.Count; i++)
-        {
-            mesh.Indices[i] = (ushort)triangles[i];
-        }
-
-        // Нормалі
-        mesh.Normals = (float*)Marshal.AllocHGlobal((normals.Count * 3 * sizeof(float)));
-        for (var i = 0; i < normals.Count; i++)
-        {
-            mesh.Normals[i * 3 + 0] = normals[i].X;
-            mesh.Normals[i * 3 + 1] = normals[i].Y;
-            mesh.Normals[i * 3 + 2] = normals[i].Z;
-        }
-
-        // Додай texcoords (UV) - просто нулі
-        mesh.TexCoords = (float*)Marshal.AllocHGlobal((vertices.Count * 2 * sizeof(float)));
-        for (var i = 0; i < vertices.Count * 2; i++)
-        {
-            mesh.TexCoords[i] = 0f;
-        }
-
-        Raylib.UploadMesh(ref mesh, false);
-        return mesh;
     }
 }

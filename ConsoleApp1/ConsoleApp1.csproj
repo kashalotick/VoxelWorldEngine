@@ -9,11 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Rider\LearningOpenTK\LearningOpenTK\LearningOpenTK.csproj" />
         <ProjectReference Include="..\VoxelWorldEngine\VoxelWorldEngine.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Raylib-cs" Version="7.0.2" />
     </ItemGroup>
 
 </Project>
