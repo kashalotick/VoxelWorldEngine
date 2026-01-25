@@ -62,6 +62,8 @@ public class Program
         
             var ambientColor = new Vector4(0.95f, 0.95f, 1, 0.3f);
             shader.SetVector4("ambientColor", ambientColor);
+            var shininess = 64f;
+            shader.SetFloat("shininess", shininess);
             // UI
 
             var rect = new Rect
