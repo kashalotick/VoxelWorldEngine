@@ -1,5 +1,5 @@
 ﻿using DotnetNoise;
-using LearningOpenTK;
+using LearningOpenTK.Core;
 using LearningOpenTK.Entities.UI;
 using LearningOpenTK.Entities.World;
 using LearningOpenTK.Entities.World.LightSources;
@@ -21,75 +21,12 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var game = new VoxelGame(1200, 900, "Voxel engine test");
+        var game = new Game(1200, 900, "Voxel engine test");
+        game.SetDefaultScene((w, h, input) => new DemoScene(w, h, input, GenerateWorldObjectList));
         game.Run();
     }
 
-    public class VoxelGame(int width, int height, string title) : Game(width, height, title)
-    {
-        protected override void OnLoad()
-        {
-            DefaultOnLoad();
-            GL.Enable(EnableCap.DepthTest);
-            GL.Enable(EnableCap.CullFace);
-
-            foreach (var gameObject in GameObjectLayout.GameObjects)
-            {
-                gameObject.Load();
-                gameObject.Transform.Position /= 2;
-            }
-        
-            var shader = new Shader("shader");
-            var texture = new Texture("Diamond.png");
-            var generateWorldObjectList = GenerateWorldObjectList(shader, texture);
-
-            foreach (var worldObject in generateWorldObjectList)
-            {
-                GameObjectLayout.GameObjects.Add(worldObject);
-
-                worldObject.Load();
-            }
-            
-            // Light Scene
-        
-            var sun = new Sun(shader, texture);
-            sun.Transform.Position = new Vector3(0, 10, 0);
-            sun.LightColor = new Vector3(1.0f, 1.0f, 0.95f);
-            sun.LightDirection = Vector3.Normalize(new Vector3(-1, -2, -1));
-        
-            shader.SetVector3("lightColor", sun.LightColor);
-            shader.SetVector3("lightDirection", sun.LightDirection);
-        
-            var ambientColor = new Vector4(0.95f, 0.95f, 1, 0.3f);
-            shader.SetVector4("ambientColor", ambientColor);
-            var shininess = 64f;
-            shader.SetFloat("shininess", shininess);
-            // UI
-
-            var rect = new Rect
-            {
-                Width = 16,
-                Height = 16,
-                Anchor = Align.Center,
-                Pivot = Align.Center,
-                Offset = new Vector2(0, 0),
-                Scale = 1
-            };
-            var shaderUi = new Shader("interface");
-            var textureUi = new Texture("Diamond.png");
-
-            var el = new UIObject(rect, shaderUi, textureUi, Size.X, Size.Y);
-            UiLayout.UIElements.Add(el);
-            foreach (var uiObject in UiLayout.UIElements)
-            {
-                uiObject.Load();
-            }
-        
-            InitCamera();
-        }
-    }
-
-    private static List<WorldObject> GenerateWorldObjectList(Shader shader, Texture texture)
+    public static List<WorldObject> GenerateWorldObjectList(Shader shader, Texture texture)
     {
         var chunkMeshes = GenerateVoxelMesh(new Vector3Int(0, 0, 0));
         var worldObjectList = new List<WorldObject>();

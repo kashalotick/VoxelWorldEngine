@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Rider\LearningOpenTK\LearningOpenTK\LearningOpenTK.csproj" />
+        <ProjectReference Include="..\..\LearningOpenTK\LearningOpenTK\LearningOpenTK.csproj" />
         <ProjectReference Include="..\VoxelWorldEngine\VoxelWorldEngine.csproj"/>
     </ItemGroup>
 
