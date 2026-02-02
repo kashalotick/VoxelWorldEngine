@@ -1,4 +1,5 @@
 ﻿using LearningOpenTK;
+using LearningOpenTK.Content;
 using LearningOpenTK.Content.Scenes;
 using LearningOpenTK.Core;
 using LearningOpenTK.Entities.World;
@@ -23,10 +24,10 @@ public class DemoScene : TestScene
         GL.Enable(EnableCap.CullFace);
 
         
-        _camera = new Camera(new Vector3(1, 2, 3), Size.X / Size.Y); // TODO: make injection for position
-        _controller = new CameraController(_inputProvider, _camera);
+        FpvCamera = new FPVCamera(new Vector3(1, 2, 3), Size.X / Size.Y); // TODO: make injection for position
+        _controller = new CameraController(_inputProvider, FpvCamera);
 
-        _camera.LookAt(Vector3.Zero);
+        FpvCamera.LookAt(Vector3.Zero);
 
 
         
