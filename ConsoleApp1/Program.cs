@@ -42,7 +42,7 @@ public class Program
 
     public static WorldObject CreateWorldObject(VoxelMesh voxelMesh, Shader shader, Texture texture)
     {
-        var mesh = GenerateVoxelMesh(voxelMesh);
+        var mesh = ConvertToGameMesh(voxelMesh);
         var obj = new WorldObject(mesh, shader, texture);
         obj.Transform.Position = (Vector3)voxelMesh.PositionOffset;
         obj.Transform.Position -= Vector3.UnitY * 10;
@@ -50,7 +50,7 @@ public class Program
         return obj;
     }
 
-    private static WorldObjectMesh GenerateVoxelMesh(VoxelMesh voxelMesh)
+    private static WorldObjectMesh ConvertToGameMesh(VoxelMesh voxelMesh)
     {
         const int stride = 11;
         var vertices = new float[voxelMesh.Vertices.Count * stride];

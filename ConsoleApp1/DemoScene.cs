@@ -1,5 +1,4 @@
-﻿using LearningOpenTK;
-using LearningOpenTK.Content;
+﻿using LearningOpenTK.Content;
 using LearningOpenTK.Content.Scenes;
 using LearningOpenTK.Core;
 using LearningOpenTK.Entities.World;
@@ -7,12 +6,18 @@ using LearningOpenTK.Entities.World.LightSources;
 using LearningOpenTK.Resources;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
+using VoxelWorldEngine.Core;
+using VoxelWorldEngine.Core.Worlds;
+using VoxelWorldEngine.DataStructures.Vector3Int;
 
 namespace ConsoleApp1;
 
 public class DemoScene : TestScene
 {
     public Func<Shader, Texture, List<WorldObject>> Genmesh;
+    private ChunkLoadingSystem _chunkLoadingSystem; // temp
+    private Player _player; // temp
+
     public DemoScene(float screenWidth, float screenHeight, InputProvider inputProvider, Func<Shader, Texture, List<WorldObject>> genMesh) : base(screenWidth, screenHeight, inputProvider)
     {
         Genmesh = genMesh;
@@ -54,6 +59,17 @@ public class DemoScene : TestScene
         shader.SetVector4("ambientColor", ambientColor);
         var shininess = 64f;
         shader.SetFloat("shininess", shininess);
-        
+
+        var world = new World(new Seed());
+        _player = new Player();
+        _chunkLoadingSystem = new ChunkLoadingSystem(world, _player);
+    }
+
+    public override void FixedUpdate(double deltaTime)
+    {
+        base.FixedUpdate(deltaTime);
+        _player.Transform.Position = FpvCamera.Position;
+
+        _chunkLoadingSystem.FixedUpdate(deltaTime);
     }
 }
