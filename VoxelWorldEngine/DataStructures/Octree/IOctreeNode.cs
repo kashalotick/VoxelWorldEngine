@@ -1,14 +1,28 @@
 ﻿namespace VoxelWorldEngine.DataStructures.Octree;
 
-public interface IOctreeNode
+public interface IOctreeNode<T>
 {
-    NodeData Data { get; set; }
+    int MaxDepth { get; }
+    int Depth { get; set; }
+    bool IsLeaf { get; }
     
-    IOctreeNode FindFirstLeaf(Vector3Int.Vector3Int position);
-    void SetFirstLeafData(Vector3Int.Vector3Int position, NodeData node);
+    T Data { get; set; }
+
     
     
-    // void Subdivide();
+    void Insert(int octant, IOctreeNode<T> node);
+    void Remove(int octant);
+    
+    
+    
+    // IOctreeNode<T> FindNode();
+    //
+    // IOctreeNode<T> FindFirstLeaf(Vector3Int.Vector3Int position);
+    // // void SetFirstLeafData(Vector3Int.Vector3Int position, NodeData data);
+    
+    
     
     
 }
+
+// TODO: separate to IN and OUT interface
