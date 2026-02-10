@@ -9,7 +9,7 @@ namespace VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 /// </summary>
 public static class ChunkMath
 {
-    private static int ChunkSize => LinearOctree.LinearOctree.Size;
+    private static int ChunkSize => Constants.ChunkSize;
 
     /// <summary>
     ///     Convert the global position into the position of 0's chunk corner (0,0,0 local).

@@ -13,7 +13,7 @@ using VoxelWorldEngine.Core.Builders;
 using VoxelWorldEngine.Core.Generators;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
-using VoxelMesh = VoxelWorldEngine.DataStructures.Special.Collections.Mesh.Mesh;
+using VoxelMesh = VoxelWorldEngine.DataStructures.Special.Collections.Meshes.Mesh;
 
 namespace ConsoleApp1;
 

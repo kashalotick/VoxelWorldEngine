@@ -11,9 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="DataStructures\Common\Collections\Trees\LineraImplementation\" />
         <Folder Include="DataStructures\Common\Structures\"/>
-        <Folder Include="DataStructures\OldForRefactor\" />
-        <Folder Include="DataStructures\Special\Collections\"/>
         <Folder Include="DataStructures\Special\Structures\"/>
     </ItemGroup>
 

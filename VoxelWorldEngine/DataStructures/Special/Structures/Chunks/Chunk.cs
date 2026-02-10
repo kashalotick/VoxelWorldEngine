@@ -1,5 +1,7 @@
-﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Collections.Mesh;
+﻿using VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
+using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
+using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
 
 namespace VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
@@ -7,7 +9,7 @@ namespace VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 public class Chunk
 {
     public List<Mesh> Meshes;
-    public LinearOctree.LinearOctree Octree;
+    public VoxelOctree Octree;
 
     public Vector3Int Position;
 
@@ -16,7 +18,7 @@ public class Chunk
         Position = position;
     }
 
-    public void SetOctree(LinearOctree.LinearOctree octree)
+    public void SetOctree(VoxelOctree octree)
     {
         Octree = octree;
     }

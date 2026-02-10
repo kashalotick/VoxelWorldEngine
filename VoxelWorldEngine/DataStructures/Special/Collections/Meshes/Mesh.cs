@@ -2,7 +2,7 @@
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.Utils;
 
-namespace VoxelWorldEngine.DataStructures.Special.Collections.Mesh;
+namespace VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 
 public class Mesh
 {
