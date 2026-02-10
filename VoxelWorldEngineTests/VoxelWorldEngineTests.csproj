@@ -32,4 +32,8 @@
         <ProjectReference Include="..\VoxelWorldEngine\VoxelWorldEngine.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="DataStructures\Common\Structures\" />
+    </ItemGroup>
+
 </Project>

@@ -1,4 +1,6 @@
-﻿namespace VoxelWorldEngineTests.DataStructures.Vector3Int;
+﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+
+namespace VoxelWorldEngineTests.DataStructures.Common.Structures.Vectors;
 
 [TestFixture]
 public class Vector3IntTest
@@ -6,7 +8,7 @@ public class Vector3IntTest
     [Test]
     public void Constructor_WithSingleValue_SetsAllFields()
     {
-        var vector = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10);
+        var vector = new Vector3Int(10);
 
         Assert.Multiple(() =>
         {
@@ -19,7 +21,7 @@ public class Vector3IntTest
     [Test]
     public void Constructor_WithThreeValues_SetsFieldsCorrectly()
     {
-        var vector = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 2, 3);
+        var vector = new Vector3Int(1, 2, 3);
 
         Assert.Multiple(() =>
         {
@@ -34,15 +36,15 @@ public class Vector3IntTest
     {
         Assert.Multiple(() =>
         {
-            Assert.That(VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int.Zero, Is.EqualTo(new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(0, 0, 0)));
-            Assert.That(VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int.One, Is.EqualTo(new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 1, 1)));
+            Assert.That(Vector3Int.Zero, Is.EqualTo(new Vector3Int(0, 0, 0)));
+            Assert.That(Vector3Int.One, Is.EqualTo(new Vector3Int(1, 1, 1)));
         });
     }
 
     [Test]
     public void Constant_Count_IsThree()
     {
-        Assert.That(VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int.Count, Is.EqualTo(3));
+        Assert.That(Vector3Int.Count, Is.EqualTo(3));
     }
 
     [TestCase(3, 4, 0, ExpectedResult = 25)]
@@ -50,20 +52,20 @@ public class Vector3IntTest
     [TestCase(0, 0, 0, ExpectedResult = 0)]
     public int LengthSquared_Calculates_CorrectValue(int x, int y, int z)
     {
-        return new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x, y, z).LengthSquared();
+        return new Vector3Int(x, y, z).LengthSquared();
     }
 
     [TestCase(3, 4, 0, ExpectedResult = 5.0f)]
     [TestCase(0, 0, 0, ExpectedResult = 0.0f)]
     public float Length_Calculates_CorrectValue(int x, int y, int z)
     {
-        return new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x, y, z).Length();
+        return new Vector3Int(x, y, z).Length();
     }
 
     [TestCase(1, 2, 3, 4, 5, 6, ExpectedResult = 27)] // (1-4)^2 + (2-5)^2 + (3-6)^2 = 9+9+9
     public int DistanceSquared_Calculates_CorrectValue(int x1, int y1, int z1, int x2, int y2, int z2)
     {
-        return VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int.DistanceSquared(new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x1, y1, z1), new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x2, y2, z2));
+        return Vector3Int.DistanceSquared(new Vector3Int(x1, y1, z1), new Vector3Int(x2, y2, z2));
     }
 
     [TestCase(1, 2, 2, 1, 1, 1, ExpectedResult = 5)] // 1*1 + 2*1 + 2*1 = 5
@@ -71,22 +73,22 @@ public class Vector3IntTest
     [TestCase(1, 0, 0, 0, 1, 0, ExpectedResult = 0)] // Перпендикулярні вектори
     public int Dot_Calculates_CorrectValue(int x1, int y1, int z1, int x2, int y2, int z2)
     {
-        return VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int.Dot(new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x1, y1, z1), new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x2, y2, z2));
+        return Vector3Int.Dot(new Vector3Int(x1, y1, z1), new Vector3Int(x2, y2, z2));
     }
 
     [TestCase(-1, 2, -3, 1, 2, 3)]
     [TestCase(0, 0, 0, 0, 0, 0)]
     public void Abs_Returns_PositiveValues(int x, int y, int z, int ex, int ey, int ez)
     {
-        var result = VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int.Abs(new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x, y, z));
-        Assert.That(result, Is.EqualTo(new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(ex, ey, ez)));
+        var result = Vector3Int.Abs(new Vector3Int(x, y, z));
+        Assert.That(result, Is.EqualTo(new Vector3Int(ex, ey, ez)));
     }
 
     [Test]
     public void Equals_SameValues_ReturnsTrue()
     {
-        var v1 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 2, 3);
-        var v2 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 2, 3);
+        var v1 = new Vector3Int(1, 2, 3);
+        var v2 = new Vector3Int(1, 2, 3);
 
         Assert.Multiple(() =>
         {
@@ -102,8 +104,8 @@ public class Vector3IntTest
     [TestCase(1, 2, 3, 1, 2, 0)]
     public void Equals_DifferentValues_ReturnsFalse(int x1, int y1, int z1, int x2, int y2, int z2)
     {
-        var v1 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x1, y1, z1);
-        var v2 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x2, y2, z2);
+        var v1 = new Vector3Int(x1, y1, z1);
+        var v2 = new Vector3Int(x2, y2, z2);
 
         Assert.Multiple(() =>
         {
@@ -116,9 +118,9 @@ public class Vector3IntTest
     [Test]
     public void Addition_Calculates_CorrectValue()
     {
-        var v1 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 2, 3);
-        var v2 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10, 20, 30);
-        var expected = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(11, 22, 33);
+        var v1 = new Vector3Int(1, 2, 3);
+        var v2 = new Vector3Int(10, 20, 30);
+        var expected = new Vector3Int(11, 22, 33);
 
         Assert.That(v1 + v2, Is.EqualTo(expected));
     }
@@ -126,9 +128,9 @@ public class Vector3IntTest
     [Test]
     public void Subtraction_Calculates_CorrectValue()
     {
-        var v1 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10, 20, 30);
-        var v2 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 2, 3);
-        var expected = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(9, 18, 27);
+        var v1 = new Vector3Int(10, 20, 30);
+        var v2 = new Vector3Int(1, 2, 3);
+        var expected = new Vector3Int(9, 18, 27);
 
         Assert.That(v1 - v2, Is.EqualTo(expected));
     }
@@ -136,8 +138,8 @@ public class Vector3IntTest
     [Test]
     public void UnaryNegation_Returns_InvertedVector()
     {
-        var v = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, -2, 3);
-        Assert.That(-v, Is.EqualTo(new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(-1, 2, -3)));
+        var v = new Vector3Int(1, -2, 3);
+        Assert.That(-v, Is.EqualTo(new Vector3Int(-1, 2, -3)));
     }
 
     [TestFixture]
@@ -146,9 +148,9 @@ public class Vector3IntTest
         [Test]
         public void VectorByVector_Calculates_CorrectValue()
         {
-            var v1 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(2, 3, 4);
-            var v2 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(5, 6, 7);
-            var expected = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10, 18, 28);
+            var v1 = new Vector3Int(2, 3, 4);
+            var v2 = new Vector3Int(5, 6, 7);
+            var expected = new Vector3Int(10, 18, 28);
 
             Assert.That(v1 * v2, Is.EqualTo(expected));
         }
@@ -156,9 +158,9 @@ public class Vector3IntTest
         [Test]
         public void VectorByInt_Calculates_CorrectValue()
         {
-            var v = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 2, 3);
+            var v = new Vector3Int(1, 2, 3);
             var multiplier = 10;
-            var expected = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10, 20, 30);
+            var expected = new Vector3Int(10, 20, 30);
 
             Assert.That(v * multiplier, Is.EqualTo(expected));
         }
@@ -166,9 +168,9 @@ public class Vector3IntTest
         [Test]
         public void IntByVector_Calculates_CorrectValue()
         {
-            var v = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 2, 3);
+            var v = new Vector3Int(1, 2, 3);
             var multiplier = 10;
-            var expected = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10, 20, 30);
+            var expected = new Vector3Int(10, 20, 30);
 
             Assert.That(multiplier * v, Is.EqualTo(expected));
         }
@@ -180,9 +182,9 @@ public class Vector3IntTest
         [Test]
         public void VectorByVector_Calculates_CorrectValue()
         {
-            var v1 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10, 20, 30);
-            var v2 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(2, 5, 3);
-            var expected = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(5, 4, 10);
+            var v1 = new Vector3Int(10, 20, 30);
+            var v2 = new Vector3Int(2, 5, 3);
+            var expected = new Vector3Int(5, 4, 10);
 
             Assert.That(v1 / v2, Is.EqualTo(expected));
         }
@@ -190,9 +192,9 @@ public class Vector3IntTest
         [Test]
         public void VectorByInt_Calculates_CorrectValue()
         {
-            var v1 = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10, 20, 30);
+            var v1 = new Vector3Int(10, 20, 30);
             var divisor = 10;
-            var expected = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(1, 2, 3);
+            var expected = new Vector3Int(1, 2, 3);
 
             Assert.That(v1 / divisor, Is.EqualTo(expected));
         }
