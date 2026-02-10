@@ -1,4 +1,6 @@
-﻿namespace VoxelWorldEngine.DataStructures.LinearOctree;
+﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+
+namespace VoxelWorldEngine.DataStructures.LinearOctree;
 
 /// <summary>
 ///     Class for working with octree data structure. Provides methods for calculating octant index and position the octant. Octant indices are 0-7 in order 0b_ZYX.
@@ -11,7 +13,7 @@ public static class OctreeMath
     /// <param name="position">Local position in octree 0-size.</param>
     /// <param name="size">Size of octree. Power of 2.</param>
     /// <returns>0-7 octant index.</returns>
-    public static int GetOctant(Vector3Int.Vector3Int position, int size)
+    public static int GetOctant(Vector3Int position, int size)
     {
         var halfSize = size >> 1;
         var octant = 0;
@@ -29,11 +31,11 @@ public static class OctreeMath
     /// <param name="octant">0-7 octant index</param>
     /// <param name="size">Size of octree. Power of 2.</param>
     /// <returns>Position</returns>
-    public static Vector3Int.Vector3Int GetOctantCorner(int octant, int size)
+    public static Vector3Int GetOctantCorner(int octant, int size)
     {
         var halfSize = size >> 1;
         
-        return new Vector3Int.Vector3Int(
+        return new Vector3Int(
             (octant & 1) != 0 ? halfSize : 0, // x
             (octant & 2) != 0 ? halfSize : 0, // y
             (octant & 4) != 0 ? halfSize : 0  // z
@@ -47,7 +49,7 @@ public static class OctreeMath
     /// <param name="position">Local position in octree 0-size.</param>
     /// <param name="size">Size of octree. Power of 2.</param>
     /// <returns>Array of octant indices way to position</returns>
-    public static int[] FindWayTo(Vector3Int.Vector3Int position, int size)
+    public static int[] FindWayTo(Vector3Int position, int size)
     {
         var depth = int.Log2(size);
         var way = new int[depth];
