@@ -1,4 +1,4 @@
-﻿namespace VoxelWorldEngine.DataStructures.Vector2Int;
+﻿namespace VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
 public partial struct Vector2Int
 {
@@ -24,9 +24,14 @@ public partial struct Vector2Int
     public static Vector2Int UnitX => new(1, 0);
     public static Vector2Int UnitY => new(0, 1);
 
-    
 
-    public override int GetHashCode() => HashCode.Combine(X, Y);
-    public override string ToString() => $"{X}, {Y}";
-    
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(X, Y);
+    }
+
+    public override string ToString()
+    {
+        return $"{X}, {Y}";
+    }
 }

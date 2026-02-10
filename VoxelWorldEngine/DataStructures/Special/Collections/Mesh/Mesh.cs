@@ -1,16 +1,17 @@
 ﻿using System.Numerics;
+using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.Utils;
 
-namespace VoxelWorldEngine.DataStructures.Mesh;
+namespace VoxelWorldEngine.DataStructures.Special.Collections.Mesh;
 
 public class Mesh
 {
-    public Vector3 PositionOffset;
-    public List<Vector3> Vertices;
     public List<Vector3> Normals;
+    public Vector3 PositionOffset;
     public List<int> Triangles;
+    public List<Vector3> Vertices;
 
-    public Mesh(Vector3Int.Vector3Int positionOffset)
+    public Mesh(Vector3Int positionOffset)
     {
         PositionOffset = positionOffset.ToVector3();
         Vertices = [];
@@ -18,33 +19,32 @@ public class Mesh
         Triangles = [];
     }
 
-    public void AddFace(Vector3Int.Vector3Int position, Vector3Int.Vector3Int normal, int size)
+    public void AddFace(Vector3Int position, Vector3Int normal, int size)
     {
         position -= PositionOffset.ToVector3Int();
-        int verticesCount = Vertices.Count;
-        
+        var verticesCount = Vertices.Count;
+
         var faceVertices = GetFaceVertices(position, normal, size);
         Vertices.AddRange(faceVertices);
-        
-        Triangles.Add(verticesCount); 
-        Triangles.Add(verticesCount + 1); 
+
+        Triangles.Add(verticesCount);
+        Triangles.Add(verticesCount + 1);
         Triangles.Add(verticesCount + 2);
-        Triangles.Add(verticesCount); 
-        Triangles.Add(verticesCount + 2); 
+        Triangles.Add(verticesCount);
+        Triangles.Add(verticesCount + 2);
         Triangles.Add(verticesCount + 3);
-        
+
         var normalVector = new Vector3(normal.X, normal.Y, normal.Z);
         Normals.Add(normalVector);
         Normals.Add(normalVector);
         Normals.Add(normalVector);
         Normals.Add(normalVector);
-
     }
 
-    private Vector3[] GetFaceVertices(Vector3Int.Vector3Int position, Vector3Int.Vector3Int normal, int size)
+    private Vector3[] GetFaceVertices(Vector3Int position, Vector3Int normal, int size)
     {
-        Vector3[] vertices = new Vector3[4];
-        Vector3 pos = new Vector3(position.X, position.Y, position.Z);
+        var vertices = new Vector3[4];
+        var pos = new Vector3(position.X, position.Y, position.Z);
         float s = size;
         var halfSize = size / 2;
 
@@ -96,7 +96,7 @@ public class Mesh
             vertices[2] = pos + new Vector3(s, 0, s);
             vertices[3] = pos + new Vector3(0, 0, s);
         }
-        
+
         // var transformMatrix = VectorHelper.GetTransformMatrix(pos, normal.ToVector3());
         //
         // var localVertex0 = new Vector3(-halfSize, -halfSize, halfSize);

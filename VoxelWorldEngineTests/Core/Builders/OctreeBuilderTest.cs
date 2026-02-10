@@ -1,10 +1,9 @@
 ﻿using Moq;
 using VoxelWorldEngine.Core.Builders;
 using VoxelWorldEngine.Core.Generators.Interfaces;
-using VoxelWorldEngine.DataStructures.Chunk;
 using VoxelWorldEngine.DataStructures.LinearOctree;
-using VoxelWorldEngine.DataStructures.Vector3Int;
-using VoxelWorldEngine.DataStructures.Voxel;
+using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
+using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
 
 namespace VoxelWorldEngineTests.Core.Builders;
 

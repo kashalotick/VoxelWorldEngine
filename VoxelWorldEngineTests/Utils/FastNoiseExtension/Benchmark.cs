@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using DotnetNoise;
-using VoxelWorldEngine.DataStructures.Vector2Int;
 using VoxelWorldEngine.Utils;
+using Vector2Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector2Int;
 
 namespace VoxelWorldEngineTests.Utils.FastNoiseExtension;
 
@@ -28,7 +28,7 @@ public class Benchmark
         var max = 256;
         RunBenchmark(noise, iterations, min, max, initialStep, refinementSteps, finalDensityFactor);
     }
-    
+
     public static void RunBenchmark(
         FastNoise noise,
         int iterations = 100,
@@ -47,17 +47,17 @@ public class Benchmark
         Console.WriteLine($"--- Starting Benchmark: {iterations} iterations ---");
 
         var random = new Random();
-        for (int i = 0; i < iterations; i++)
+        for (var i = 0; i < iterations; i++)
         {
             // 1. Генеруємо рандомну область
-            Vector2Int start = new Vector2Int(random.Next(-10000, 10000),
+            var start = new Vector2Int(random.Next(-10000, 10000),
                 random.Next(-10000, 10000));
-            Vector2Int size = new Vector2Int(random.Next(minAreaSize, maxAreaSize),
+            var size = new Vector2Int(random.Next(minAreaSize, maxAreaSize),
                 random.Next(minAreaSize, maxAreaSize));
-            Vector2Int end = start + size;
+            var end = start + size;
 
             // 2. Вимірюємо час виконання твого методу
-            Stopwatch sw = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
             var result = noise.GetApproximateRange(start, end, initialStep, refinementSteps, finalDensityFactor);
             sw.Stop();
             totalTimeMs += sw.Elapsed.TotalMilliseconds;
@@ -66,8 +66,8 @@ public class Benchmark
             var realValues = GetNoiseMinMaxBruteForce(noise, start, end);
 
             // 4. Рахуємо похибку
-            float errorMin = Math.Abs(result.min - realValues.min);
-            float errorMax = Math.Abs(result.max - realValues.max);
+            var errorMin = Math.Abs(result.min - realValues.min);
+            var errorMax = Math.Abs(result.max - realValues.max);
 
             totalErrorMin += errorMin;
             totalErrorMax += errorMax;
@@ -75,9 +75,9 @@ public class Benchmark
         }
 
         // Підбиваємо підсумки
-        double avgTime = totalTimeMs / iterations;
-        float avgErrorMin = totalErrorMin / iterations;
-        float avgErrorMax = totalErrorMax / iterations;
+        var avgTime = totalTimeMs / iterations;
+        var avgErrorMin = totalErrorMin / iterations;
+        var avgErrorMax = totalErrorMax / iterations;
 
         Console.WriteLine("\n--- RESULTS ---");
         Console.WriteLine($"Total Time: {totalTimeMs:F4} ms");
@@ -96,19 +96,19 @@ public class Benchmark
     // Еталонний метод (перебір усіх точок)
     private static (float min, float max) GetNoiseMinMaxBruteForce(FastNoise noise, Vector2Int a, Vector2Int b)
     {
-        float min = float.MaxValue;
-        float max = float.MinValue;
+        var min = float.MaxValue;
+        var max = float.MinValue;
 
-        int startX = Math.Min(a.X, b.X);
-        int endX = Math.Max(a.X, b.X);
-        int startY = Math.Min(a.Y, b.Y);
-        int endY = Math.Max(a.Y, b.Y);
+        var startX = Math.Min(a.X, b.X);
+        var endX = Math.Max(a.X, b.X);
+        var startY = Math.Min(a.Y, b.Y);
+        var endY = Math.Max(a.Y, b.Y);
 
-        for (int x = startX; x <= endX; x++)
+        for (var x = startX; x <= endX; x++)
         {
-            for (int y = startY; y <= endY; y++)
+            for (var y = startY; y <= endY; y++)
             {
-                float val = noise.GetNoise(x, y);
+                var val = noise.GetNoise(x, y);
                 if (val < min) min = val;
                 if (val > max) max = val;
             }

@@ -1,4 +1,4 @@
-﻿namespace VoxelWorldEngine.DataStructures.Voxel;
+﻿namespace VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 public struct Voxel
 {

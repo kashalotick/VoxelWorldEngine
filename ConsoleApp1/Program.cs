@@ -11,9 +11,9 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core.Builders;
 using VoxelWorldEngine.Core.Generators;
-using VoxelWorldEngine.DataStructures.Chunk;
-using VoxelWorldEngine.DataStructures.Vector3Int;
-using VoxelMesh = VoxelWorldEngine.DataStructures.Mesh.Mesh;
+using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
+using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
+using VoxelMesh = VoxelWorldEngine.DataStructures.Special.Collections.Mesh.Mesh;
 
 namespace ConsoleApp1;
 

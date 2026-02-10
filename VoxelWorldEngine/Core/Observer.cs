@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using VoxelWorldEngine.DataStructures.Vector3Int;
+using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
 
 namespace VoxelWorldEngine.Core;
 

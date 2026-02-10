@@ -1,4 +1,6 @@
-﻿namespace VoxelWorldEngine.DataStructures.LinearOctree;
+﻿using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
+
+namespace VoxelWorldEngine.DataStructures.LinearOctree;
 
 public class LinearOctree
 {
@@ -22,7 +24,7 @@ public class LinearOctree
     /// </summary>
     /// <param name="position">The position in the octree as a <see cref="Vector3Int"/>.</param>
     /// <returns>The index of the <b>first leaf node</b> according to position</returns>
-    public int GetNodeIndex(Vector3Int.Vector3Int position)
+    public int GetNodeIndex(Common.Structures.Vectors.Vector3Int position)
     {
         if (!position.IsInBounds(Size)) throw new ArgumentOutOfRangeException(nameof(position));
 
@@ -49,7 +51,7 @@ public class LinearOctree
     /// </summary>
     /// <param name="position">The position in the octree as a <see cref="Vector3Int"/>.</param>
     /// <returns>Node struct of the <b>first leaf node</b> according to position</returns>
-    public LinearOctreeNode GetNode(Vector3Int.Vector3Int position)
+    public LinearOctreeNode GetNode(Common.Structures.Vectors.Vector3Int position)
     {
         return _nodes[GetNodeIndex(position)];
     }
@@ -70,7 +72,7 @@ public class LinearOctree
     /// </summary>
     /// <param name="position">The position in the octree as a <see cref="Vector3Int"/>.</param>
     /// <param name="newNode">The new <see cref="LinearOctreeNode"/> to set.</param>
-    public void SetNode(Vector3Int.Vector3Int position, LinearOctreeNode newNode)
+    public void SetNode(Common.Structures.Vectors.Vector3Int position, LinearOctreeNode newNode)
     {
         if (!position.IsInBounds(Size)) throw new ArgumentOutOfRangeException(nameof(position));
 
@@ -93,13 +95,13 @@ public class LinearOctree
         _nodes[nodeIndex] = newNode;
     }
 
-    public void SetNodeVoxel(Vector3Int.Vector3Int position, Voxel.Voxel voxel)
+    public void SetNodeVoxel(Common.Structures.Vectors.Vector3Int position, Voxel voxel)
     {
         var index = GetNodeIndex(position);
         SetNodeVoxel(index, voxel);
     }
 
-    public void SetNodeVoxel(int index, Voxel.Voxel voxel)
+    public void SetNodeVoxel(int index, Voxel voxel)
     {
         // TODO: Add doc; add test??
 

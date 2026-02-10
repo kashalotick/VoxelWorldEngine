@@ -9,12 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\LearningOpenTK\LearningOpenTK\LearningOpenTK.csproj" />
+        <ProjectReference Include="..\..\LearningOpenTK\LearningOpenTK\LearningOpenTK.csproj"/>
         <ProjectReference Include="..\VoxelWorldEngine\VoxelWorldEngine.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="OpenTK.Graphics" Version="4.9.4" />
+        <PackageReference Include="OpenTK.Graphics" Version="4.9.4"/>
     </ItemGroup>
 
 </Project>

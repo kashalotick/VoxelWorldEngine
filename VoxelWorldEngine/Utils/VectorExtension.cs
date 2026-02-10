@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
-using VoxelWorldEngine.DataStructures.Vector2Int;
-using VoxelWorldEngine.DataStructures.Vector3Int;
+using Vector2Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector2Int;
+using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
 
 namespace VoxelWorldEngine.Utils;
 

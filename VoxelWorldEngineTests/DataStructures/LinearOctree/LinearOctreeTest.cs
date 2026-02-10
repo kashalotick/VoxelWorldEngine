@@ -21,7 +21,7 @@ public class LinearOctreeTest
 
         // Перевіряємо, чи створено кореневий вузол
         // (Оскільки ми не маємо прямого доступу до _nodes, перевіряємо через GetNode на позиції 0)
-        var rootPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(0, 0, 0);
+        var rootPos = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(0, 0, 0);
         var node = _octree.GetNode(rootPos);
 
         // Корінь має бути створений (не null/default) і бути листом (Air) на старті
@@ -33,7 +33,7 @@ public class LinearOctreeTest
     public void SubdivideNode_SplitsLeafIntoChildren()
     {
         // Arrange
-        var rootPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(0, 0, 0);
+        var rootPos = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(0, 0, 0);
         int rootIndex = _octree.GetNodeIndex(rootPos); // На старті це індекс кореня (0)
 
         // Act
@@ -55,7 +55,7 @@ public class LinearOctreeTest
     public void SubdivideNode_ThrowsException_IfAlreadySubdivided()
     {
         // Arrange
-        var rootPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(0, 0, 0);
+        var rootPos = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(0, 0, 0);
         int rootIndex = _octree.GetNodeIndex(rootPos);
         _octree.SubdivideNode(rootIndex); // Перший поділ
 
@@ -68,7 +68,7 @@ public class LinearOctreeTest
     public void UnsubdivideNode_RestoresLeafStatus()
     {
         // Arrange
-        var rootPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(0, 0, 0);
+        var rootPos = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(0, 0, 0);
 
         // Отримуємо індекс кореня (має бути 0)
         int rootIndex = _octree.GetNodeIndex(rootPos);
@@ -104,10 +104,10 @@ public class LinearOctreeTest
     public void SetNode_And_GetNode_Consistency()
     {
         // Arrange
-        var position = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(10, 10, 10);
+        var position = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(10, 10, 10);
 
         // Створюємо тестовий воксель (Solid)
-        var voxel = new VoxelWorldEngine.DataStructures.Voxel.Voxel(127); // Припустимо 127 - це значення
+        var voxel = new VoxelWorldEngine.DataStructures.Special.Structures.Voxels.Voxel(127); // Припустимо 127 - це значення
         var nodeToSet = new LinearOctreeNode(voxel); // Solid node constructor logic implies -2 usually, or set manually
         // Якщо конструктор не ставить IsSolid автоматично, форсуємо для тесту:
         if (nodeToSet.IsAir) nodeToSet = LinearOctreeNode.Solid;
@@ -131,7 +131,7 @@ public class LinearOctreeTest
         // Якщо ми ставимо воксель на конкретну координату, дерево повинно розбитися до MaxDepth
 
         // Arrange
-        var position = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(5, 5, 5);
+        var position = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(5, 5, 5);
         var solidNode = LinearOctreeNode.Solid;
 
         // Act
@@ -151,7 +151,7 @@ public class LinearOctreeTest
         // Припускаємо, що метод кидає виключення для координат поза межами Size
         // Size = 256. Valid: 0..255.
 
-        var badPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(300, 0, 0);
+        var badPos = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(300, 0, 0);
 
         Assert.Throws<ArgumentOutOfRangeException>(() => _octree.GetNode(badPos));
     }

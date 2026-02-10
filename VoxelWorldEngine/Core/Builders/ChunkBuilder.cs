@@ -1,7 +1,7 @@
 using DotnetNoise;
 using VoxelWorldEngine.Core.Generators;
-using VoxelWorldEngine.DataStructures.Chunk;
-using VoxelWorldEngine.DataStructures.Vector3Int;
+using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
+using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
 
 namespace VoxelWorldEngine.Core.Builders;
 

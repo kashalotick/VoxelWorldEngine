@@ -1,8 +1,8 @@
 ﻿using System.Numerics;
 using VoxelWorldEngine.DataStructures.LinearOctree;
-using VoxelWorldEngine.DataStructures.Mesh;
-using VoxelWorldEngine.DataStructures.Vector3Int;
+using VoxelWorldEngine.DataStructures.Special.Collections.Mesh;
 using VoxelWorldEngine.Utils;
+using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
 
 namespace VoxelWorldEngine.Core.Builders;
 

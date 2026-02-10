@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using VoxelWorldEngine.DataStructures.Vector3Int;
+using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
 
 namespace VoxelWorldEngine.Utils;
 

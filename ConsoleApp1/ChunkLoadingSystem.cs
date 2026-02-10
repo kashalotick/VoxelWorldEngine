@@ -1,7 +1,7 @@
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Worlds;
-using VoxelWorldEngine.DataStructures.Vector3Int;
+using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
 
 namespace ConsoleApp1;
 

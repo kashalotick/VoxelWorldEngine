@@ -8,7 +8,6 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Worlds;
-using VoxelWorldEngine.DataStructures.Vector3Int;
 
 namespace ConsoleApp1;
 

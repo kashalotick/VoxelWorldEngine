@@ -15,7 +15,7 @@ public class VoxelTest
     [TestCase(-128, ExpectedResult = -128)]
     public sbyte Constructor_Sbyte(sbyte density)
     {
-        var voxel = new VoxelWorldEngine.DataStructures.Voxel.Voxel(density);
+        var voxel = new VoxelWorldEngine.DataStructures.Special.Structures.Voxels.Voxel(density);
         return voxel.Density;
     }
 }

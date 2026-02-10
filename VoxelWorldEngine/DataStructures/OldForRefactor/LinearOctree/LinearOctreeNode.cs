@@ -1,8 +1,10 @@
-﻿namespace VoxelWorldEngine.DataStructures.LinearOctree;
+﻿using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
+
+namespace VoxelWorldEngine.DataStructures.LinearOctree;
 
 public struct LinearOctreeNode
 {
-    public Voxel.Voxel Voxel;
+    public Voxel Voxel;
     public int ChildrenStartIndex {private set; get;}
 
 
@@ -15,13 +17,13 @@ public struct LinearOctreeNode
     public static LinearOctreeNode Solid => new(new(sbyte.MaxValue), -2);
 
     
-    public LinearOctreeNode(Voxel.Voxel voxel)
+    public LinearOctreeNode(Voxel voxel)
     {
         Voxel = voxel;
         ChildrenStartIndex = -1;
     }
     
-    public LinearOctreeNode(Voxel.Voxel voxel, int childrenStartIndex)
+    public LinearOctreeNode(Voxel voxel, int childrenStartIndex)
     {
         Voxel = voxel;
         ChildrenStartIndex = childrenStartIndex;

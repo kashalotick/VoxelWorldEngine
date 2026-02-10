@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using DotnetNoise;
-using VoxelWorldEngine.DataStructures.Vector2Int;
+using Vector2Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector2Int;
 
 namespace VoxelWorldEngine.Utils;
 

@@ -1,9 +1,7 @@
 ﻿using System.Numerics;
 using DotnetNoise;
 using VoxelWorldEngine.Core.Generators;
-using VoxelWorldEngine.DataStructures.Mesh;
-using VoxelWorldEngine.DataStructures.Vector2Int;
-using VoxelWorldEngine.DataStructures.Vector3Int;
+using Vector2Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector2Int;
 
 namespace VoxelWorldEngine.Core.Builders;
 

@@ -1,6 +1,5 @@
-﻿using VoxelWorldEngine.DataStructures.Chunk;
-using VoxelWorldEngine.DataStructures.Vector3Int;
-using VoxelWorldEngine.DataStructures.Voxel;
+﻿using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
+using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int;
 
 namespace VoxelWorldEngine.Core.Worlds;
 

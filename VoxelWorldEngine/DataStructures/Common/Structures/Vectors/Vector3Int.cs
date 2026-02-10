@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace VoxelWorldEngine.DataStructures.Vector3Int;
+namespace VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
 public partial struct Vector3Int
 {
@@ -30,7 +30,6 @@ public partial struct Vector3Int
     public static Vector3Int UnitZ => new(0, 0, 1);
 
 
-
     public override int GetHashCode()
     {
         return HashCode.Combine(X, Y, Z);
@@ -40,6 +39,9 @@ public partial struct Vector3Int
     {
         return $"{X}, {Y}, {Z}";
     }
-    
-    public Vector3 ToVector3() => new Vector3(X, Y, Z);
+
+    public Vector3 ToVector3()
+    {
+        return new Vector3(X, Y, Z);
+    }
 }

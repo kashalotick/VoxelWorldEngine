@@ -1,4 +1,4 @@
-﻿using VoxelWorldEngine.DataStructures.Chunk;
+﻿using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
 namespace VoxelWorldEngineTests.DataStructures.Chunk;
 
@@ -24,7 +24,7 @@ public class ChunkMathTest
     [TestCase(-2, 0, 10, ExpectedResult = new int[] { -512, 0, 2560 })]
     public int[] ChunkToGlobal_CalculatesCorrectly(int x, int y, int z)
     {
-        var chunkPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x, y, z);
+        var chunkPos = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(x, y, z);
         var globalPos = ChunkMath.ChunkToGlobal(chunkPos);
 
         // Використовуємо X, Y, Z з великої літери
@@ -52,7 +52,7 @@ public class ChunkMathTest
     [TestCase(-257, -10, -500, ExpectedResult = new int[] { -2, -1, -2 })] // -257->ch-2, -500->ch-2
     public int[] GlobalToChunk_CalculatesCorrectly(int x, int y, int z)
     {
-        var globalPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x, y, z);
+        var globalPos = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(x, y, z);
         var chunkPos = ChunkMath.GlobalToChunk(globalPos);
 
         return new int[] { chunkPos.X, chunkPos.Y, chunkPos.Z };
@@ -79,7 +79,7 @@ public class ChunkMathTest
     [TestCase(-257, 10, -1, ExpectedResult = new int[] { 255, 10, 255 })]
     public int[] GlobalToLocal_CalculatesCorrectly(int x, int y, int z)
     {
-        var globalPos = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x, y, z);
+        var globalPos = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(x, y, z);
         var localPos = ChunkMath.GlobalToLocal(globalPos);
 
         // Перевіряємо, чи ми в межах [0..255]
@@ -100,7 +100,7 @@ public class ChunkMathTest
     [TestCase(-257, 0, -1)]
     public void Consistency_Check(int x, int y, int z)
     {
-        var globalOriginal = new VoxelWorldEngine.DataStructures.Vector3Int.Vector3Int(x, y, z);
+        var globalOriginal = new VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vector3Int(x, y, z);
 
         var chunkPos = ChunkMath.GlobalToChunk(globalOriginal);
         var localPos = ChunkMath.GlobalToLocal(globalOriginal);

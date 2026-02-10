@@ -42,7 +42,7 @@ public class LinearOctreeNodeTest
     public void Constructor_VoxelOnly_SetsDefaultIndex()
     {
         // Arrange
-        var voxel = new VoxelWorldEngine.DataStructures.Voxel.Voxel(10);
+        var voxel = new VoxelWorldEngine.DataStructures.Special.Structures.Voxels.Voxel(10);
 
         // Act
         var node = new LinearOctreeNode(voxel);
@@ -58,7 +58,7 @@ public class LinearOctreeNodeTest
     public void Constructor_VoxelAndIndex_SetsProperties()
     {
         // Arrange
-        var voxel = new VoxelWorldEngine.DataStructures.Voxel.Voxel(5);
+        var voxel = new VoxelWorldEngine.DataStructures.Special.Structures.Voxels.Voxel(5);
         int expectedIndex = 100;
 
         // Act
@@ -78,7 +78,7 @@ public class LinearOctreeNodeTest
     public void IsLeaf_ReturnsCorrectValue_BasedOnIndex(int index, bool expectedIsLeaf)
     {
         // Arrange
-        var node = new LinearOctreeNode(new VoxelWorldEngine.DataStructures.Voxel.Voxel(0), index);
+        var node = new LinearOctreeNode(new VoxelWorldEngine.DataStructures.Special.Structures.Voxels.Voxel(0), index);
 
         // Act & Assert
         Assert.That(node.IsLeaf, Is.EqualTo(expectedIsLeaf));
@@ -89,7 +89,7 @@ public class LinearOctreeNodeTest
     [TestCase(0, false)]
     public void IsAir_Check(int index, bool expected)
     {
-        var node = new LinearOctreeNode(new VoxelWorldEngine.DataStructures.Voxel.Voxel(0), index);
+        var node = new LinearOctreeNode(new VoxelWorldEngine.DataStructures.Special.Structures.Voxels.Voxel(0), index);
         Assert.That(node.IsAir, Is.EqualTo(expected));
     }
 
@@ -98,7 +98,7 @@ public class LinearOctreeNodeTest
     [TestCase(10, false)]
     public void IsSolid_Check(int index, bool expected)
     {
-        var node = new LinearOctreeNode(new VoxelWorldEngine.DataStructures.Voxel.Voxel(0), index);
+        var node = new LinearOctreeNode(new VoxelWorldEngine.DataStructures.Special.Structures.Voxels.Voxel(0), index);
         Assert.That(node.IsSolid, Is.EqualTo(expected));
     }
 
@@ -121,7 +121,7 @@ public class LinearOctreeNodeTest
     public void GetChildIndex_ReturnsCorrectOffset(int startIndex, int octant, int expectedResult)
     {
         // Arrange
-        var node = new LinearOctreeNode(new VoxelWorldEngine.DataStructures.Voxel.Voxel(0), startIndex);
+        var node = new LinearOctreeNode(new VoxelWorldEngine.DataStructures.Special.Structures.Voxels.Voxel(0), startIndex);
 
         // Act
         int result = node.GetChildIndex(octant);
