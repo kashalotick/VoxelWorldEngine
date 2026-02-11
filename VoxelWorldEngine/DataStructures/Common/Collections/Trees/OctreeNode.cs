@@ -5,80 +5,74 @@ using VoxelWorldEngine.DataStructures.LinearOctree;
 
 namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
-public class OctreeNode<T> : IOctreeNode<T>
+public partial class Octree<T>
 {
-    private LinearOctree<T> _linearOctree;
-    private int _linearIndex;
-    
-    public int MaxDepth { get; set; }
-    public int Depth { get; set;}
-    public int Size => 1 << (MaxDepth - Depth);
-
-    public Vector3Int Min { get; set; }
-    public Vector3Int Max => Min + Vector3Int.One * (Size - 1);
-
-
-    public IOctreeNode<T>[] Children
+    protected readonly struct OctreeNode
     {
-        get
+        private LinearOctree<T> _linearOctree { get; init; }
+        private int LinearIndex { get; init; }
+
+        public int Depth { get; init; }
+        public int Size => 1 << (MaxDepth - Depth);
+
+        public Vector3Int Min { get; init; }
+        public Vector3Int Max => Min + Vector3Int.One * (Size - 1);
+
+        public T Data
         {
-            if (IsLeaf) return null;
-            
-            var childSize = Size >> 1;
-            
-            var children = new OctreeNode<T>[8];
-            for (int i = 0; i < 8; i++)
-            {
-                var corner = OctreeMath.GetOctantCorner(i, childSize);
-                var childLinearIndex = _linearOctree.GetNode(_linearIndex).GetChildIndex(i);
-                var child = new OctreeNode<T>(_linearOctree, _linearIndex + i)
-                {
-                    _linearOctree = _linearOctree,
-                    _linearIndex = childLinearIndex,
-                    MaxDepth = MaxDepth,
-                    Depth = Depth - 1,
-                    Min = corner,
-                };
-                children[i] = child;
-            }
-
-
-            return children;
+            get => _linearOctree.GetNode(LinearIndex).Data;
+            set => _linearOctree.SetNodeData(LinearIndex, value);
         }
-    }
+
+        public OctreeNode(LinearOctree<T> linearOctree, int linearIndex, int maxDepth, int depth, Vector3Int min)
+        {
+            _linearOctree = linearOctree;
+            LinearIndex = linearIndex;
+            Depth = depth;
+            Min = min;
+        }
+
+        public OctreeNode GetChild(int octant)
+        {
+            var childLinearIndex = _linearOctree.GetNode(LinearIndex).GetChildIndex(octant);
+            var corner = Min + OctreeMath.GetOctantCorner(octant, Size >> 1);
+            var child = new OctreeNode(_linearOctree, childLinearIndex)
+            {
+                _linearOctree = _linearOctree,
+                LinearIndex = childLinearIndex,
+                Depth = Depth + 1,
+                Min = corner,
+            };
+            return child;
+        }
 
 
-    public OctreeNode(LinearOctree<T> linearOctree, int linearIndex)
-    {
-        _linearOctree = linearOctree;
-        _linearIndex = linearIndex;
-    }
+        public OctreeNode(LinearOctree<T> linearOctree, int linearLinearIndex)
+        {
+            _linearOctree = linearOctree;
+            LinearIndex = linearLinearIndex;
+        }
 
-    public IEnumerable<T> Query(Vector3Int min, Vector3Int max)
-    {
-        throw new NotImplementedException();
-    }
+        public IEnumerable<T> Query(Vector3Int min, Vector3Int max)
+        {
+            throw new NotImplementedException();
+        }
 
-    public T Data
-    {
-        get => _linearOctree.GetNode(_linearIndex).Data;
-        set => _linearOctree.SetNodeData(_linearIndex, value);
-    }
+        public bool IsLeaf => _linearOctree.GetNode(LinearIndex).IsLeaf;
 
-    public bool IsLeaf => _linearOctree.GetNode(_linearIndex).IsLeaf;
+        public void Split()
+        {
+            _linearOctree.Split(LinearIndex);
+        }
 
-    public void Split()
-    {
-        _linearOctree.Split(_linearIndex);
-    }
+        public bool Merge()
+        {
+            return _linearOctree.Merge(LinearIndex);
+        }
 
-    public bool Merge()
-    {
-        return _linearOctree.Merge(_linearIndex);
-    }
-
-    public bool TryMerge()
-    {
-        return _linearOctree.TryMerge(_linearIndex);
+        public bool TryMerge()
+        {
+            return _linearOctree.TryMerge(LinearIndex);
+        }
     }
 }

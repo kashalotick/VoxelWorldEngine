@@ -3,28 +3,28 @@ using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
 namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
-public class Octree<T> : IOctree<T>
+public partial class Octree<T> : IOctree<T>
 {
     public const int MaxDepth = 6;
     private LinearOctree<T> _linearOctree;
-    
-    private OctreeNode<T> _root;
-    
+
+
     public bool IsEmpty => _linearOctree.Root.IsLeaf;
 
-    protected IOctreeNode<T> Root()
+
+    public void Clear()
     {
-        var root = new OctreeNode<T>(_linearOctree, _linearOctree.RootIndex)
+        _linearOctree = new LinearOctree<T>();
+    }
+
+
+    protected OctreeNode Root()
+    {
+        var root = new OctreeNode(_linearOctree, _linearOctree.RootIndex)
         {
-            MaxDepth = MaxDepth,
             Depth = 0,
             Min = Vector3Int.Zero,
         };
         return root;
-    }
-
-    public void Clear()
-    {
-        _root = null;
     }
 }

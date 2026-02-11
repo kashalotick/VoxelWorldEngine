@@ -8,7 +8,7 @@ public class VoxelOctree : Octree<Voxel>
 {
     public void Build(IGenerator generator)
     {
-        var stack = new Stack<IOctreeNode<Voxel>>();
+        var stack = new Stack<OctreeNode>();
         var root = Root();
         stack.Push(root);
 
@@ -16,15 +16,16 @@ public class VoxelOctree : Octree<Voxel>
         {
             var node = stack.Pop();
             
-            if (generator.IsUniform(root.Min, root.Max))
+            if (node.Depth < MaxDepth && generator.IsUniform(node.Min, node.Max))
             {
-                root.Data = generator.Approximate(root.Min, root.Max);
+                node.Data = generator.Approximate(node.Min, node.Max);
             }
             else
             {
-                root.Split();
-                foreach (var child in root.Children)
+                node.Split();
+                for (int i = 0; i < 8; i++)
                 {
+                    var child = node.GetChild(i);
                     stack.Push(child);
                 }
             }

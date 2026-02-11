@@ -10,7 +10,6 @@ public interface IOctree<T>
     // IOctreeNode<T> Root(); // TODO: remove?
     
     
-    
     // void Insert(T data, Vector3Int min, Vector3Int max);
     // bool Remove(Vector3Int position);
     
