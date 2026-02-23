@@ -16,7 +16,7 @@ public class VoxelOctree : Octree<Voxel>
         {
             var node = stack.Pop();
             
-            if (node.Depth < MaxDepth && generator.IsUniform(node.Min, node.Max))
+            if (generator.IsUniform(node.Min, node.Max) || node.Depth == MaxDepth )
             {
                 node.Data = generator.Approximate(node.Min, node.Max);
             }

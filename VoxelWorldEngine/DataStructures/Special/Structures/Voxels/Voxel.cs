@@ -11,5 +11,7 @@ public struct Voxel
     {
         Density = density;
     }
+    
+    public bool IsEmpty => Density == 0;
 
 }

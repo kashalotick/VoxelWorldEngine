@@ -7,7 +7,7 @@ namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
 public partial class Octree<T>
 {
-    protected readonly struct OctreeNode
+    internal readonly struct OctreeNode
     {
         private LinearOctree<T> _linearOctree { get; init; }
         private int LinearIndex { get; init; }
@@ -24,14 +24,12 @@ public partial class Octree<T>
             set => _linearOctree.SetNodeData(LinearIndex, value);
         }
 
-        public OctreeNode(LinearOctree<T> linearOctree, int linearIndex, int maxDepth, int depth, Vector3Int min)
+        public OctreeNode(LinearOctree<T> linearOctree, int linearLinearIndex)
         {
             _linearOctree = linearOctree;
-            LinearIndex = linearIndex;
-            Depth = depth;
-            Min = min;
+            LinearIndex = linearLinearIndex;
         }
-
+        
         public OctreeNode GetChild(int octant)
         {
             var childLinearIndex = _linearOctree.GetNode(LinearIndex).GetChildIndex(octant);
@@ -47,11 +45,7 @@ public partial class Octree<T>
         }
 
 
-        public OctreeNode(LinearOctree<T> linearOctree, int linearLinearIndex)
-        {
-            _linearOctree = linearOctree;
-            LinearIndex = linearLinearIndex;
-        }
+
 
         public IEnumerable<T> Query(Vector3Int min, Vector3Int max)
         {

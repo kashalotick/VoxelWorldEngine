@@ -6,7 +6,7 @@ using Vector3Int = VoxelWorldEngine.DataStructures.Common.Structures.Vectors.Vec
 
 namespace VoxelWorldEngine.Core.Builders;
 
-public class MeshBuilder
+public class MeshBuilder2
 {
     public const int SubMeshResolution = 16;
 

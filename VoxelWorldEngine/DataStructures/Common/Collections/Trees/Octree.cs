@@ -18,7 +18,7 @@ public partial class Octree<T> : IOctree<T>
     }
 
 
-    protected OctreeNode Root()
+    internal OctreeNode Root()
     {
         var root = new OctreeNode(_linearOctree, _linearOctree.RootIndex)
         {
