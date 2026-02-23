@@ -1,4 +1,6 @@
-﻿namespace VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+﻿using System.Numerics;
+
+namespace VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
 public partial struct Vector2Int : IEquatable<Vector2Int>
 {
@@ -79,4 +81,9 @@ public partial struct Vector2Int : IEquatable<Vector2Int>
     {
         return left / new Vector2Int(right);
     }
+    
+    // type cast
+    
+    public static explicit operator Vector2(Vector2Int vector) 
+        => new Vector2(vector.X, vector.Y);
 }

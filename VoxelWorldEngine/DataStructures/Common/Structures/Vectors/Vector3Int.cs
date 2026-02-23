@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+﻿namespace VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
 public partial struct Vector3Int
 {
@@ -39,9 +37,5 @@ public partial struct Vector3Int
     {
         return $"{X}, {Y}, {Z}";
     }
-
-    public Vector3 ToVector3()
-    {
-        return new Vector3(X, Y, Z);
-    }
+    
 }
