@@ -3,6 +3,7 @@ using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.LinearOctree.Special.Structures.Vertices;
 using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
+using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.Core.Builders;
 
@@ -20,8 +21,7 @@ public class MeshBuilder
     {
         var mesh = new MeshData();
         var stack = new Stack<VoxelOctree.OctreeNode>();
-
-
+        
         stack.Push(_octree.Root());
 
         while (stack.Count > 0)
@@ -52,7 +52,60 @@ public class MeshBuilder
         for (int i = 0; i < 6; i++)
         {
             var normal = Normals[i];
+
+            if (FaceCulling(node, normal)) continue;
+
+            AddFace(node.Min, normal, node.Size, mesh);
         }
+    }
+
+    private bool FaceCulling(VoxelOctree.OctreeNode node, Vector3Int normal)
+    {
+        if (normal.X != 0)
+        {
+            int x = normal.X > 0 ? node.Max.X + 1 : node.Min.X - 1;
+
+            for (int y = node.Min.Y; y <= node.Max.Y; y++)
+            for (int z = node.Min.Z; z <= node.Max.Z; z++)
+            {
+                var pos = new Vector3Int(x, y, z);
+
+                if (_octree.GetData(pos).IsEmpty)
+                    return false;
+            }
+
+            return true;
+        }
+
+        if (normal.Y != 0)
+        {
+            int y = normal.Y > 0 ? node.Max.Y + 1 : node.Min.Y - 1;
+
+            for (int x = node.Min.X; x <= node.Max.X; x++)
+            for (int z = node.Min.Z; z <= node.Max.Z; z++)
+            {
+                var pos = new Vector3Int(x, y, z);
+
+                if (_octree.GetData(pos).IsEmpty)
+                    return false;
+            }
+
+            return true;
+        }
+
+        // Z
+        int zFixed = normal.Z > 0 ? node.Max.Z + 1 : node.Min.Z - 1;
+
+        for (int x = node.Min.X; x <= node.Max.X; x++)
+        for (int y = node.Min.Y; y <= node.Max.Y; y++)
+        {
+            var pos = new Vector3Int(x, y, zFixed);
+
+            if (_octree.GetData(pos).IsEmpty)
+                return false;
+        }
+
+        return true;
     }
 
 
@@ -61,7 +114,7 @@ public class MeshBuilder
         var facePosition = (Vector3)position;
         var faceNormal = (Vector3)normal;
         var faceColor = new Vector3(1, 2, 3);
-        var vCount = (ushort)mesh.Vertices.Count;
+        var vCount = mesh.Vertices.Count;
         var normalIndex = GetFaceIndex(normal);
 
         for (int i = 0; i < 4; i++)
@@ -69,41 +122,40 @@ public class MeshBuilder
             var offset = FaceVertices[normalIndex][i];
             var vertex = new Vertex
             {
-                Position = facePosition + offset * size,
+                Position = facePosition + size * offset,
                 Normal = faceNormal,
                 Uv = FaceUVs[i],
                 Color = faceColor
             };
             mesh.Vertices.Add(vertex);
-            
-            mesh.Indices.Add(vCount + 0); mesh.Indices.Add(vCount + 1); mesh.Indices.Add(vCount + 2);
-            mesh.Indices.Add(vCount + 2); mesh.Indices.Add(vCount + 3); mesh.Indices.Add(vCount + 0);
         }
-    }
 
-    private bool FaceCulling(Vector3Int position)
-    {
-        throw new NotImplementedException();
+        mesh.Indices.Add(vCount + 0);
+        mesh.Indices.Add(vCount + 1);
+        mesh.Indices.Add(vCount + 2);
+        mesh.Indices.Add(vCount + 2);
+        mesh.Indices.Add(vCount + 3);
+        mesh.Indices.Add(vCount + 0);
     }
 
     private static readonly Vector2[] FaceUVs =
     [
-        new Vector2(0, 0), // Нижній лівий
-        new Vector2(1, 0), // Нижній правий
-        new Vector2(1, 1), // Верхній правий
-        new Vector2(0, 1)  // Верхній лівий
+        new(0, 0), // Нижній лівий
+        new(1, 0), // Нижній правий
+        new(1, 1), // Верхній правий
+        new(0, 1) // Верхній лівий
     ];
-    
-    private static readonly Vector3[] Normals =
+
+    private static readonly Vector3Int[] Normals =
     [
-        Vector3.UnitY, 
-        -Vector3.UnitY, 
-        Vector3.UnitZ, 
-        -Vector3.UnitZ,
-        Vector3.UnitX, 
-        -Vector3.UnitX 
+        Vector3Int.UnitY,
+        -Vector3Int.UnitY,
+        Vector3Int.UnitZ,
+        -Vector3Int.UnitZ,
+        Vector3Int.UnitX,
+        -Vector3Int.UnitX
     ];
-    
+
     private static readonly Vector3[][] FaceVertices =
     [
         // Top (+Y)
