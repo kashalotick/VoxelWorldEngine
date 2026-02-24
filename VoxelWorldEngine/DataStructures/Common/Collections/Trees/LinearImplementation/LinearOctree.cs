@@ -1,5 +1,4 @@
 ﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.LinearOctree;
 using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
