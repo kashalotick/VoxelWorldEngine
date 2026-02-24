@@ -6,10 +6,17 @@ namespace VoxelWorldEngine.Core.Builders;
 
 public class ChunkBuilder
 {
+    private readonly int _seed;
+    
+    public ChunkBuilder(int seed)
+    {
+        _seed = seed;
+    }
+
     public Chunk Build(Vector3Int position)
     {
 
-        IGenerator generator = new ProceduralGenerator(position);
+        IGenerator generator = new ProceduralGenerator(_seed, position);
         var octree = new VoxelOctree();
         octree.Build(generator);
 

@@ -19,7 +19,7 @@ public class ChunkManager
         _chunks = new Dictionary<Vector3Int, Chunk>();
         _readyChunks = new ConcurrentQueue<Chunk>();
         _requestedChunks = new HashSet<Vector3Int>();
-        _chunkBuilder = new ChunkBuilder();
+        _chunkBuilder = new ChunkBuilder(1234);
     }
 
 
@@ -82,7 +82,7 @@ public class ChunkManager
     }
     private void GenerateChunk(Vector3Int chunkPosition)
     {
-        var chunkBuilder = new ChunkBuilder();
+        var chunkBuilder = new ChunkBuilder(1234);
 
         var chunk = chunkBuilder.Build(chunkPosition);
         _readyChunks.Enqueue(chunk);

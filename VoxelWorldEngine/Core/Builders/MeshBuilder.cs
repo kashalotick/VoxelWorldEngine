@@ -20,7 +20,7 @@ public class MeshBuilder
     {
         var mesh = new MeshData();
         var stack = new Stack<VoxelOctree.OctreeNode>();
-        
+
         stack.Push(_octree.Root());
 
         while (stack.Count > 0)
@@ -110,7 +110,7 @@ public class MeshBuilder
         {
             return true;
         }
-        
+
         var data = _octree.GetData(pos);
         return data.IsEmpty;
     }
@@ -121,7 +121,7 @@ public class MeshBuilder
         var facePosition = (Vector3)position;
         var faceNormal = (Vector3)normal;
         var faceColor = new Vector3(1, 2, 3);
-        var vCount = mesh.Vertices.Count;
+        var vCount = (uint)mesh.Vertices.Count;
         var normalIndex = GetFaceIndex(normal);
 
         for (int i = 0; i < 4; i++)

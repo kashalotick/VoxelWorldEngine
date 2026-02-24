@@ -10,10 +10,10 @@ public class ProceduralGenerator : IGenerator
     private Vector3Int _offset;
     private FastNoise _noise;
 
-    public ProceduralGenerator(Vector3Int offset)
+    public ProceduralGenerator(int seed, Vector3Int offset)
     {
         _offset = offset;
-        _noise = new FastNoise();
+        _noise = new FastNoise(seed);
     }
 
     public Voxel Approximate(Vector3Int min, Vector3Int max)
