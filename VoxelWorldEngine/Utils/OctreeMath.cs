@@ -1,6 +1,6 @@
 ﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
-namespace VoxelWorldEngine.DataStructures.LinearOctree;
+namespace VoxelWorldEngine.Utils;
 
 /// <summary>
 ///     Class for working with octree data structure. Provides methods for calculating octant index and position the octant. Octant indices are 0-7 in order 0b_ZYX.

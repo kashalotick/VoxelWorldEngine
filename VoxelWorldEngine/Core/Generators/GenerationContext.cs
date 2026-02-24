@@ -1,6 +1,6 @@
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
-namespace VoxelWorldEngine.Core.Generatros;
+namespace VoxelWorldEngine.Core.Generators;
 
 public struct GenerationContext
 {

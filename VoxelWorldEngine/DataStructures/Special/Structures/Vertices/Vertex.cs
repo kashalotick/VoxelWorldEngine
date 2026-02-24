@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace VoxelWorldEngine.DataStructures.LinearOctree.Special.Structures.Vertices;
+namespace VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
 
 public struct Vertex
 {

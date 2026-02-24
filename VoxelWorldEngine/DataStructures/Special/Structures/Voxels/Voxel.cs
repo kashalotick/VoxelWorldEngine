@@ -11,6 +11,10 @@ public struct Voxel
     {
         Density = density;
     }
+    public Voxel(int density)
+    {
+        Density = (sbyte)density;
+    }
     
     public bool IsEmpty => Density == 0;
 

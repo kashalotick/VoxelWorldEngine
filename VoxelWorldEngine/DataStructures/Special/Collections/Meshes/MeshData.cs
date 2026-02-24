@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using VoxelWorldEngine.DataStructures.LinearOctree.Special.Structures.Vertices;
+using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
 
 namespace VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 

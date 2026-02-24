@@ -13,7 +13,7 @@ public class Mesh
 
     public Mesh(Vector3Int positionOffset)
     {
-        PositionOffset = positionOffset.ToVector3();
+        PositionOffset = (Vector3)positionOffset;
         Vertices = [];
         Normals = [];
         Triangles = [];

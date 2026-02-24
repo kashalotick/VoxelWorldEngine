@@ -1,4 +1,4 @@
-namespace VoxelWorldEngine.Core.Generatros;
+namespace VoxelWorldEngine.Core.Generators;
 
 public interface IGeneratorStep
 {

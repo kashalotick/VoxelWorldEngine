@@ -1,4 +1,4 @@
-namespace VoxelWorldEngine.Core.Generatros;
+namespace VoxelWorldEngine.Core.Generators;
 
 public interface IGenerator<T, TVector>
     where T : struct
@@ -10,3 +10,4 @@ public interface IGenerator<T, TVector>
     T Minimum(TVector min, TVector max);
 
 }
+

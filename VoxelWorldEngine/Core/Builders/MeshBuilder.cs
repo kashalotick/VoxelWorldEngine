@@ -1,9 +1,8 @@
 ﻿using System.Numerics;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.LinearOctree.Special.Structures.Vertices;
 using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
-using VoxelWorldEngine.Utils;
+using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
 
 namespace VoxelWorldEngine.Core.Builders;
 

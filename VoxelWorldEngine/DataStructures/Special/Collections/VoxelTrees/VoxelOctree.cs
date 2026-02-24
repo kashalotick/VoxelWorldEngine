@@ -1,5 +1,5 @@
-﻿using VoxelWorldEngine.DataStructures.Common.Collections.Trees;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+﻿using VoxelWorldEngine.Core;
+using VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
@@ -32,10 +32,4 @@ public class VoxelOctree : Octree<Voxel>
         }
     }
 
-}
-
-public interface IGenerator
-{
-    Voxel Approximate(Vector3Int min, Vector3Int max);
-    bool IsUniform(Vector3Int min, Vector3Int max);
 }
