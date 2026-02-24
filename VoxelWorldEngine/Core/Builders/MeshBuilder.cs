@@ -69,8 +69,7 @@ public class MeshBuilder
             {
                 var pos = new Vector3Int(x, y, z);
 
-                if (_octree.GetData(pos).IsEmpty)
-                    return false;
+                return !IsEmpty(pos);
             }
 
             return true;
@@ -85,8 +84,7 @@ public class MeshBuilder
             {
                 var pos = new Vector3Int(x, y, z);
 
-                if (_octree.GetData(pos).IsEmpty)
-                    return false;
+                return !IsEmpty(pos);
             }
 
             return true;
@@ -100,11 +98,21 @@ public class MeshBuilder
         {
             var pos = new Vector3Int(x, y, zFixed);
 
-            if (_octree.GetData(pos).IsEmpty)
-                return false;
+            return !IsEmpty(pos);
         }
 
         return true;
+    }
+
+    private bool IsEmpty(Vector3Int pos)
+    {
+        if (!pos.IsInBounds(_octree.Root().Size))
+        {
+            return true;
+        }
+        
+        var data = _octree.GetData(pos);
+        return data.IsEmpty;
     }
 
 

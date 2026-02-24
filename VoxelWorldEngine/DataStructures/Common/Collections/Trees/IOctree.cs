@@ -1,6 +1,4 @@
-﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-
-namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
+﻿namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
 public interface IOctree<T>
 {

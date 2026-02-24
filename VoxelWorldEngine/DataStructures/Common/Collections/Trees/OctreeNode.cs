@@ -1,7 +1,5 @@
-﻿using System.Runtime.InteropServices.ComTypes;
-using VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
+﻿using VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.LinearOctree;
 using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
@@ -14,7 +12,7 @@ public partial class Octree<T>
         private int LinearIndex { get; init; }
 
         public int Depth { get; init; }
-        public int Size => 1 << (MaxDepth - Depth);
+        public int Size => 1 << (_linearOctree.MaxDepth - Depth);
 
         public Vector3Int Min { get; init; }
         public Vector3Int Max => Min + Vector3Int.One * (Size - 1);
