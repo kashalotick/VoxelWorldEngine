@@ -10,6 +10,8 @@ public class MeshBuilder
 {
     private readonly VoxelOctree _octree;
 
+    private bool?[,,] _isEmptyCache;
+
     public MeshBuilder(VoxelOctree octree)
     {
         _octree = octree;
@@ -18,6 +20,8 @@ public class MeshBuilder
 
     public MeshData Build()
     {
+        _isEmptyCache = new bool?[_octree.Size, _octree.Size, _octree.Size];
+
         var mesh = new MeshData();
         var stack = new Stack<VoxelOctree.OctreeNode>();
 
@@ -43,6 +47,8 @@ public class MeshBuilder
                 }
             }
         }
+
+        _isEmptyCache = new bool?[0,0,0];
 
         return mesh;
     }
@@ -113,8 +119,14 @@ public class MeshBuilder
             return true;
         }
 
-        var data = _octree.GetData(pos);
-        return data.IsEmpty;
+        var cached = _isEmptyCache[pos.X, pos.Y, pos.Z];
+        if (cached.HasValue)
+            return cached.Value;
+    
+        var isEmpty = _octree.GetData(pos).IsEmpty;
+        _isEmptyCache[pos.X, pos.Y, pos.Z] = isEmpty;
+        return isEmpty;
+
     }
 
 
