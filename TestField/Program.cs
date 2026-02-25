@@ -11,17 +11,15 @@ class Program
 {
     static void Main(string[] args)
     {
-        var seed = 1234;
+        var seed = 151234;
         var iterations = 100;
-        Console.WriteLine("\n Air chunk");
+        Console.WriteLine("\n-- Air chunk");
         ProfileBuildMethod(seed, new Vector3Int(0, 1, 0), iterations);
-        Console.WriteLine("\n Top surface chunk");
+        Console.WriteLine("\n-- Top surface chunk");
         ProfileBuildMethod(seed, new Vector3Int(0, 0, 0), iterations);
-
-        Console.WriteLine("\n Down surface chunk");
+        Console.WriteLine("\n-- Down surface chunk");
         ProfileBuildMethod(seed, new Vector3Int(0, -1, 0), iterations);
-
-        Console.WriteLine("\n solid chunk");
+        Console.WriteLine("\n-- solid chunk");
         ProfileBuildMethod(seed, new Vector3Int(0, -2, 0), iterations);
     }
 
@@ -74,15 +72,18 @@ class Program
     PrintResult("Mesh Building  ", totalMeshTime, iterations);
     PrintResult("Chunk Instance ", totalChunkTime, iterations);
     
-    double grandTotal = (totalGenTime + totalOctreeTime + totalMeshTime + totalChunkTime) / iterations;
-    Console.WriteLine($"Загальний середній час: {grandTotal:F4} ms");
+    double grandTotal = totalGenTime + totalOctreeTime + totalMeshTime + totalChunkTime;
+    double grandAverage = grandTotal / iterations;
+    Console.WriteLine($"Загальний час: {grandTotal:N2} ms");
+    Console.WriteLine($"Загальний середній час: {grandAverage:F4} ms");
+
 }
 
 private static void PrintResult(string label, double totalMs, int count)
 {
     double average = totalMs / count;
     // Використовуємо F4 для точності до 4 знаків після коми
-    Console.WriteLine($"{label}: {average:F4} ms");
+    Console.WriteLine($"{label}: {average:F3} ms");
 }
 }
 
