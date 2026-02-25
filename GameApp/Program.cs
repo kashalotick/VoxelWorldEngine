@@ -78,7 +78,7 @@ public class Program
 
     public static List<Chunk> GenerateChunks()
     {
-        const int seed = 123456;
+        const int seed = 151234;
         var chunks = new List<Chunk>();
 
         var chunkBuilder = new ChunkBuilder(seed);

@@ -12,15 +12,15 @@ class Program
     static void Main(string[] args)
     {
         var seed = 151234;
-        var iterations = 100;
-        Console.WriteLine("\n-- Air chunk");
-        ProfileBuildMethod(seed, new Vector3Int(0, 1, 0), iterations);
+        var iterations = 1000;
+        // Console.WriteLine("\n-- Air chunk");
+        // ProfileBuildMethod(seed, new Vector3Int(0, 1, 0), iterations);
         Console.WriteLine("\n-- Top surface chunk");
         ProfileBuildMethod(seed, new Vector3Int(0, 0, 0), iterations);
         Console.WriteLine("\n-- Down surface chunk");
         ProfileBuildMethod(seed, new Vector3Int(0, -1, 0), iterations);
-        Console.WriteLine("\n-- solid chunk");
-        ProfileBuildMethod(seed, new Vector3Int(0, -2, 0), iterations);
+        // Console.WriteLine("\n-- solid chunk");
+        // ProfileBuildMethod(seed, new Vector3Int(0, -2, 0), iterations);
     }
 
 

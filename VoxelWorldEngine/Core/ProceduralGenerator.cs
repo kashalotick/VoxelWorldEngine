@@ -10,6 +10,10 @@ public class ProceduralGenerator : IGenerator
     private Vector3Int _offset;
     private FastNoise _noise;
 
+    
+    private (Vector2Int min, Vector2Int max) _cacheVector;
+    private (float min, float max) _cacheValue;
+    
     public ProceduralGenerator(int seed, Vector3Int offset)
     {
         _offset = offset;
@@ -54,8 +58,16 @@ public class ProceduralGenerator : IGenerator
 
     private (float min, float max) Evaluate(Vector3Int min, Vector3Int max)
     {
-        var height = _noise.GetNoiseMinMax(new Vector2Int(min.X, min.Z), new Vector2Int(max.X, max.Z));
-        return (ModifyHeight(height.min), ModifyHeight(height.max));
+        var min2 = new Vector2Int(min.X, min.Z);
+        var max2 = new Vector2Int(max.X, max.Z);
+        if (_cacheVector == (min2, max2))
+        {
+            return _cacheValue;
+        }
+        _cacheVector = (min2, max2);
+        var height = _noise.GetNoiseMinMax(min2, max2);
+        _cacheValue = (ModifyHeight(height.min), ModifyHeight(height.max));
+        return _cacheValue;
     }
 
     private float ModifyHeight(float value)
