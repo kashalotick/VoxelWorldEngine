@@ -32,7 +32,7 @@ public partial class Octree<T>
         public OctreeNode GetChild(int octant)
         {
             var childLinearIndex = _linearOctree.GetNode(LinearIndex).GetChildIndex(octant);
-            var corner = Min + OctreeMath.GetOctantCorner(octant, Size >> 1);
+            var corner = Min + OctreeMath.GetOctantCorner(octant, Size);
             var child = new OctreeNode(_linearOctree, childLinearIndex)
             {
                 _linearOctree = _linearOctree,

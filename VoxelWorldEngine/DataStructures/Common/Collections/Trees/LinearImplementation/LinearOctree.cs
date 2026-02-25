@@ -51,6 +51,7 @@ public class LinearOctree<T>
     {
         var linearOctreeNode = _nodes[index];
         linearOctreeNode.Data = data;
+        _nodes[index] = linearOctreeNode;
     }
 
 

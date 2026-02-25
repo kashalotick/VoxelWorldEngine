@@ -18,6 +18,9 @@ public class ProceduralGenerator : IGenerator
 
     public Voxel Approximate(Vector3Int min, Vector3Int max)
     {
+        min += _offset;
+        max += _offset;
+        
         Voxel mixed = new Voxel(2);
         Voxel solid = new Voxel(1);
         Voxel air = new Voxel(0);
@@ -35,6 +38,9 @@ public class ProceduralGenerator : IGenerator
 
     public bool IsUniform(Vector3Int min, Vector3Int max)
     {
+        min += _offset;
+        max += _offset;
+        
         var height = Evaluate(min, max);
 
         if (max.Y <= height.min)
@@ -48,9 +54,6 @@ public class ProceduralGenerator : IGenerator
 
     private (float min, float max) Evaluate(Vector3Int min, Vector3Int max)
     {
-        min += _offset;
-        max += _offset;
-
         var height = _noise.GetNoiseMinMax(new Vector2Int(min.X, min.Z), new Vector2Int(max.X, max.Z));
         return (ModifyHeight(height.min), ModifyHeight(height.max));
     }

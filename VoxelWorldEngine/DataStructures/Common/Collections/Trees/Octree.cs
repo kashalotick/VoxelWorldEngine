@@ -6,11 +6,11 @@ namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 public partial class Octree<T> : IOctree<T>
 {
     public int MaxDepth { get; private set; }
-    private LinearOctree<T> _linearOctree;
+    protected LinearOctree<T> _linearOctree;
 
     public Octree()
     {
-        MaxDepth = 6;
+        MaxDepth = Constants.MaxChunkOctreeDepth;
         _linearOctree = new LinearOctree<T>(MaxDepth);
     }
 

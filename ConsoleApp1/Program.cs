@@ -24,7 +24,7 @@ public class Program
     {
         var chunks = GenerateChunks();
         var worldObjectList = new List<WorldObject>();
-        
+
         foreach (var chunk in chunks)
         {
             var worldObject = CreateWorldObject(chunk, shader, texture);
@@ -39,8 +39,8 @@ public class Program
     {
         var mesh = new WorldObjectMesh(FlattenVertices(chunk.Mesh.Vertices), chunk.Mesh.Indices.ToArray());
         var obj = new WorldObject(mesh, shader, texture);
-        
-        obj.Transform.Position = (Vector3)(System.Numerics.Vector3)chunk.Position;
+
+        obj.Transform.Position = (Vector3)(System.Numerics.Vector3)chunk.GlobalPosition;
         // obj.Transform.Position -= Vector3.UnitY * 10;
         // obj.Transform.Rotation = new Vector3(-MathHelper.PiOver2, 0, 0);
         return obj;
@@ -80,10 +80,24 @@ public class Program
     {
         const int seed = 123456;
         var chunks = new List<Chunk>();
-        
+
         var chunkBuilder = new ChunkBuilder(seed);
-        chunks.Add(chunkBuilder.Build(new Vector3Int(0, 0, 0)));
+        List<Vector3Int> chunkCoords =
+        [
+            // new(0, 0, 0),
+            // new(0, 0, 1),
+            new(0, -1, 1),
+
+            new(0, -1, 0),
+            new(0, 0, 0),
+
+        ];
+        foreach (var c in chunkCoords)
+        {
+            chunks.Add(chunkBuilder.Build(c));
+        }
         
+
         return chunks;
     }
 }

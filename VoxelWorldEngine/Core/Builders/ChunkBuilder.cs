@@ -16,7 +16,8 @@ public class ChunkBuilder
     public Chunk Build(Vector3Int position)
     {
 
-        IGenerator generator = new ProceduralGenerator(_seed, position);
+        IGenerator generator = new ProceduralGenerator(_seed, ChunkMath.ChunkToGlobal(position));
+        Console.WriteLine(ChunkMath.ChunkToGlobal(position));
         var octree = new VoxelOctree();
         octree.Build(generator);
 

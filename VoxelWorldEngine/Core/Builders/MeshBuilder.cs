@@ -21,6 +21,7 @@ public class MeshBuilder
         var mesh = new MeshData();
         var stack = new Stack<VoxelOctree.OctreeNode>();
 
+        var counter = 0;
         stack.Push(_octree.Root());
 
         while (stack.Count > 0)
@@ -38,6 +39,7 @@ public class MeshBuilder
                 for (int i = 0; i < 8; i++)
                 {
                     stack.Push(node.GetChild(i));
+                    counter++;
                 }
             }
         }
@@ -69,7 +71,7 @@ public class MeshBuilder
             {
                 var pos = new Vector3Int(x, y, z);
 
-                return !IsEmpty(pos);
+                if (IsEmpty(pos)) return false;
             }
 
             return true;
@@ -84,7 +86,7 @@ public class MeshBuilder
             {
                 var pos = new Vector3Int(x, y, z);
 
-                return !IsEmpty(pos);
+                if (IsEmpty(pos)) return false;
             }
 
             return true;
@@ -98,7 +100,7 @@ public class MeshBuilder
         {
             var pos = new Vector3Int(x, y, zFixed);
 
-            return !IsEmpty(pos);
+            if (IsEmpty(pos)) return false;
         }
 
         return true;

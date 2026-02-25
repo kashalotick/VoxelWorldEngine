@@ -21,9 +21,9 @@ public class ChunkLoadingSystem : ISystem
 
     public void FixedUpdate(double deltaTime)
     {
-        var observerPosition = new Vector3Int((int)_player.Transform.Position.X, 0, (int)_player.Transform.Position.Z);
-        var observer = new Observer(observerPosition, 2);
-        
-        _world.Update(deltaTime, observer);
+        // var observerPosition = new Vector3Int((int)_player.Transform.Position.X, 0, (int)_player.Transform.Position.Z);
+        // var observer = new Observer(observerPosition, 2);
+        //
+        // _world.Update(deltaTime, observer);
     }
 }

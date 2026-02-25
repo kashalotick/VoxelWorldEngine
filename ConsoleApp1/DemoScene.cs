@@ -2,6 +2,7 @@
 using LearningOpenTK.Content.Scenes;
 using LearningOpenTK.Core;
 using LearningOpenTK.Entities.World;
+using LearningOpenTK.Entities.World.Content;
 using LearningOpenTK.Entities.World.LightSources;
 using LearningOpenTK.Resources;
 using OpenTK.Graphics.OpenGL4;
@@ -13,13 +14,13 @@ namespace ConsoleApp1;
 
 public class DemoScene : TestScene
 {
-    public Func<Shader, Texture, List<WorldObject>> Genmesh;
+    public Func<Shader, Texture, List<WorldObject>> genchunks;
     private ChunkLoadingSystem _chunkLoadingSystem; // temp
     private Player _player; // temp
 
     public DemoScene(float screenWidth, float screenHeight, InputProvider inputProvider, Func<Shader, Texture, List<WorldObject>> genMesh) : base(screenWidth, screenHeight, inputProvider)
     {
-        Genmesh = genMesh;
+        genchunks = genMesh;
     }
 
     public override void Load()
@@ -35,16 +36,34 @@ public class DemoScene : TestScene
 
 
         
+
         // objects
         var shader = new Shader("shader");
         var texture = new Texture("Diamond.png");
-        var generateWorldObjectList = Genmesh(shader, texture);
+        var generateWorldObjectList = genchunks(shader, texture);
 
+        
+        var cubeMesh = Cube.CreateMesh();
+        var cube = new WorldObject(cubeMesh, shader, texture);
+        cube.Transform.Position = new Vector3(0, 0, 0);
+        GameObjectLayout.GameObjects.Add(cube);
+
+        var cube2 = new WorldObject(cubeMesh, shader, texture);
+        cube2.Transform.Position = new Vector3(64, 0, 64);
+        GameObjectLayout.GameObjects.Add(cube2);
+
+        
+        
         foreach (var worldObject in generateWorldObjectList)
         {
             GameObjectLayout.GameObjects.Add(worldObject);
-            worldObject.Load();
         }
+
+        foreach (var gameObject in GameObjectLayout.GameObjects)
+        {
+            gameObject.Load();
+        }
+        
         // light
         var sun = new Sun(shader, texture);
         sun.Transform.Position = new Vector3(0, 10, 0);
