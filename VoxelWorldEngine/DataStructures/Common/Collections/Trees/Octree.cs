@@ -36,8 +36,11 @@ public partial class Octree<T> : IOctree<T>
 
     internal T GetData(Vector3Int position)
     {
+        Counter.Increment(CounterType.VoxelOctreeGetData);
+
         var nodeIndex = _linearOctree.GetNodeIndex(position);
         var node = _linearOctree.GetNode(nodeIndex);
         return node.Data;
+
     }
 }

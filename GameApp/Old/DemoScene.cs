@@ -86,6 +86,7 @@ public class DemoScene : TestScene
         Entries.Add(gameWorld);
         
         _chunkLoadingSystem = new ChunkLoadingSystem(world);
+        _chunkLoadingSystem.Initialize();
         
         foreach (var entry in Entries)
         {
@@ -123,5 +124,11 @@ public class DemoScene : TestScene
             ChunkViewRadius = 3
         };
         _chunkLoadingSystem.Update(player);
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+        _chunkLoadingSystem.Dispose();
     }
 }

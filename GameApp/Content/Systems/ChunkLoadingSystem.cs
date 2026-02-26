@@ -6,9 +6,9 @@ using VoxelWorldEngine.Utils;
 
 namespace GameApp.Content.Systems;
 
-public class ChunkLoadingSystem
+public class ChunkLoadingSystem : ISystem
 {
-    private const int ChunkPerFrameLimit = 2;
+    private const int ChunkPerFrameLimit = 100;
     private ChunkLoader _chunkLoader;
 
     private World _world;
@@ -19,8 +19,15 @@ public class ChunkLoadingSystem
     {
         _chunkLoader = new ChunkLoader(world);
         _world = world;
+        StartWorkers();
     }
 
+    public void Initialize()
+    {
+        // TODO: Proxy???
+        StartWorkers();
+    }
+    
     public void Update(Player player)
     {
         UpdateChunks();
@@ -77,7 +84,8 @@ public class ChunkLoadingSystem
 
             if (!_world.Chunks.ContainsKey(chunkPosition) && !_requestedNewChunks.Contains(chunkPosition))
             {
-                RequestNewChunk(chunkPosition);
+                _requestedNewChunks.Add(chunkPosition);
+                _missingChunks.Add(chunkPosition);
             }
         }
 
@@ -88,23 +96,43 @@ public class ChunkLoadingSystem
         foreach (var pos in pendingToCancel)
         {
             _requestedNewChunks.Remove(pos);
+            // _missingChunks.TryTake(out var chunk);
         }
+
+        // _requestedNewChunks.Clear();
     }
 
     private HashSet<Vector3Int> _chunksToRemove = new();
     private HashSet<Vector3Int> _requestedNewChunks = new();
     private ConcurrentQueue<Chunk> _readyChunks = new();
+    
 
-
-    private void RequestNewChunk(Vector3Int chunkPosition)
+    private BlockingCollection<Vector3Int> _missingChunks = new();
+    private const int Workers = 2;
+    
+    private void StartWorkers()
     {
-        _requestedNewChunks.Add(chunkPosition);
-        Task.Run(() => LoadNewChunk(chunkPosition));
+        for (int i = 0; i < Workers; i++)
+        {
+            new Thread(ChunkWorker) {IsBackground = true}.Start();
+        }
+    }
+    private void ChunkWorker()
+    {
+        foreach (var chunkPosition in _missingChunks.GetConsumingEnumerable())
+        {
+            if (_chunksToRemove.Contains(chunkPosition)) continue;
+            
+            var chunk = _chunkLoader.Get(chunkPosition);
+            _readyChunks.Enqueue(chunk);
+        }
     }
 
-    private void LoadNewChunk(Vector3Int chunkPosition)
+
+    public void Dispose()
     {
-        var chunk = _chunkLoader.Get(chunkPosition);
-        _readyChunks.Enqueue(chunk);
+        _missingChunks.CompleteAdding();
+        _missingChunks.Dispose();
     }
+
 }
