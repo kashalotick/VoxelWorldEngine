@@ -1,3 +1,4 @@
+using System.Numerics;
 using DotnetNoise;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
@@ -9,22 +10,29 @@ public class ProceduralGenerator : IGenerator
 {
     private Vector3Int _offset;
     private FastNoise _noise;
+    private FastNoise _noise2;
 
-    
+
     private (Vector2Int min, Vector2Int max) _cacheVector;
     private (float min, float max) _cacheValue;
-    
+
     public ProceduralGenerator(int seed, Vector3Int offset)
     {
         _offset = offset;
         _noise = new FastNoise(seed);
+        _noise2 = new FastNoise(seed)
+        {
+            Frequency = 0.03f,
+            Lacunarity = 3f,
+            Gain = 0.75f,
+        };
     }
 
     public Voxel Approximate(Vector3Int min, Vector3Int max)
     {
         min += _offset;
         max += _offset;
-        
+
         Voxel mixed = new Voxel(2);
         Voxel solid = new Voxel(1);
         Voxel air = new Voxel(0);
@@ -44,7 +52,7 @@ public class ProceduralGenerator : IGenerator
     {
         min += _offset;
         max += _offset;
-        
+
         var height = Evaluate(min, max);
 
         if (max.Y <= height.min)
@@ -64,9 +72,22 @@ public class ProceduralGenerator : IGenerator
         {
             return _cacheValue;
         }
+
         _cacheVector = (min2, max2);
         var height = _noise.GetNoiseMinMax(min2, max2);
-        _cacheValue = (ModifyHeight(height.min), ModifyHeight(height.max));
+        var subHeight = _noise2.GetNoiseMinMax(min2 * 3, max2 * 3);
+
+        var baseHeight = _noise.GetNoiseMinMax((Vector2)min2 * 0.1f, (Vector2)max2 * 0.1f);
+
+
+        var newMin = height.min + subHeight.min * 0.05f;
+        var newMax = height.max + subHeight.max * 0.05f;
+
+        newMin += baseHeight.min * 2;
+        newMax += baseHeight.max * 2;
+
+
+        _cacheValue = (ModifyHeight(newMin), ModifyHeight(newMax));
         return _cacheValue;
     }
 

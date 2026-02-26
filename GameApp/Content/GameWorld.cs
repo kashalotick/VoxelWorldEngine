@@ -25,6 +25,10 @@ public class GameWorld : IGameEntry
 
     public void AddChunk(Chunk chunk)
     {
+        if (chunk.Mesh.Vertices.Count == 0)
+        {
+        }
+        // TODO: make proxy from no empty objects
         var wo = ConvertToWorldObject(chunk);
         _chunks[chunk.Position] = wo;
         wo.Load();
@@ -41,6 +45,7 @@ public class GameWorld : IGameEntry
         _chunks.Remove(chunkPosition);
     }
     
+    // TODO: temporary?????
     private WorldObject ConvertToWorldObject(Chunk chunk)
     {
         var mesh = new WorldObjectMesh(FlattenVertices(chunk.Mesh.Vertices), chunk.Mesh.Indices.ToArray());
@@ -50,6 +55,7 @@ public class GameWorld : IGameEntry
         return obj;
     }
     
+    // TODO: temporary????? update mesh class to Mesh<TVertex, TIndex> where TVertex, TIndex : struct
     private float[] FlattenVertices(List<Vertex> vertices)
     {
         var result = new float[vertices.Count * 11]; // 3+3+3+2
