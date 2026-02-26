@@ -6,7 +6,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <RootNamespace>ConsoleApp1</RootNamespace>
+        <RootNamespace>GameApp</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

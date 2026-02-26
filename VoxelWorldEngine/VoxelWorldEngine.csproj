@@ -12,6 +12,7 @@
 
     <ItemGroup>
         <Folder Include="DataStructures\Common\Structures\"/>
+        <Folder Include="DataStructures\DTO\" />
     </ItemGroup>
 
 </Project>

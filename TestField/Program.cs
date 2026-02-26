@@ -40,7 +40,7 @@ class Program
     {
         // 1. Етап Генератора
         sw.Restart();
-        IGenerator generator = new ProceduralGenerator(seed, ChunkMath.ChunkToGlobal(position));
+        IGenerator generator = new ProceduralGenerator(seed, Chunk.ChunkToGlobal(position));
         sw.Stop();
         totalGenTime += sw.Elapsed.TotalMilliseconds;
 
@@ -60,7 +60,9 @@ class Program
 
         // 4. Етап Створення об'єкта Chunk
         sw.Restart();
-        var chunk = new Chunk(position, octree, mesh);
+        var chunk = new Chunk(position);
+        chunk.Octree = octree;
+        chunk.Mesh = mesh;
         sw.Stop();
         totalChunkTime += sw.Elapsed.TotalMilliseconds;
     }

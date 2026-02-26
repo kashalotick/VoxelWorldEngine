@@ -1,15 +1,11 @@
-﻿using LearningOpenTK.Core.Components;
+﻿using System.Numerics;
 
-namespace ConsoleApp1;
+namespace GameApp;
 
-public class Player
+public struct Player
 {
-    public Transform Transform;
-
-    public Player()
-    {
-        Transform = new Transform();
-    }
-    
+    public Vector3 Position;
+    public Vector3 ViewDirection;
+    public int ChunkViewRadius;
     
 }

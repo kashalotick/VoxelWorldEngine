@@ -7,7 +7,7 @@ public partial class Octree<T> : IOctree<T>
 {
     public int MaxDepth { get; private set; }
     public int Size => _linearOctree.Size;
-    protected LinearOctree<T> _linearOctree;
+    private LinearOctree<T> _linearOctree;
 
     public Octree()
     {

@@ -8,12 +8,10 @@ public class World
     
     
     
-    public Seed Seed;
     private ChunkManager _chunkManager;
 
-    public World(Seed seed)
+    public World()
     {
-        Seed = seed;
         _chunkManager = new ChunkManager();
     }
 

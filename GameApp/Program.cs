@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using GameApp.Old;
 using LearningOpenTK.Core;
 using LearningOpenTK.Entities.World;
 using LearningOpenTK.Meshes;
@@ -9,14 +10,14 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
 using Vector3 = OpenTK.Mathematics.Vector3;
 
-namespace ConsoleApp1;
+namespace GameApp;
 
 public class Program
 {
     public static void Main(string[] args)
     {
-        var game = new Game(1200, 900, "Voxel engine test");
-        game.SetDefaultScene((w, h, input) => new DemoScene(w, h, input, GenerateWorldObjectList));
+        var game = new Game(1200, 900, "Voxel engine test",
+            (w, h, input) => new DemoScene(w, h, input, GenerateWorldObjectList));
         game.Run();
     }
 
@@ -90,13 +91,12 @@ public class Program
 
             new(0, -1, 0),
             new(0, 0, 0),
-
         ];
         foreach (var c in chunkCoords)
         {
             chunks.Add(chunkBuilder.Build(c));
         }
-        
+
 
         return chunks;
     }

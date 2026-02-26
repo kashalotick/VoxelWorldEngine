@@ -15,16 +15,14 @@ public class ChunkBuilder
 
     public Chunk Build(Vector3Int position)
     {
-
-        IGenerator generator = new ProceduralGenerator(_seed, ChunkMath.ChunkToGlobal(position));
-        Console.WriteLine(ChunkMath.ChunkToGlobal(position));
+        var chunk = new Chunk(position);
+        
+        IGenerator generator = new ProceduralGenerator(_seed, chunk.GlobalPosition);
+        Console.WriteLine(Chunk.ChunkToGlobal(position));
         var octree = new VoxelOctree();
         octree.Build(generator);
 
-        var meshBuilder = new MeshBuilder(octree);
-        var mesh = meshBuilder.Build();
-
-        var chunk = new Chunk(position, octree, mesh);
+        chunk.Octree = octree;
         
         return chunk;
     }
