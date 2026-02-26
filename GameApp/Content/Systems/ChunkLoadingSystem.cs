@@ -85,8 +85,17 @@ public class ChunkLoadingSystem : ISystem
         {
             var chunkPosition = playerChunkPosition + new Vector3Int(x, y, z);
             shouldBeLoaded.Add(chunkPosition);
-            
-            
+
+            //
+            // var aabb = new AABB(
+            //     (Vector3)Chunk.ChunkToGlobal(chunkPosition),
+            //     (Vector3)(Chunk.ChunkToGlobal(chunkPosition) + Vector3Int.One * Chunk.ChunkSize)
+            // );
+            // if (!_frustrum.IsAABBVisible(aabb))
+            // {
+            //     continue;
+            // }
+
             if (!_world.Chunks.ContainsKey(chunkPosition) && !_requestedNewChunks.Contains(chunkPosition))
             {
                 _requestedNewChunks.Add(chunkPosition);
