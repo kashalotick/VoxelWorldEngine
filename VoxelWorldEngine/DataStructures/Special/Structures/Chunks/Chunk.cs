@@ -12,6 +12,9 @@ public class Chunk
     public VoxelOctree Octree { get; set; }
     public Vector3Int Position { get; set; }
     public Vector3Int GlobalPosition => ChunkToGlobal(Position);
+    
+    // public Vector3Int Min => GlobalPosition;
+    // public Vector3Int Max => GlobalPosition + Vector3Int.One * ChunkSize;
 
 
     public Chunk(Vector3Int position)
@@ -21,7 +24,7 @@ public class Chunk
 
 
     
-    private static int ChunkSize => Constants.ChunkSize;
+    public static int ChunkSize => Constants.ChunkSize;
 
     public static Vector3Int ChunkToGlobal(Vector3Int position)
     {

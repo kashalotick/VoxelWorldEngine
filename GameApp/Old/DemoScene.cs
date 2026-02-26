@@ -1,4 +1,5 @@
-﻿using GameApp.Content;
+﻿using System.Numerics;
+using GameApp.Content;
 using GameApp.Content.Services;
 using GameApp.Content.Systems;
 using LearningOpenTK.Content;
@@ -9,8 +10,9 @@ using LearningOpenTK.Entities.World.Content;
 using LearningOpenTK.Entities.World.LightSources;
 using LearningOpenTK.Resources;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using VoxelWorldEngine.Core;
+using Vector3 = OpenTK.Mathematics.Vector3;
+using Vector4 = OpenTK.Mathematics.Vector4;
 
 namespace GameApp.Old;
 
@@ -121,7 +123,8 @@ public class DemoScene : TestScene
         {
             Position = (System.Numerics.Vector3)FpvCamera.Position,
             ViewDirection = (System.Numerics.Vector3)FpvCamera.Front,
-            ChunkViewRadius = 3
+            ChunkViewRadius = 5,
+            ViewMatrix = (Matrix4x4)FpvCamera.GetViewMatrix()
         };
         _chunkLoadingSystem.Update(player);
     }

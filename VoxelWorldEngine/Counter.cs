@@ -24,4 +24,6 @@ public enum CounterType
 {
     VoxelOctreeGetData,
     VoxelOctreeBuild,
+    MissingChunks,
+    MissingChunksTryAdd
 }
