@@ -123,7 +123,7 @@ public class DemoScene : TestScene
         {
             Position = (System.Numerics.Vector3)FpvCamera.Position,
             ViewDirection = (System.Numerics.Vector3)FpvCamera.Front,
-            ChunkViewRadius = 5,
+            ChunkViewRadius = 3,
             ViewMatrix = (Matrix4x4)FpvCamera.GetViewMatrix()
         };
         _chunkLoadingSystem.Update(player);

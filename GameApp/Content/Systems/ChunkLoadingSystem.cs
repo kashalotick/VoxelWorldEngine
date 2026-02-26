@@ -161,13 +161,13 @@ public class ChunkLoadingSystem : ISystem
         for (int i = 0; i < MinWorkers; i++)
         {
             new Thread(ChunkWorker) { IsBackground = true }.Start();
+            Interlocked.Increment(ref _activeWorkers);
         }
     }
 
     private void AdjustWorkers()
     {
         int queueSize = _missingChunks.Count;
-
         if (queueSize > QueueTriggerSize * _activeWorkers && _activeWorkers < MaxWorkers)
         {
             AddWorker();
