@@ -8,7 +8,7 @@ namespace GameApp.Content.Systems;
 
 public class ChunkLoadingSystem
 {
-    private const int ChunkPerFrameLimit = 100;
+    private const int ChunkPerFrameLimit = 2;
     private ChunkLoader _chunkLoader;
 
     private World _world;
@@ -43,7 +43,7 @@ public class ChunkLoadingSystem
     {
         int chunksProcessed = 0;
 
-        while (_readyChunks.TryDequeue(out Chunk chunk) && chunksProcessed < ChunkPerFrameLimit)
+        while (chunksProcessed < ChunkPerFrameLimit && _readyChunks.TryDequeue(out Chunk chunk))
         {
             if (!_requestedNewChunks.Contains(chunk.Position)) continue;
 
