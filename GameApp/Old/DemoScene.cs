@@ -18,18 +18,18 @@ namespace GameApp.Old;
 
 public class DemoScene : TestScene
 {
-    public Func<Shader, Texture, List<WorldObject>> genchunks;
     private ChunkLoadingSystem _chunkLoadingSystem; // temp
-
-    public DemoScene(float screenWidth, float screenHeight, InputProvider inputProvider, Func<Shader, Texture, List<WorldObject>> genMesh) : base(screenWidth, screenHeight, inputProvider)
+    private ResourceRepository _resourceRepository;
+    
+    public DemoScene(float screenWidth, float screenHeight, InputProvider inputProvider) : base(screenWidth, screenHeight, inputProvider)
     {
-        genchunks = genMesh;
     }
 
     public override void Load()
     {
         GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.CullFace);
+        // GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);
 
         
         FpvCamera = new FPVCamera(new Vector3(1, 2, 3), Size.X / Size.Y); // TODO: make injection for position
@@ -40,41 +40,15 @@ public class DemoScene : TestScene
 
 
         
-
-        // objects
-        // var shader = new Shader("shader");
-        // var texture = new Texture("Diamond.png");
-        // var generateWorldObjectList = genchunks(shader, texture);
-
-        
-        // var cubeMesh = Cube.CreateMesh();
-        // var cube = new WorldObject(cubeMesh, shader, texture);
-        // cube.Transform.Position = new Vector3(0, 0, 0);
-        // GameObjectLayout.GameObjects.Add(cube);
-        //
-        // var cube2 = new WorldObject(cubeMesh, shader, texture);
-        // cube2.Transform.Position = new Vector3(64, 0, 64);
-        // GameObjectLayout.GameObjects.Add(cube2);
-
         
         
-        // foreach (var worldObject in generateWorldObjectList)
-        // {
-        //     GameObjectLayout.GameObjects.Add(worldObject);
-        // }
-        //
-        // foreach (var gameObject in GameObjectLayout.GameObjects)
-        // {
-        //     gameObject.Load();
-        // }
-        
-        var resourceRepository = new ResourceRepository();
+        _resourceRepository = new ResourceRepository();
+        _resourceRepository.Load();
         
         var cubeMesh = Cube.CreateMesh();
-        var cube = new WorldObject(cubeMesh, resourceRepository.ShaderShader, resourceRepository.DiamondTexture);
+        var cube = new WorldObject(cubeMesh, _resourceRepository.ShaderShader, _resourceRepository.DiamondTexture);
         cube.Transform.Position = new Vector3(0, 0, 0);
         GameObjectLayout.GameObjects.Add(cube);
-        // GameObjectLayout.Load();
         
 
         
@@ -82,7 +56,7 @@ public class DemoScene : TestScene
         var ws = new WorldService();
         var world = ws.GenerateWorld(124);
         
-        var gameWorld = new GameWorld(resourceRepository);
+        var gameWorld = new GameWorld(_resourceRepository);
         world.ChunkAdded += gameWorld.AddChunk;
         world.ChunkRemoved += gameWorld.RemoveChunk;
         Entries.Add(gameWorld);
@@ -95,13 +69,19 @@ public class DemoScene : TestScene
             entry.Load();
         }
         // light
-        LightComposition(resourceRepository.ShaderShader, resourceRepository.DiamondTexture);
+        // LightComposition(resourceRepository.ShaderShader, resourceRepository.DiamondTexture);
+        LightComposition(_resourceRepository.ChunkShader, _resourceRepository.DiamondTexture);
+        LightComposition(_resourceRepository.ShaderShader, _resourceRepository.DiamondTexture);
+
 
     }
 
     private static void LightComposition(Shader shader, Texture texture)
     {
+        shader.Use();
+        
         var sun = new Sun(shader, texture);
+        
         sun.Transform.Position = new Vector3(0, 10, 0);
         sun.LightColor = new Vector3(1.0f, 1.0f, 0.95f);
         sun.LightDirection = Vector3.Normalize(new Vector3(-1, -2, -1));
@@ -133,5 +113,6 @@ public class DemoScene : TestScene
     {
         base.Dispose(disposing);
         _chunkLoadingSystem.Dispose();
+        _resourceRepository.Dispose();
     }
 }

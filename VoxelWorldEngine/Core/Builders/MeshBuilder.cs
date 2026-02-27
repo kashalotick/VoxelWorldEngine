@@ -62,7 +62,7 @@ public class MeshBuilder
 
             if (FaceCulling(node, normal)) continue;
 
-            AddFace(node.Min, normal, node.Size, mesh);
+            AddFace(node, normal, mesh);
         }
     }
 
@@ -130,23 +130,22 @@ public class MeshBuilder
     }
 
 
-    private void AddFace(Vector3Int position, Vector3Int normal, int size, MeshData mesh)
+    private void AddFace(VoxelOctree.OctreeNode node, Vector3Int normal, MeshData mesh)
     {
-        var facePosition = (Vector3)position;
+        var facePosition = (Vector3)node.Min;
         var faceNormal = (Vector3)normal;
-        var faceColor = new Vector3(1, 2, 3);
         var vCount = (uint)mesh.Vertices.Count;
         var normalIndex = GetFaceIndex(normal);
 
         for (int i = 0; i < 4; i++)
         {
             var offset = FaceVertices[normalIndex][i];
-            var vertex = new Vertex
+            var vertex = new ChunkVertex
             {
-                Position = facePosition + size * offset,
+                Position = facePosition + node.Size * offset,
                 Normal = faceNormal,
-                Uv = FaceUVs[i],
-                Color = faceColor
+                Uv = FaceUVs[i] * node.Size,
+                BlockId = node.Data.BlockId
             };
             mesh.Vertices.Add(vertex);
         }

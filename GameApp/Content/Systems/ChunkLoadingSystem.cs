@@ -163,7 +163,7 @@ public class ChunkLoadingSystem : ISystem
     private int _activeWorkers = 0;
     private const int MaxWorkers = 8;
     private const int MinWorkers = 2;
-    private const int QueueTriggerSize = 100; // TODO: player view radius depending
+    private const int QueueTriggerSize = 50; // TODO: player view radius depending
 
     private void StartWorkers()
     {
@@ -177,7 +177,7 @@ public class ChunkLoadingSystem : ISystem
     private void AdjustWorkers()
     {
         int queueSize = _missingChunks.Count;
-        if (queueSize > QueueTriggerSize * _activeWorkers && _activeWorkers < MaxWorkers)
+        if (queueSize > QueueTriggerSize * 2 * _activeWorkers && _activeWorkers < MaxWorkers)
         {
             AddWorker();
         }

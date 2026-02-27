@@ -2,20 +2,16 @@
 
 public struct Voxel
 {
-    public sbyte Density;
+    public BlockId BlockId;
     
     
     // TODO: make equality operation
     
-    public Voxel(sbyte density)
+    public Voxel(BlockId blockId)
     {
-        Density = density;
-    }
-    public Voxel(int density)
-    {
-        Density = (sbyte)density;
+        BlockId = blockId;
     }
     
-    public bool IsEmpty => Density == 0;
+    public bool IsEmpty => BlockId == 0;
 
 }

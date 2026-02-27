@@ -1,6 +1,6 @@
 ﻿namespace VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
-public enum Material : byte
+public enum BlockId : byte
 {
     Air,
     Mixed,

@@ -48,42 +48,42 @@ public class GameWorld : IGameEntry
     // TODO: temporary?????
     private WorldObject ConvertToWorldObject(Chunk chunk)
     {
-        var mesh = new WorldObjectMesh(FlattenVertices(chunk.Mesh.Vertices), chunk.Mesh.Indices.ToArray());
-        var obj = new WorldObject(mesh, _resources.ShaderShader, _resources.DiamondTexture);
+        var mesh = new ChunkMesh(chunk.Mesh.Vertices.ToArray(), chunk.Mesh.Indices.ToArray());
+        var obj = new WorldObject(mesh, _resources.ChunkShader, _resources.DiamondTexture);
 
         obj.Transform.Position = (Vector3)(System.Numerics.Vector3)chunk.GlobalPosition;
         return obj;
     }
     
     // TODO: temporary????? update mesh class to Mesh<TVertex, TIndex> where TVertex, TIndex : struct
-    private float[] FlattenVertices(List<Vertex> vertices)
-    {
-        var result = new float[vertices.Count * 11]; // 3+3+3+2
-        int idx = 0;
-
-        foreach (var v in vertices)
-        {
-            void AddVec3(System.Numerics.Vector3 vec)
-            {
-                result[idx++] = vec.X;
-                result[idx++] = vec.Y;
-                result[idx++] = vec.Z;
-            }
-
-            void AddVec2(Vector2 vec)
-            {
-                result[idx++] = vec.X;
-                result[idx++] = vec.Y;
-            }
-
-            AddVec3(v.Position);
-            AddVec3(v.Normal);
-            AddVec3(v.Color);
-            AddVec2(v.Uv);
-        }
-
-        return result;
-    }
+    // private float[] FlattenVertices(List<ChunkVertex> vertices)
+    // {
+    //     var result = new float[vertices.Count * 11]; // 3+3+3+2
+    //     int idx = 0;
+    //
+    //     foreach (var v in vertices)
+    //     {
+    //         void AddVec3(System.Numerics.Vector3 vec)
+    //         {
+    //             result[idx++] = vec.X;
+    //             result[idx++] = vec.Y;
+    //             result[idx++] = vec.Z;
+    //         }
+    //
+    //         void AddVec2(Vector2 vec)
+    //         {
+    //             result[idx++] = vec.X;
+    //             result[idx++] = vec.Y;
+    //         }
+    //
+    //         AddVec3(v.Position);
+    //         AddVec3(v.Normal);
+    //         AddVec3(v.Color);
+    //         AddVec2(v.Uv);
+    //     }
+    //
+    //     return result;
+    // }
 
 
 

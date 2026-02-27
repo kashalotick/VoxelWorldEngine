@@ -33,9 +33,9 @@ public class ProceduralGenerator : IGenerator
         min += _offset;
         max += _offset;
 
-        Voxel mixed = new Voxel(2);
-        Voxel solid = new Voxel(1);
-        Voxel air = new Voxel(0);
+        Voxel mixed = new Voxel(BlockId.Mixed);
+        Voxel solid = new Voxel(BlockId.Stone);
+        Voxel air = new Voxel(BlockId.Air);
 
         var height = Evaluate(min, max);
 
@@ -75,17 +75,21 @@ public class ProceduralGenerator : IGenerator
 
         _cacheVector = (min2, max2);
         var height = _noise.GetNoiseMinMax(min2, max2);
+        // var newMin = height.min;
+        // var newMax = height.max;
+        
         var subHeight = _noise2.GetNoiseMinMax(min2 * 3, max2 * 3);
-
+        
         var baseHeight = _noise.GetNoiseMinMax((Vector2)min2 * 0.1f, (Vector2)max2 * 0.1f);
-
-
+        
+        
         var newMin = height.min + subHeight.min * 0.05f;
         var newMax = height.max + subHeight.max * 0.05f;
-
+        
         newMin += baseHeight.min * 2;
         newMax += baseHeight.max * 2;
 
+        
 
         _cacheValue = (ModifyHeight(newMin), ModifyHeight(newMax));
         return _cacheValue;

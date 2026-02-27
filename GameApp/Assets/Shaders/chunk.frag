@@ -1,0 +1,39 @@
+#version 330 core
+
+in vec3 vertexNormal;
+in vec2 texCoord;
+in vec3 fragPos;
+flat in uint blockId;
+
+out vec4 FragColor;
+
+uniform sampler2D texture0;
+uniform vec3 lightColor;
+uniform vec3 lightDirection;
+uniform vec4 ambientColor;
+uniform vec3 viewPos;
+uniform float shininess;
+
+void main()
+{
+    vec3 N = normalize(vertexNormal);
+    vec3 L = normalize(-lightDirection);
+    vec3 V = normalize(viewPos - fragPos);
+    vec3 R = reflect(-L, N);
+
+    float diff = max(dot(N, L), 0.0);
+
+    vec3 tex = texture(texture0, texCoord).rgb;
+
+    float spec = pow(max(dot(V, R), 0.0), shininess);
+
+    vec3 ambient = tex * vec3(ambientColor.xyz) * ambientColor.w;
+    vec3 diffuse = tex * lightColor * diff;
+    vec3 specular = lightColor * spec;
+
+    vec3 result = ambient + diffuse + specular;
+
+    FragColor = vec4(result, 1.0);
+//    FragColor = vec4(tex, 1.0);
+//    FragColor = vec4(texCoord, 0.0, 1.0);
+}
