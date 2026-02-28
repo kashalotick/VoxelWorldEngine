@@ -1,6 +1,6 @@
 ﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
-namespace VoxelWorldEngine.Utils;
+namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
 
 public static class OctreeMath

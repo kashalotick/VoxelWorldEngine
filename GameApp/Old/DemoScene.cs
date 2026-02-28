@@ -9,6 +9,7 @@ using LearningOpenTK.Entities.World;
 using LearningOpenTK.Entities.World.Content;
 using LearningOpenTK.Entities.World.LightSources;
 using LearningOpenTK.Resources;
+using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using VoxelWorldEngine.Core;
 using Vector3 = OpenTK.Mathematics.Vector3;
@@ -29,7 +30,7 @@ public class DemoScene : TestScene
     {
         GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.CullFace);
-        GL.PolygonMode(TriangleFace.Front, PolygonMode.Line);
+        // GL.PolygonMode(TriangleFace.Front, PolygonMode.Line);
 
         
         FpvCamera = new FPVCamera(new Vector3(1, 2, 3), GameContext.ScreenWidth / GameContext.ScreenHeight); // TODO: make injection for position
@@ -39,9 +40,9 @@ public class DemoScene : TestScene
         FpvCamera.LookAt(Vector3.Zero);
 
 
-        var chunkShader = GameContext.Resources.Shaders.GetAndLoad("chunk");
-        var cubeShader = GameContext.Resources.Shaders.GetAndLoad("shader");
-        var diamondTexture = GameContext.Resources.Textures.GetAndLoad("Diamond");
+        var chunkShader = GameContext.ShaderRepository.Get("chunk");
+        var cubeShader = GameContext.ShaderRepository.Get("shader");
+        var diamondTexture = GameContext.TextureRepository.Get("Stone");
         
         
 
@@ -106,7 +107,7 @@ public class DemoScene : TestScene
         {
             Position = (System.Numerics.Vector3)FpvCamera.Position,
             ViewDirection = (System.Numerics.Vector3)FpvCamera.Front,
-            ChunkViewRadius = 5,
+            ChunkViewRadius = 3,
             ViewMatrix = (Matrix4x4)FpvCamera.GetViewMatrix()
         };
         _chunkLoadingSystem.Update(deltaTime, player);

@@ -5,6 +5,7 @@ using LearningOpenTK.Core.Interfaces;
 using LearningOpenTK.Entities.World;
 using LearningOpenTK.Meshes;
 using LearningOpenTK.Resources;
+using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;

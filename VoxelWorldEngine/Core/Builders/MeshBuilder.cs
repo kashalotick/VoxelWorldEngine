@@ -60,7 +60,7 @@ public class MeshBuilder
         {
             var normal = Normals[i];
 
-            if (FaceCulling(node, normal)) continue;
+            // if (FaceCulling(node, normal)) continue;
 
             AddFace(node, normal, mesh);
         }

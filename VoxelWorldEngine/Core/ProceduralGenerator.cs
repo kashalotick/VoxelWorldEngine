@@ -66,7 +66,11 @@ public class ProceduralGenerator : IGenerator
 
     private (float min, float max) Evaluate(Vector3Int min, Vector3Int max)
     {
-        // return (21f, 21f);
+        var h = SinSurface.GetSinCosRange(min, max);
+        return (ModifyHeight(h.min), ModifyHeight(h.max));
+
+        return (-21f, -21f);
+        
         var min2 = new Vector2Int(min.X, min.Z);
         var max2 = new Vector2Int(max.X, max.Z);
         if (_cacheVector == (min2, max2))
