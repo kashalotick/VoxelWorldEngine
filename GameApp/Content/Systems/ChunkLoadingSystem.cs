@@ -31,16 +31,23 @@ public class ChunkLoadingSystem : ISystem
         StartWorkers();
     }
 
-    public void Update(Player player)
+    private double _cooldown = 0f;
+    private const float CooldownTime = 0.5f;
+
+    public void Update(double deltaTime, Player player)
     {
+        _cooldown -= deltaTime;
         UpdateChunks();
         AdjustWorkers();
 
-        var playerChunkPosition = Chunk.GlobalToChunk(player.Position.ToVector3Int());
-        if (playerChunkPosition != _activeChunkPosition)
+        if (_cooldown <= 0f)
         {
-            _activeChunkPosition = playerChunkPosition;
-            RecalculateChunksAround(player);
+            var playerChunkPosition = Chunk.GlobalToChunk(player.Position.ToVector3Int());
+            if (playerChunkPosition != _activeChunkPosition)
+            {
+                _activeChunkPosition = playerChunkPosition;
+                RecalculateChunksAround(player);
+            }
         }
     }
 
@@ -163,7 +170,7 @@ public class ChunkLoadingSystem : ISystem
     private int _activeWorkers = 0;
     private const int MaxWorkers = 8;
     private const int MinWorkers = 2;
-    private const int QueueTriggerSize = 50; // TODO: player view radius depending
+    private const int QueueTriggerSize = 81; // TODO: player view radius depending
 
     private void StartWorkers()
     {
@@ -177,7 +184,7 @@ public class ChunkLoadingSystem : ISystem
     private void AdjustWorkers()
     {
         int queueSize = _missingChunks.Count;
-        if (queueSize > QueueTriggerSize * 2 * _activeWorkers && _activeWorkers < MaxWorkers)
+        if (queueSize > QueueTriggerSize * _activeWorkers && _activeWorkers < MaxWorkers)
         {
             AddWorker();
         }
