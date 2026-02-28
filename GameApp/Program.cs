@@ -17,7 +17,7 @@ public class Program
     public static void Main(string[] args)
     {
         var game = new Game(1200, 900, "Voxel engine test",
-            (w, h, input) => new DemoScene(w, h, input));
+            gc => new DemoScene(gc));
         game.Run();
     }
 }

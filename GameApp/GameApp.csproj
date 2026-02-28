@@ -19,14 +19,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Assets\Textures\" />
-    </ItemGroup>
-
-    <ItemGroup>
       <None Update="Assets\Shaders\chunk.frag">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Assets\Shaders\chunk.vert">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Assets\Textures\Stone.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

@@ -10,10 +10,10 @@ public class WorldScene : Scene
     private FPVCamera _camera;
     private CameraController _controller;
     
-    public WorldScene(float screenWidth, float screenHeight, InputProvider inputProvider) : base(screenWidth, screenHeight, inputProvider)
+    public WorldScene(GameContext gameContext) : base(gameContext)
     {
-        _camera = new FPVCamera(new Vector3(1, 2, 3), Size.X / Size.Y); // TODO: make injection for position
-        _controller = new CameraController(inputProvider, _camera);
+        _camera = new FPVCamera(new Vector3(1, 2, 3), GameContext.ScreenWidth / GameContext.ScreenHeight); // TODO: make injection for position
+        _controller = new CameraController(GameContext.Input, _camera);
         _controller.ExitRequested += RequestCloseWindow;
         
         
@@ -22,7 +22,7 @@ public class WorldScene : Scene
     public override bool IsCursorLocked => true;
 
 
-    public override void Load()
+    protected override void InternalLoad()
     {
         
     }

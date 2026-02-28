@@ -66,6 +66,7 @@ public class ProceduralGenerator : IGenerator
 
     private (float min, float max) Evaluate(Vector3Int min, Vector3Int max)
     {
+        // return (21f, 21f);
         var min2 = new Vector2Int(min.X, min.Z);
         var max2 = new Vector2Int(max.X, max.Z);
         if (_cacheVector == (min2, max2))
@@ -74,6 +75,15 @@ public class ProceduralGenerator : IGenerator
         }
 
         _cacheVector = (min2, max2);
+
+        const int absoluteMin = -78;
+        const int absoluteMax = 78;
+        if (max.Y <= absoluteMin)
+            return (absoluteMin, absoluteMin);
+
+        if (min.Y >= absoluteMax)
+            return (absoluteMax, absoluteMax);
+
         var height = _noise.GetNoiseMinMax(min2, max2);
         // var newMin = height.min;
         // var newMax = height.max;

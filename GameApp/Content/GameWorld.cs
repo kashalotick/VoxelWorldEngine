@@ -1,9 +1,12 @@
 ﻿using System.Numerics;
+using LearningOpenTK.Components;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.Interfaces;
 using LearningOpenTK.Entities.World;
 using LearningOpenTK.Meshes;
+using LearningOpenTK.Resources;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
@@ -15,12 +18,15 @@ namespace GameApp.Content;
 
 public class GameWorld : IGameEntry
 {
-    private ResourceRepository _resources;
+    private IShader _worldShader;
+    private ITexture _worldTexture;
+    
     private Dictionary<Vector3Int, WorldObject> _chunks = new();
 
-    public GameWorld(ResourceRepository resources)
+    public GameWorld(IShader shader, ITexture texture)
     {
-        _resources = resources;
+        _worldShader = shader;
+        _worldTexture = texture;
     }
 
     public void AddChunk(Chunk chunk)
@@ -49,43 +55,11 @@ public class GameWorld : IGameEntry
     private WorldObject ConvertToWorldObject(Chunk chunk)
     {
         var mesh = new ChunkMesh(chunk.Mesh.Vertices.ToArray(), chunk.Mesh.Indices.ToArray());
-        var obj = new WorldObject(mesh, _resources.ChunkShader, _resources.DiamondTexture);
+        var obj = new WorldObject(mesh, _worldShader, _worldTexture);
 
         obj.Transform.Position = (Vector3)(System.Numerics.Vector3)chunk.GlobalPosition;
         return obj;
     }
-    
-    // TODO: temporary????? update mesh class to Mesh<TVertex, TIndex> where TVertex, TIndex : struct
-    // private float[] FlattenVertices(List<ChunkVertex> vertices)
-    // {
-    //     var result = new float[vertices.Count * 11]; // 3+3+3+2
-    //     int idx = 0;
-    //
-    //     foreach (var v in vertices)
-    //     {
-    //         void AddVec3(System.Numerics.Vector3 vec)
-    //         {
-    //             result[idx++] = vec.X;
-    //             result[idx++] = vec.Y;
-    //             result[idx++] = vec.Z;
-    //         }
-    //
-    //         void AddVec2(Vector2 vec)
-    //         {
-    //             result[idx++] = vec.X;
-    //             result[idx++] = vec.Y;
-    //         }
-    //
-    //         AddVec3(v.Position);
-    //         AddVec3(v.Normal);
-    //         AddVec3(v.Color);
-    //         AddVec2(v.Uv);
-    //     }
-    //
-    //     return result;
-    // }
-
-
 
 
     public void Update(float deltaTime)
@@ -97,9 +71,27 @@ public class GameWorld : IGameEntry
     {
         GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.CullFace);
+        
+        _worldTexture.Use(TextureUnit.Texture0);
+        _worldShader.Use();
+
+        _worldShader.SetMatrix4("view", context.ViewMatrix);
+        _worldShader.SetMatrix4("projection", context.ProjectionMatrix3D);
+        _worldShader.SetVector3("viewPos", context.CameraPosition);
+
+        
         foreach (var chunk in _chunks.Values)
         {
-            chunk.Render(context);
+            var model = chunk.Transform.GetModelMatrix();
+            _worldShader.SetMatrix4("model", model);
+            var normalMatrix = new Matrix3(chunk.Transform.GetModelMatrix());
+            normalMatrix = normalMatrix.Inverted();
+            normalMatrix = normalMatrix.Transposed();
+            _worldShader.SetMatrix3("normalMatrix", normalMatrix);
+
+            
+            chunk.Mesh.Render();
+            // chunk.Render(context);
         }
     }
 
