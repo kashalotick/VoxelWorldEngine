@@ -32,7 +32,7 @@ public class GameWorld : IGameEntry
 
     public void AddChunk(Chunk chunk)
     {
-        if (chunk.Mesh.Vertices.Count == 0)
+        if (chunk.Mesh.Vertices.Length == 0)
         {
         }
         // TODO: make proxy from no empty objects
@@ -55,7 +55,7 @@ public class GameWorld : IGameEntry
     // TODO: temporary?????
     private WorldObject ConvertToWorldObject(Chunk chunk)
     {
-        var mesh = new ChunkMesh(chunk.Mesh.Vertices.ToArray(), chunk.Mesh.Indices.ToArray());
+        var mesh = new ChunkMesh(chunk.Mesh.Vertices, chunk.Mesh.Indices);
         var obj = new WorldObject(mesh, _worldShader, _worldTexture);
 
         obj.Transform.Position = (Vector3)(System.Numerics.Vector3)chunk.GlobalPosition;

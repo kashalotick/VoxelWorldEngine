@@ -54,8 +54,8 @@ class Program
 
             // 3. Етап Генерації Mesh
             sw.Restart();
-            var meshBuilder = new MeshBuilder(octree);
-            var mesh = meshBuilder.Build();
+            var meshBuilder = new MeshBuilder();
+            var mesh = meshBuilder.Build(octree);
             sw.Stop();
             totalMeshTime += sw.Elapsed.TotalMilliseconds;
 
@@ -117,8 +117,8 @@ class Program
 
             // 3. Етап Генерації Mesh
             sw.Restart();
-            var meshBuilder = new MeshBuilder(octree);
-            var mesh = meshBuilder.Build();
+            var meshBuilder = new MeshBuilder();
+            var mesh = meshBuilder.Build(octree);
             sw.Stop();
             totalMeshTime += sw.Elapsed.TotalMilliseconds;
 

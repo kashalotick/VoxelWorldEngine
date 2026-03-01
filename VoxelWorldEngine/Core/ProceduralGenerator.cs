@@ -8,7 +8,7 @@ namespace VoxelWorldEngine.Core;
 
 public class ProceduralGenerator : IGenerator
 {
-    private Vector3Int _offset;
+    public Vector3Int Offset;
     private FastNoise _noise;
     private FastNoise _noise2;
 
@@ -18,7 +18,7 @@ public class ProceduralGenerator : IGenerator
 
     public ProceduralGenerator(int seed, Vector3Int offset)
     {
-        _offset = offset;
+        Offset = offset;
         _noise = new FastNoise(seed);
         _noise2 = new FastNoise(seed)
         {
@@ -30,8 +30,8 @@ public class ProceduralGenerator : IGenerator
 
     public Voxel Approximate(Vector3Int min, Vector3Int max)
     {
-        min += _offset;
-        max += _offset;
+        min += Offset;
+        max += Offset;
 
         Voxel mixed = new Voxel(BlockId.Mixed);
         Voxel solid = new Voxel(BlockId.Stone);
@@ -50,8 +50,8 @@ public class ProceduralGenerator : IGenerator
 
     public bool IsUniform(Vector3Int min, Vector3Int max)
     {
-        min += _offset;
-        max += _offset;
+        min += Offset;
+        max += Offset;
 
         var height = Evaluate(min, max);
 
@@ -66,10 +66,10 @@ public class ProceduralGenerator : IGenerator
 
     private (float min, float max) Evaluate(Vector3Int min, Vector3Int max)
     {
-        var h = SinSurface.GetSinCosRange(min, max);
-        return (ModifyHeight(h.min), ModifyHeight(h.max));
-
-        return (-21f, -21f);
+        // var h = SinSurface.GetSinCosRange(min, max);
+        // return (ModifyHeight(h.min), ModifyHeight(h.max));
+        // //
+        // return (-21f, -21f);
         
         var min2 = new Vector2Int(min.X, min.Z);
         var max2 = new Vector2Int(max.X, max.Z);

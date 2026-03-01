@@ -5,7 +5,12 @@ namespace VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 
 public class MeshData
 {
-    public List<uint> Indices = [];
-    public List<ChunkVertex> Vertices = [];
+    public uint[] Indices;      // capacity одразу
+    public ChunkVertex[] Vertices;
 
+    public MeshData(uint[] indices, ChunkVertex[] vertices)
+    {
+        Indices = indices;
+        Vertices = vertices;
+    }
 }

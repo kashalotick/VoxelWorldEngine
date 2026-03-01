@@ -7,9 +7,13 @@ namespace VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
 
 public class VoxelOctree : Octree<Voxel>
 {
+    private static readonly ThreadLocal<Stack<OctreeNode>> _stackPool = 
+        new(() => new Stack<OctreeNode>());
+
+    private Stack<OctreeNode> _stack = new();
     public void Build(IGenerator generator)
     {
-        var stack = new Stack<OctreeNode>();
+        var stack = _stackPool.Value;
         var root = Root();
         stack.Push(root);
 
@@ -31,5 +35,6 @@ public class VoxelOctree : Octree<Voxel>
                 }
             }
         }
+        _stack.Clear();
     }
 }

@@ -1,29 +1,32 @@
 ﻿using System.Numerics;
+using VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
+using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
 
 namespace VoxelWorldEngine.Core.Builders;
 
 public class MeshBuilder
 {
-    private readonly VoxelOctree _octree;
+    private VoxelOctree _octree;
 
-    private bool?[,,] _isEmptyCache;
+    private bool?[,,] _isEmptyCache = new bool?[Chunk.ChunkSize, Chunk.ChunkSize, Chunk.ChunkSize];
 
-    public MeshBuilder(VoxelOctree octree)
+    private Stack<VoxelOctree.OctreeNode> _stack = new();
+
+    private List<uint> _indices = new (4096);
+    private List<ChunkVertex> _vertices = new (4096);
+
+
+    public MeshData Build(VoxelOctree octree)
     {
         _octree = octree;
-    }
 
-
-    public MeshData Build()
-    {
-        _isEmptyCache = new bool?[_octree.Size, _octree.Size, _octree.Size];
-
-        var mesh = new MeshData();
-        var stack = new Stack<VoxelOctree.OctreeNode>();
+        
+        _stack.Clear();
+        var stack = _stack;
 
         var counter = 0;
         stack.Push(_octree.Root());
@@ -36,7 +39,7 @@ public class MeshBuilder
             {
                 if (node.Data.IsEmpty) continue;
 
-                AddFaces(node, mesh);
+                AddFaces(node);
             }
             else
             {
@@ -48,13 +51,17 @@ public class MeshBuilder
             }
         }
 
-        _isEmptyCache = new bool?[0,0,0];
+        var mesh = new MeshData(_indices.ToArray(), _vertices.ToArray());
+        _indices.Clear();
+        _vertices.Clear();
+        Array.Clear(_isEmptyCache, 0, _isEmptyCache.Length);
+        Console.WriteLine($"Mesh: {mesh.Vertices.Length} vertices, {mesh.Indices.Length} indices");
 
         return mesh;
     }
 
 
-    private void AddFaces(VoxelOctree.OctreeNode node, MeshData mesh)
+    private void AddFaces(VoxelOctree.OctreeNode node)
     {
         for (int i = 0; i < 6; i++)
         {
@@ -62,7 +69,7 @@ public class MeshBuilder
 
             if (FaceCulling(node, normal)) continue;
 
-            AddFace(node, normal, mesh);
+            AddFace(node, normal);
         }
     }
 
@@ -130,11 +137,11 @@ public class MeshBuilder
     }
 
 
-    private void AddFace(VoxelOctree.OctreeNode node, Vector3Int normal, MeshData mesh)
+    private void AddFace(VoxelOctree.OctreeNode node, Vector3Int normal)
     {
         var facePosition = (Vector3)node.Min;
         var faceNormal = (Vector3)normal;
-        var vCount = (uint)mesh.Vertices.Count;
+        var vCount = (uint)_vertices.Count;
         var normalIndex = GetFaceIndex(normal);
 
         for (int i = 0; i < 4; i++)
@@ -147,15 +154,15 @@ public class MeshBuilder
                 Uv = FaceUVs[i] * node.Size,
                 BlockId = node.Data.BlockId
             };
-            mesh.Vertices.Add(vertex);
+            _vertices.Add(vertex);
         }
 
-        mesh.Indices.Add(vCount + 0);
-        mesh.Indices.Add(vCount + 1);
-        mesh.Indices.Add(vCount + 2);
-        mesh.Indices.Add(vCount + 2);
-        mesh.Indices.Add(vCount + 3);
-        mesh.Indices.Add(vCount + 0);
+        _indices.Add(vCount + 0);
+        _indices.Add(vCount + 1);
+        _indices.Add(vCount + 2);
+        _indices.Add(vCount + 2);
+        _indices.Add(vCount + 3);
+        _indices.Add(vCount + 0);
     }
 
     private static readonly Vector2[] FaceUVs =

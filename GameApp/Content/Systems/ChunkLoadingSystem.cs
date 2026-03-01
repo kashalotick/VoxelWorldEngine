@@ -10,7 +10,7 @@ namespace GameApp.Content.Systems;
 
 public class ChunkLoadingSystem : ISystem
 {
-    private const int ChunkPerFrameLimit = 100;
+    private const int ChunkPerFrameLimit = 5;
     private ChunkLoader _chunkLoader;
 
     private World _world;
@@ -69,6 +69,8 @@ public class ChunkLoadingSystem : ISystem
             _world.AddChunk(chunk);
             chunksProcessed++;
         }
+
+        // Console.WriteLine($"chunks processed: {chunksProcessed}");
     }
 
     private void RemoveExtraChunks()
@@ -108,8 +110,6 @@ public class ChunkLoadingSystem : ISystem
                 _requestedNewChunks.Add(chunkPosition);
                 lock (_missingChunks)
                 {
-                    Counter.Increment(CounterType.MissingChunksTryAdd);
-
                     float dist = Vector3Int.Distance(playerChunkPosition, chunkPosition);
                     _missingChunks.Add(new SortedEntry(dist, chunkPosition));
                     _signal.Release();
@@ -170,10 +170,18 @@ public class ChunkLoadingSystem : ISystem
     private int _activeWorkers = 0;
     private const int MaxWorkers = 8;
     private const int MinWorkers = 2;
-    private const int QueueTriggerSize = 81; // TODO: player view radius depending
+    private const int QueueTriggerSize = 81;
+    
+    private long _lastScaleUpTime = 0;
+    private long _lastScaleDownTime = 0;
+    private const long ScaleUpCooldownMs = 500;
+    private const long ScaleDownCooldownMs = 2000;
+
 
     private void StartWorkers()
     {
+        // Console.WriteLine($"start workers: {_activeWorkers} for (missing/ready queue/total/max) chunks");
+
         for (int i = 0; i < MinWorkers; i++)
         {
             new Thread(ChunkWorker) { IsBackground = true }.Start();
@@ -183,28 +191,39 @@ public class ChunkLoadingSystem : ISystem
 
     private void AdjustWorkers()
     {
+        long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         int queueSize = _missingChunks.Count;
-        if (queueSize > QueueTriggerSize * _activeWorkers && _activeWorkers < MaxWorkers)
+
+        if (queueSize > QueueTriggerSize * _activeWorkers 
+            && _activeWorkers < MaxWorkers
+            && now - _lastScaleUpTime > ScaleUpCooldownMs)
         {
             AddWorker();
+            _lastScaleUpTime = now;
         }
-        else if (queueSize < 10 && _activeWorkers > MinWorkers)
+        else if (queueSize < 10 
+                 && _activeWorkers > MinWorkers
+                 && now - _lastScaleDownTime > ScaleDownCooldownMs)
         {
-            // worker сам зупиниться
-            _signal.Release(); // розбудити щоб вийшов
+            _signal.Release(); // воркер сам вийде
+            _lastScaleDownTime = now;
         }
     }
 
+    const int maxChunks = 13 * 13 * 13;
+
     private void AddWorker()
     {
-        Console.WriteLine($"Add worker: {_activeWorkers}");
-
         Interlocked.Increment(ref _activeWorkers);
         new Thread(ChunkWorker) { IsBackground = true }.Start();
+
+        // Console.WriteLine(
+        //     $"+ worker: {_activeWorkers} for {_missingChunks.Count}/{_readyChunks.Count}/{_world.Chunks.Count}/{maxChunks} chunks");
     }
 
     private void ChunkWorker()
     {
+        var chunkLoader = new ChunkLoader(_world);
         while (true)
         {
             _signal.Wait();
@@ -215,22 +234,21 @@ public class ChunkLoadingSystem : ISystem
                 {
                     if (_activeWorkers > MinWorkers)
                     {
-                        Console.WriteLine($"Remove worker: {_activeWorkers}");
-
                         Interlocked.Decrement(ref _activeWorkers);
+                        // Console.WriteLine(
+                        //     $"- worker: {_activeWorkers} for {_missingChunks.Count}/{_readyChunks.Count}/{_world.Chunks.Count}/{maxChunks} chunks");
                         return;
                     }
 
                     continue;
                 }
 
-                Counter.Increment(CounterType.MissingChunks);
                 var first = _missingChunks.Min;
                 _missingChunks.Remove(first);
                 pos = first.pos;
             }
 
-            var chunk = _chunkLoader.Get(pos);
+            var chunk = chunkLoader.Get(pos);
             _readyChunks.Enqueue(chunk);
         }
     }
@@ -238,7 +256,6 @@ public class ChunkLoadingSystem : ISystem
 
     public void Dispose()
     {
-        Counter.Display();
         _signal.Dispose();
         // _missingChunks.CompleteAdding();
         // _missingChunks.Dispose();

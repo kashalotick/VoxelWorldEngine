@@ -11,7 +11,8 @@ public class LinearOctree<T>
     public LinearOctree(int maxDepth)
     {
         MaxDepth = maxDepth;
-        _nodes = [new LinearOctreeNode<T>()];
+        _nodes = new List<LinearOctreeNode<T>>(2048);
+        _nodes.Add(new LinearOctreeNode<T>());
     }
 
     public int Size => 1 << MaxDepth;
@@ -116,4 +117,9 @@ public class LinearOctree<T>
     //     if (_nodes[index].IsLeaf) return;
     //     _nodes[index].MarkAsLeaf();
     // }
+    
+    public void Clear()
+    {
+        _nodes.Clear();
+    }
 }
