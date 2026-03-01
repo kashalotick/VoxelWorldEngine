@@ -33,7 +33,7 @@ public class DemoScene : TestScene
         // GL.PolygonMode(TriangleFace.Front, PolygonMode.Line);
 
         
-        FpvCamera = new FPVCamera(new Vector3(1, 2, 3), GameContext.ScreenWidth / GameContext.ScreenHeight); // TODO: make injection for position
+        FpvCamera = new FPVCamera(new Vector3(1, 0, 1), GameContext.ScreenWidth / GameContext.ScreenHeight); // TODO: make injection for position
         _controller = new CameraController(GameContext.Input, FpvCamera);
         _controller.ExitRequested += RequestCloseWindow;
 
@@ -60,7 +60,7 @@ public class DemoScene : TestScene
         var ws = new WorldService();
         var world = ws.GenerateWorld(124);
         
-        var gameWorld = new GameWorld(chunkShader, diamondTexture);
+        var gameWorld = new GameWorld(world, chunkShader, diamondTexture);
         world.ChunkAdded += gameWorld.AddChunk;
         world.ChunkRemoved += gameWorld.RemoveChunk;
         Entries.Add(gameWorld);
@@ -107,7 +107,7 @@ public class DemoScene : TestScene
         {
             Position = (System.Numerics.Vector3)FpvCamera.Position,
             ViewDirection = (System.Numerics.Vector3)FpvCamera.Front,
-            ChunkViewRadius = 6,
+            ChunkViewRadius = 3,
             ViewMatrix = (Matrix4x4)FpvCamera.GetViewMatrix()
         };
         _chunkLoadingSystem.Update(deltaTime, player);

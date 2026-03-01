@@ -55,7 +55,6 @@ public class MeshBuilder
         _indices.Clear();
         _vertices.Clear();
         Array.Clear(_isEmptyCache, 0, _isEmptyCache.Length);
-        Console.WriteLine($"Mesh: {mesh.Vertices.Length} vertices, {mesh.Indices.Length} indices");
 
         return mesh;
     }
