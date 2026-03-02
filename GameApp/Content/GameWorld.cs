@@ -37,7 +37,11 @@ public class GameWorld : IGameEntry
         // TODO: make proxy from no empty objects
         var wo = ConvertToWorldObject(chunk);
         _chunks[chunk.Position] = wo;
-        wo.Load();
+        if (wo.Mesh != null)
+        {
+            wo.Load();
+
+        }
     }
 
     public void UpdateChunk(Chunk chunk)
@@ -119,7 +123,7 @@ public class GameWorld : IGameEntry
         if (chunksWithMesh != _previousChunksWithMesh)
         {
             _previousChunksWithMesh = chunksWithMesh;
-            Console.WriteLine($"{chunksWithMesh}/{chunks} chunks rendered");
+            // Console.WriteLine($"{chunksWithMesh}/{chunks} chunks rendered");
         }
     }
 

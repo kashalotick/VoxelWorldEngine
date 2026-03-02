@@ -17,7 +17,6 @@ public class ChunkLoadingSystem : ISystem
     private Vector3Int? _activeChunkPosition;
 
 
-    private Frustrum _frustrum = new Frustrum();
 
     public ChunkLoadingSystem(World world)
     {

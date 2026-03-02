@@ -10,6 +10,7 @@ using LearningOpenTK.Entities.World.Content;
 using LearningOpenTK.Entities.World.LightSources;
 using LearningOpenTK.Resources;
 using LearningOpenTK.Resources.Interfaces;
+using LearningOpenTK.Text;
 using OpenTK.Graphics.OpenGL4;
 using VoxelWorldEngine.Core;
 using Vector3 = OpenTK.Mathematics.Vector3;
@@ -30,12 +31,11 @@ public class DemoScene : TestScene
     {
         GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.CullFace);
-        // GL.PolygonMode(TriangleFace.Front, PolygonMode.Line);
 
         
         FpvCamera = new FPVCamera(new Vector3(1, 0, 1), GameContext.ScreenWidth / GameContext.ScreenHeight); // TODO: make injection for position
-        _controller = new CameraController(GameContext.Input, FpvCamera);
-        _controller.ExitRequested += RequestCloseWindow;
+        Controller = new CameraController(GameContext.Input, FpvCamera);
+        Controller.ExitRequested += RequestCloseWindow;
 
         FpvCamera.LookAt(Vector3.Zero);
 
@@ -46,7 +46,13 @@ public class DemoScene : TestScene
         
         
 
-        
+        var pixelFont = GameContext.FontRepository.Get("Pixel");
+        var textShader = GameContext.ShaderRepository.Get("text");
+
+        _text = new TextObject(pixelFont, textShader);
+        _text.Load();
+        _text.SetTextContent("Kashalot");
+        _text.Transform.Position = new Vector3(0, 0, 0);
         
         
         var cubeMesh = Cube.CreateMesh();
@@ -77,7 +83,17 @@ public class DemoScene : TestScene
         LightComposition(chunkShader, diamondTexture);
         LightComposition(cubeShader, diamondTexture);
 
+        // fps
+        InitFpsCounter();
 
+    }
+    public override void Render(double deltaTime)
+    {
+        _fpsCounter.Update(deltaTime);
+        
+        base.Render(deltaTime);
+        GL.Disable(EnableCap.DepthTest);
+        _text.Render2D(RenderContext);
     }
 
     private static void LightComposition(IShader shader, ITexture texture)
@@ -99,6 +115,28 @@ public class DemoScene : TestScene
         shader.SetFloat("shininess", shininess);
     }
 
+    private TextObject _text;
+    private FpsCounter _fpsCounter;
+
+    private void InitFpsCounter()
+    {
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+        _fpsCounter = new FpsCounter(1.0, 0.25);
+        
+        var pixelFont = GameContext.FontRepository.Get("Pixel");
+        var textShader = GameContext.ShaderRepository.Get("text");
+        
+        _text = new TextObject(pixelFont, textShader);
+        _text.Text.Color = (System.Numerics.Vector3)new Vector3(1, 1, 1);
+        _text.Transform.Position = new Vector3(24, 24, 0);
+        _text.Transform.Scale = new Vector3(2);
+        
+        _text.SetTextContent("ABCDEFG absdefg");
+        _text.Load();
+        _fpsCounter.OnFpsChanged += fps => _text.SetTextContent($"FPS: {fps}");
+    }
+
     public override void FixedUpdate(double deltaTime)
     {
         base.FixedUpdate(deltaTime);
@@ -107,7 +145,7 @@ public class DemoScene : TestScene
         {
             Position = (System.Numerics.Vector3)FpvCamera.Position,
             ViewDirection = (System.Numerics.Vector3)FpvCamera.Front,
-            ChunkViewRadius = 3,
+            ChunkViewRadius = 4,
             ViewMatrix = (Matrix4x4)FpvCamera.GetViewMatrix()
         };
         _chunkLoadingSystem.Update(deltaTime, player);
