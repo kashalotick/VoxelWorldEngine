@@ -1,5 +1,6 @@
 ﻿using LearningOpenTK.Core;
-using LearningOpenTK.Core.Interfaces;
+using LearningOpenTK.Core.DTO;
+using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Entities.World;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
@@ -13,7 +14,7 @@ namespace GameApp.Content;
 
 // TODO: inherit some scene collection class idk (common for scene)
 
-public class GameWorld : IGameEntry
+public class GameWorld : ILoadable, IRenderable
 {
     private IShader _worldShader;
     private ITexture _worldTexture;

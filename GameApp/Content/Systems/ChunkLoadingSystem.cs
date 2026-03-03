@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Numerics;
+using LearningOpenTK.Core.Primitives;
 using VoxelWorldEngine;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
@@ -8,7 +9,7 @@ using VoxelWorldEngine.Utils;
 
 namespace GameApp.Content.Systems;
 
-public class ChunkLoadingSystem : ISystem
+public class ChunkLoadingSystem : ILoadable
 {
     private const int ChunkPerFrameLimit = 5;
     private ChunkLoader _chunkLoader;
@@ -24,11 +25,6 @@ public class ChunkLoadingSystem : ISystem
         _world = world;
     }
 
-    public void Initialize()
-    {
-        // TODO: Proxy???
-        StartWorkers();
-    }
 
     private double _cooldown = 0f;
     private const float CooldownTime = 0.5f;
@@ -176,16 +172,18 @@ public class ChunkLoadingSystem : ISystem
     private const long ScaleUpCooldownMs = 500;
     private const long ScaleDownCooldownMs = 2000;
 
-
-    private void StartWorkers()
+    public void Load()
     {
-        // Console.WriteLine($"start workers: {_activeWorkers} for (missing/ready queue/total/max) chunks");
-
         for (int i = 0; i < MinWorkers; i++)
         {
             new Thread(ChunkWorker) { IsBackground = true }.Start();
             Interlocked.Increment(ref _activeWorkers);
-        }
+        }    }
+    private void StartWorkers()
+    {
+        // Console.WriteLine($"start workers: {_activeWorkers} for (missing/ready queue/total/max) chunks");
+
+
     }
 
     private void AdjustWorkers()

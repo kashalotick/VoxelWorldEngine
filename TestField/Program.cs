@@ -12,6 +12,13 @@ class Program
 {
     static void Main(string[] args)
     {
+        var root = "F:/Univer/Rider/LearningOpenTK/LearningOpenTK";
+
+        var dir = new DirectoryInfo(root);
+        Console.WriteLine(dir.FullName);
+        var files = dir.EnumerateFiles("*.cs", SearchOption.AllDirectories);
+        Console.WriteLine(string.Join('\n', files.Select(f => f.Name)));
+        return;
         var seed = 151234;
         var iterations = 100;
         // Console.WriteLine("\n-- Top surface chunk");
@@ -22,6 +29,7 @@ class Program
         ProfileBuildAreaMethod(seed, new Vector3Int(-5, 0, -5), new Vector3Int(5, 1, 5));
         Counter.Display();
     }
+    
 
     private static void ProfileBuildMethod(int seed, Vector3Int position, int iterations = 100)
     {

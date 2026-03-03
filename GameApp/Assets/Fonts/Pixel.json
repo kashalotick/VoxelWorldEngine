@@ -4,6 +4,8 @@
   "columns": 5,
   "glyphWidth": 8,
   "glyphHeight": 11,
+  "letterSpacing": 2,
+  "baseline": 2,
   "advance": [
     6, 2, 5, 7, 7,
     6, 7, 2, 4, 4,
