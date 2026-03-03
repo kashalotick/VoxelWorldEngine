@@ -95,12 +95,12 @@ public class DemoScene : Scene
         
         
         var lightColor = new Vector3(1.0f, 1.0f, 0.95f);
-        var lightDirection = Vector3.Normalize(new Vector3(-1, -1, -1));
+        var lightDirection = Vector3.Normalize(new Vector3(-1, -2, -1));
 
         shader.SetVector3("lightColor", lightColor);
         shader.SetVector3("lightDirection", lightDirection);
 
-        var ambientColor = new Vector4(0.95f, 0.95f, 1, 0.1f);
+        var ambientColor = new Vector4(0.95f, 0.95f, 1, 0.3f);
         shader.SetVector4("ambientColor", ambientColor);
         var shininess = 64f;
         shader.SetFloat("shininess", shininess);
