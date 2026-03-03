@@ -23,6 +23,8 @@ public class DemoScene : Scene
     private ChunkLoadingSystem _chunkLoadingSystem; // temp
     protected CameraController Controller;
 
+    
+    private GameWorld _gameWorld;
 
     public DemoScene(GameContext gameContext) : base(gameContext)
     {
@@ -51,10 +53,10 @@ public class DemoScene : Scene
         
 
         
-        var cubeMesh = Cube.CreateMesh();
-        var cube = new WorldObject(cubeMesh, cubeShader, diamondTexture);
-        cube.Transform.Position = new Vector3(0, 0, 0);
-        SOR.Register(cube);
+        // var cubeMesh = Cube.CreateMesh();
+        // var cube = new WorldObject(cubeMesh, cubeShader, diamondTexture);
+        // cube.Transform.Position = new Vector3(0, 0, 0);
+        // SOR.Register(cube);
         
 
         
@@ -65,7 +67,9 @@ public class DemoScene : Scene
         var gameWorld = new GameWorld(world, chunkShader, diamondTexture);
         world.ChunkAdded += gameWorld.AddChunk;
         world.ChunkRemoved += gameWorld.RemoveChunk;
-        SOR.Register(gameWorld);
+        _gameWorld = gameWorld;
+        _gameWorld.Load();
+        // SOR.Register(gameWorld);
         
         _chunkLoadingSystem = new ChunkLoadingSystem(world);
         SOR.Register(_chunkLoadingSystem);
@@ -81,6 +85,7 @@ public class DemoScene : Scene
     protected override void Render(RenderContext renderContext)
     {
         _fpsCounter.Update(renderContext.DeltaTime);
+        _gameWorld.Render(renderContext);
         GL.Disable(EnableCap.DepthTest);
     }
 
