@@ -13,6 +13,8 @@ using LearningOpenTK.Resources.Interfaces;
 using LearningOpenTK.Text;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
+using VoxelWorldEngine.Utils;
 using Vector3 = OpenTK.Mathematics.Vector3;
 using Vector4 = OpenTK.Mathematics.Vector4;
 
@@ -36,6 +38,9 @@ public class DemoScene : Scene
     {
         GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.CullFace);
+        GL.Enable(EnableCap.Blend);
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        // GL.Enable(EnableCap.Multisample);
         
 
         
@@ -78,9 +83,9 @@ public class DemoScene : Scene
         LightComposition(chunkShader, diamondTexture);
         LightComposition(cubeShader, diamondTexture);
 
-        // fps
+        // text
         InitFpsCounter();
-
+        InitPositionTracker();
     }
     protected override void Render(RenderContext renderContext)
     {
@@ -108,22 +113,34 @@ public class DemoScene : Scene
 
     private FpsCounter _fpsCounter;
 
+    private TextObject _chunkPositionText;
+    private TextObject _playerPositionText;
+
+    private void InitPositionTracker()
+    {
+        var pixelFont = GameContext.FontRepository.Get("Pixel");
+        var textShader = GameContext.ShaderRepository.Get("text");
+    
+        _chunkPositionText = SOR.Register(new TextObject(pixelFont, textShader));
+        _chunkPositionText.Transform.Position = new Vector3(24, 24 + 2 * 32, 0);
+        _chunkPositionText.Transform.Scale = new Vector3(2);
+        
+        _playerPositionText = SOR.Register(new TextObject(pixelFont, textShader));
+        _playerPositionText.Transform.Position = new Vector3(24, 24 + 32, 0);
+        _playerPositionText.Transform.Scale = new Vector3(2);
+
+    }
     private void InitFpsCounter()
     {
-        GL.Enable(EnableCap.Blend);
-        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
         _fpsCounter = new FpsCounter(1.0, 0.25);
         
         var pixelFont = GameContext.FontRepository.Get("Pixel");
         var textShader = GameContext.ShaderRepository.Get("text");
 
         var text = SOR.Register(new TextObject(pixelFont, textShader));
-        text.Text.Color = (System.Numerics.Vector3)new Vector3(1, 1, 1);
         text.Transform.Position = new Vector3(24, 24, 0);
         text.Transform.Scale = new Vector3(2);
         
-        text.SetTextContent("ABCDEFG absdefg");
         _fpsCounter.OnFpsChanged += fps => text.SetTextContent($"FPS: {fps}");
     }
 
@@ -149,6 +166,10 @@ public class DemoScene : Scene
             ChunkViewRadius = 4,
             ViewMatrix = (Matrix4x4)Camera.GetViewMatrix()
         };
+        var chunkPos = Chunk.GlobalToChunk(player.Position.ToVector3Int());
+        _playerPositionText.SetTextContent($"xyz: {player.Position.RoundTo(2).FancyString()}");
+        _chunkPositionText.SetTextContent($"chunk xyz: {chunkPos}");
+
         _chunkLoadingSystem.Update(deltaTime, player);
     }
 }

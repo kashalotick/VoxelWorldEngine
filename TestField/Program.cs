@@ -12,13 +12,6 @@ class Program
 {
     static void Main(string[] args)
     {
-        var root = "F:/Univer/Rider/LearningOpenTK/LearningOpenTK";
-
-        var dir = new DirectoryInfo(root);
-        Console.WriteLine(dir.FullName);
-        var files = dir.EnumerateFiles("*.cs", SearchOption.AllDirectories);
-        Console.WriteLine(string.Join('\n', files.Select(f => f.Name)));
-        return;
         var seed = 151234;
         var iterations = 100;
         // Console.WriteLine("\n-- Top surface chunk");
@@ -49,6 +42,7 @@ class Program
 
             // 1. Етап Генератора
             sw.Restart();
+
             IGenerator generator = new ProceduralGenerator(seed, Chunk.ChunkToGlobal(position));
             sw.Stop();
             totalGenTime += sw.Elapsed.TotalMilliseconds;
@@ -112,6 +106,7 @@ class Program
 
             // 1. Етап Генератора
             sw.Restart();
+
             IGenerator generator = new ProceduralGenerator(seed, Chunk.ChunkToGlobal(position));
             sw.Stop();
             totalGenTime += sw.Elapsed.TotalMilliseconds;
