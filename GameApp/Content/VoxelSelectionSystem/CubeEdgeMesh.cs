@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using LearningOpenTK.Meshes;
+using LearningOpenTK.Engine.Meshes;
 using OpenTK.Graphics.OpenGL4;
 
 namespace GameApp.Content.VoxelSelectionSystem;

@@ -3,7 +3,6 @@ using System.Numerics;
 using LearningOpenTK.Core.Components;
 using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Primitives;
-using LearningOpenTK.Meshes;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;

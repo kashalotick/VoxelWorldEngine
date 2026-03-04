@@ -2,7 +2,6 @@
 using GameApp.Old;
 using LearningOpenTK.Core;
 using LearningOpenTK.Entities.World;
-using LearningOpenTK.Meshes;
 using LearningOpenTK.Resources;
 using VoxelWorldEngine.Core.Builders;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;

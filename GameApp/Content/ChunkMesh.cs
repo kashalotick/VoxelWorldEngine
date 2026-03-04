@@ -1,5 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
-using LearningOpenTK.Meshes;
+﻿using LearningOpenTK.Engine.Meshes;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
 

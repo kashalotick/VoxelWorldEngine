@@ -80,8 +80,8 @@ public class ProceduralGenerator : IGenerator
 
         _cacheVector = (min2, max2);
 
-        const int absoluteMin = -78;
-        const int absoluteMax = 78;
+        const int absoluteMin = -32;
+        const int absoluteMax = 156;
         if (max.Y <= absoluteMin)
             return (absoluteMin, absoluteMin);
 
@@ -95,6 +95,7 @@ public class ProceduralGenerator : IGenerator
         var subHeight = _noise2.GetNoiseMinMax(min2 * 3, max2 * 3);
         
         var baseHeight = _noise.GetNoiseMinMax((Vector2)min2 * 0.1f, (Vector2)max2 * 0.1f);
+
         
         
         var newMin = height.min + subHeight.min * 0.05f;
@@ -102,6 +103,12 @@ public class ProceduralGenerator : IGenerator
         
         newMin += baseHeight.min * 2;
         newMax += baseHeight.max * 2;
+
+        newMin *= (baseHeight.min + 1);
+        newMax *= (baseHeight.max + 1);
+
+        // newMin -= 78;
+        // newMax -= 78;
 
         
 
