@@ -77,10 +77,15 @@ public class World : IRaycastable
             if (_chunks.TryGetValue(chunkPos, out var chunk))
             {
                 var localRay = ray with { Origin = ray.Origin - (Vector3)chunk.GlobalPosition };
+                // var localRay = ray;
 
                 var hit = chunk.Octree.Raycast(localRay);
                 if (!hit.Voxel.IsEmpty)
+                {
+                    hit.HitIn += (Vector3)chunk.GlobalPosition;
+                    hit.HitOut += (Vector3)chunk.GlobalPosition;
                     return hit;
+                }
             }
 
             // ?????????? ? ????????? ???? ?? ?????????? ????

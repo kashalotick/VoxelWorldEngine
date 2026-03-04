@@ -1,4 +1,5 @@
-﻿using VoxelWorldEngine.Core;
+﻿using System.Numerics;
+using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
@@ -43,57 +44,85 @@ public class VoxelOctree : Octree<Voxel>, IRaycastable
 
     public RayHit Raycast(Ray ray)
     {
-        var stack = _rayStack;
-        stack.Clear();
         var root = Root();
     
-        if (!Raycaster.IntersectsAABB(ray, root.Min, root.Max, out float rootTIn, out float rootTOut))
+        // Межі кореневого вузла в float
+        var minF = new Vector3(root.Min.X, root.Min.Y, root.Min.Z);
+        var maxF = new Vector3(root.Max.X + 1, root.Max.Y + 1, root.Max.Z + 1);
+    
+        // Знаходимо точку входу/виходу променя в AABB кореня
+        if (!Raycaster.IntersectAABB(ray, minF, maxF, out float tMin, out float tMax))
             return new RayHit { Voxel = Voxel.Empty };
-    
-        stack.Push((root, rootTIn));
 
-        while (stack.Count > 0)
+        tMin = MathF.Max(tMin, 0f);
+        if (tMin > tMax)
+            return new RayHit { Voxel = Voxel.Empty };
+
+        return RaycastNode(root, ray, tMin, tMax);
+    }
+    private RayHit RaycastNode(OctreeNode node, Ray ray, float tMin, float tMax)
+    {
+        if (tMin > ray.Length)
+            return new RayHit { Voxel = Voxel.Empty };
+
+        // Листовий вузол — повертаємо результат
+        if (node.IsLeaf)
         {
-            var (node, tIn) = stack.Pop();
+            var voxel = node.Data;
+            if (voxel.IsEmpty)
+                return new RayHit { Voxel = Voxel.Empty };
 
-            if (node.IsLeaf)
+            return new RayHit
             {
-                if (node.Data.IsEmpty) continue;
-                Raycaster.IntersectsAABB(ray, node.Min, node.Max, out float leafTIn, out float leafTOut);
-    
-                return new RayHit
-                {
-                    // ✅ Повертаємо глобальні координати, додаючи назад GlobalPosition
-                    HitIn  = ray.Origin + ray.Direction * leafTIn,
-                    HitOut = ray.Origin + ray.Direction * leafTOut,
-                    Voxel  = node.Data
-                };
-            }
+                HitIn  = ray.Origin + ray.Direction * tMin,
+                HitOut = ray.Origin + ray.Direction * MathF.Min(tMax, ray.Length),
+                Voxel  = voxel
+            };
+        }
 
-            int count = 0;
-            for (int i = 0; i < 8; i++)
+        // Сортуємо дочірні вузли за відстанню входу
+        Span<(int octant, float t0, float t1)> hits = stackalloc (int, float, float)[8];
+        int hitCount = 0;
+
+        for (int octant = 0; octant < 8; octant++)
+        {
+            var child = node.GetChild(octant);
+            var cMin = new Vector3(child.Min.X, child.Min.Y, child.Min.Z);
+            var cMax = new Vector3(child.Max.X + 1, child.Max.Y + 1, child.Max.Z + 1);
+
+            if (!Raycaster.IntersectAABB(ray, cMin, cMax, out float ct0, out float ct1))
+                continue;
+
+            ct0 = MathF.Max(ct0, tMin);
+            ct1 = MathF.Min(ct1, tMax);
+
+            if (ct0 <= ct1 && ct0 <= ray.Length)
+                hits[hitCount++] = (octant, ct0, ct1);
+        }
+
+        // Сортування по t0 (insertion sort, бо масив малий — max 8)
+        for (int i = 1; i < hitCount; i++)
+        {
+            var cur = hits[i];
+            int j = i - 1;
+            while (j >= 0 && hits[j].t0 > cur.t0)
             {
-                var child = node.GetChild(i);
-                if (Raycaster.IntersectsAABB(ray, child.Min, child.Max, out float childTIn, out float childTOut))
-                    _childBuffer[count++] = (child, childTIn);
+                hits[j + 1] = hits[j];
+                j--;
             }
+            hits[j + 1] = cur;
+        }
 
-            // Сортування по tIn
-            for (int i = 1; i < count; i++)
-            {
-                var key = _childBuffer[i];
-                int j = i - 1;
-                while (j >= 0 && _childBuffer[j].tIn > key.tIn)
-                    _childBuffer[j + 1] = _childBuffer[j--];
-                _childBuffer[i] = key;
-            }
-
-            // Пушимо у зворотньому порядку
-            for (int i = count - 1; i >= 0; i--)
-                stack.Push(_childBuffer[i]);
+        // Рекурсивно перевіряємо в порядку зростання відстані
+        for (int i = 0; i < hitCount; i++)
+        {
+            var (octant, ct0, ct1) = hits[i];
+            var child = node.GetChild(octant);
+            var result = RaycastNode(child, ray, ct0, ct1);
+            if (result.IsHit)
+                return result;
         }
 
         return new RayHit { Voxel = Voxel.Empty };
     }
-    
 }
