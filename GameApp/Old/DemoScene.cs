@@ -2,6 +2,7 @@
 using GameApp.Content;
 using GameApp.Content.Services;
 using GameApp.Content.Systems;
+using GameApp.Debug;
 using LearningOpenTK.Content;
 using LearningOpenTK.Content.Scenes;
 using LearningOpenTK.Core;
@@ -30,7 +31,8 @@ public class DemoScene : Scene
 
     private const float TextUpdateInterval = 1 / 60f;
     private ThrottleReactive<RayHit> _rayHit = new(TextUpdateInterval);
-
+    private RayShooter _rayShooter;
+    
     private World _world;
     private GameWorld _gameWorld;
     private TextObject _playerPositionText;
@@ -93,6 +95,9 @@ public class DemoScene : Scene
         InitPositionTracker();
         InitRaycastTracker();
         InitCrosshair();
+
+        _rayShooter = new RayShooter(GameContext.ShaderRepository.Get("debugray"));
+        _rayShooter.Load();
     }
 
     protected override void Render(RenderContext renderContext)
@@ -100,6 +105,8 @@ public class DemoScene : Scene
         _fpsCounter.Update(renderContext.DeltaTime);
         _gameWorld.Render(renderContext);
         GL.Disable(EnableCap.DepthTest);
+
+        _rayShooter.Render(renderContext);
     }
 
     private static void LightComposition(IShader shader, ITexture texture)
@@ -176,11 +183,13 @@ public class DemoScene : Scene
     {
         Controller.ProcessInput(key);
     }
+    
 
     public override void Update(double deltaTime)
     {
         Controller.ProcessMouseStreamInput();
         Controller.ProcessKeyboardStreamInput((float)deltaTime);
+
         var ray = new Ray
         {
             Length = 25,
@@ -188,9 +197,17 @@ public class DemoScene : Scene
             Direction = (System.Numerics.Vector3)Camera.Front
         };
         var rayHit = _world.Raycast(ray);
+        
+        if (GameContext.Input.Mouse.IsButtonPressed(MouseButton.Left))
+        {
+            _rayShooter.Update(ray, rayHit);
+        }
+        
         _rayHit.Value = rayHit;
         _rayHit.Update(deltaTime);
     }
+    
+
 
     public override void FixedUpdate(double deltaTime)
     {
