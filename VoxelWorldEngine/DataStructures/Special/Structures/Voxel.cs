@@ -13,5 +13,8 @@ public struct Voxel
     }
     
     public bool IsEmpty => BlockId == 0;
+    
+    
+    public static Voxel Empty => new Voxel(BlockId.Air);
 
 }

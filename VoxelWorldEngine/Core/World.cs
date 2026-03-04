@@ -1,12 +1,15 @@
+using System.Numerics;
+using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
+using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
+using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.Core;
 
-public class World
+public class World : IRaycastable
 {
     public event Action<Chunk> ChunkAdded;
-
     public event Action<Chunk> ChunkUpdated;
     public event Action<Vector3Int> ChunkRemoved;
     
@@ -38,4 +41,70 @@ public class World
         ChunkRemoved?.Invoke(chunkPosition);
     }
 
+    private readonly Stack<Chunk> _rayStack = new Stack<Chunk>();
+
+    public RayHit Raycast(Ray ray)
+    {
+        var chunkPos = Chunk.GlobalToChunk(ray.Origin.ToVector3Int());
+        var dir = ray.Direction;
+        var chunkSize = Chunk.ChunkSize;
+
+        // ???? ?? ?????? ???
+        var step = new Vector3Int(
+            dir.X >= 0 ? 1 : -1,
+            dir.Y >= 0 ? 1 : -1,
+            dir.Z >= 0 ? 1 : -1
+        );
+
+        // ??????? t ????? ?????? ??? ????????? ???? ???? ?? ?????? ???
+        var tDelta = new Vector3(
+            MathF.Abs(chunkSize / dir.X),
+            MathF.Abs(chunkSize / dir.Y),
+            MathF.Abs(chunkSize / dir.Z)
+        );
+
+        // t ?? ?????? ???? ?? ?????? ???
+        var chunkOrigin = chunkPos * chunkSize;
+        var tMax = new Vector3(
+            dir.X >= 0 ? (chunkOrigin.X + chunkSize - ray.Origin.X) / dir.X : (chunkOrigin.X - ray.Origin.X) / dir.X,
+            dir.Y >= 0 ? (chunkOrigin.Y + chunkSize - ray.Origin.Y) / dir.Y : (chunkOrigin.Y - ray.Origin.Y) / dir.Y,
+            dir.Z >= 0 ? (chunkOrigin.Z + chunkSize - ray.Origin.Z) / dir.Z : (chunkOrigin.Z - ray.Origin.Z) / dir.Z
+        );
+
+        float t = 0;
+        while (t <= ray.Length)
+        {
+            if (_chunks.TryGetValue(chunkPos, out var chunk))
+            {
+                var localRay = ray with { Origin = ray.Origin - (Vector3)chunk.GlobalPosition };
+
+                var hit = chunk.Octree.Raycast(localRay);
+                if (!hit.Voxel.IsEmpty)
+                    return hit;
+            }
+
+            // ?????????? ? ????????? ???? ?? ?????????? ????
+            if (tMax.X < tMax.Y && tMax.X < tMax.Z)
+            {
+                chunkPos.X += step.X;
+                t = tMax.X;
+                tMax.X += tDelta.X;
+            }
+            else if (tMax.Y < tMax.Z)
+            {
+                chunkPos.Y += step.Y;
+                t = tMax.Y;
+                tMax.Y += tDelta.Y;
+            }
+            else
+            {
+                chunkPos.Z += step.Z;
+                t = tMax.Z;
+                tMax.Z += tDelta.Z;
+            }
+        }
+
+        return new RayHit { Voxel = Voxel.Empty };
+
+    }
 }

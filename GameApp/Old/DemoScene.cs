@@ -7,12 +7,14 @@ using LearningOpenTK.Content.Scenes;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Scenes;
-using LearningOpenTK.Entities.World;
-using LearningOpenTK.Entities.World.Content;
 using LearningOpenTK.Resources.Interfaces;
 using LearningOpenTK.Text;
+using LearningOpenTK.UI.Components;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using VoxelWorldEngine.Core;
+using VoxelWorldEngine.Core.Raycasting;
+using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.Utils;
 using Vector3 = OpenTK.Mathematics.Vector3;
@@ -23,10 +25,16 @@ namespace GameApp.Old;
 public class DemoScene : Scene
 {
     private ChunkLoadingSystem _chunkLoadingSystem; // temp
-    protected CameraController Controller;
+    private TextObject _chunkPositionText;
+    private FpsCounter _fpsCounter;
 
-    
+    private const float TextUpdateInterval = 1 / 60f;
+    private ThrottleReactive<RayHit> _rayHit = new(TextUpdateInterval);
+
+    private World _world;
     private GameWorld _gameWorld;
+    private TextObject _playerPositionText;
+    protected CameraController Controller;
 
     public DemoScene(GameContext gameContext) : base(gameContext)
     {
@@ -41,10 +49,10 @@ public class DemoScene : Scene
         GL.Enable(EnableCap.Blend);
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         // GL.Enable(EnableCap.Multisample);
-        
 
-        
-        Camera = new Camera(new Vector3(1, 0, 1), GameContext.ScreenWidth / GameContext.ScreenHeight); // TODO: make injection for position
+
+        Camera = new Camera(new Vector3(1, 0, 0),
+            GameContext.ScreenWidth / GameContext.ScreenHeight); // TODO: make injection for position
         Controller = new CameraController(GameContext.Input, Camera);
         Controller.ExitRequested += RequestCloseWindow;
 
@@ -54,31 +62,28 @@ public class DemoScene : Scene
         var chunkShader = GameContext.ShaderRepository.Get("chunk");
         var cubeShader = GameContext.ShaderRepository.Get("shader");
         var diamondTexture = GameContext.TextureRepository.Get("Stone");
-        
-        
 
-        
+
         // var cubeMesh = Cube.CreateMesh();
         // var cube = new WorldObject(cubeMesh, cubeShader, diamondTexture);
         // cube.Transform.Position = new Vector3(0, 0, 0);
         // SOR.Register(cube);
-        
 
-        
+
         // world
         var ws = new WorldService();
-        var world = ws.GenerateWorld(124);
-        
-        var gameWorld = new GameWorld(world, chunkShader, diamondTexture);
-        world.ChunkAdded += gameWorld.AddChunk;
-        world.ChunkRemoved += gameWorld.RemoveChunk;
+        _world = ws.GenerateWorld(124);
+
+        var gameWorld = new GameWorld(_world, chunkShader, diamondTexture);
+        _world.ChunkAdded += gameWorld.AddChunk;
+        _world.ChunkRemoved += gameWorld.RemoveChunk;
         _gameWorld = gameWorld;
         _gameWorld.Load();
         // SOR.Register(gameWorld);
-        
-        _chunkLoadingSystem = new ChunkLoadingSystem(world);
+
+        _chunkLoadingSystem = new ChunkLoadingSystem(_world);
         SOR.Register(_chunkLoadingSystem);
-        
+
 
         LightComposition(chunkShader, diamondTexture);
         LightComposition(cubeShader, diamondTexture);
@@ -86,7 +91,10 @@ public class DemoScene : Scene
         // text
         InitFpsCounter();
         InitPositionTracker();
+        InitRaycastTracker();
+        InitCrosshair();
     }
+
     protected override void Render(RenderContext renderContext)
     {
         _fpsCounter.Update(renderContext.DeltaTime);
@@ -97,8 +105,8 @@ public class DemoScene : Scene
     private static void LightComposition(IShader shader, ITexture texture)
     {
         shader.Use();
-        
-        
+
+
         var lightColor = new Vector3(1.0f, 1.0f, 0.95f);
         var lightDirection = Vector3.Normalize(new Vector3(-1, -2, -1));
 
@@ -111,37 +119,57 @@ public class DemoScene : Scene
         shader.SetFloat("shininess", shininess);
     }
 
-    private FpsCounter _fpsCounter;
+    private void InitRaycastTracker()
+    {
+        var rayInText = FastText(new Vector3(24, 128, 0));
+        var rayOutText = FastText(new Vector3(24, 128 + 32, 0));
+        var rayIsHitText = FastText(new Vector3(24, 128 + 64, 0));
+        var aabb = FastText(new Vector3(24, 128 + 96, 0));
 
-    private TextObject _chunkPositionText;
-    private TextObject _playerPositionText;
+
+        _rayHit.OnChanged += hit =>
+        {
+            aabb.SetTextContent($"AABB: {hit.HitIn.ToVector3Int()} / {hit.HitIn.ToVector3Int() + Vector3Int.One}");
+            rayIsHitText.SetTextContent($"Ray hit: {hit.IsHit}");
+            rayOutText.SetTextContent($"Ray in: {hit.HitIn.FancyString()}");
+            rayInText.SetTextContent($"Ray out: {hit.HitOut.FancyString()}");
+        };
+
+    }
 
     private void InitPositionTracker()
     {
-        var pixelFont = GameContext.FontRepository.Get("Pixel");
-        var textShader = GameContext.ShaderRepository.Get("text");
-    
-        _chunkPositionText = SOR.Register(new TextObject(pixelFont, textShader));
-        _chunkPositionText.Transform.Position = new Vector3(24, 24 + 2 * 32, 0);
-        _chunkPositionText.Transform.Scale = new Vector3(2);
-        
-        _playerPositionText = SOR.Register(new TextObject(pixelFont, textShader));
-        _playerPositionText.Transform.Position = new Vector3(24, 24 + 32, 0);
-        _playerPositionText.Transform.Scale = new Vector3(2);
+        _chunkPositionText = FastText(new Vector3(24, 24 + 2 * 32, 0));
+        _playerPositionText = FastText(new Vector3(24, 24 + 32, 0));
+    }
 
+
+    private void InitCrosshair()
+    {
+        var textShader = GameContext.ShaderRepository.Get("text");
+        var crosshairTexture = GameContext.TextureRepository.Get("Crosshair");
+        var crosshair = SOR.Register(new Crosshair(crosshairTexture, textShader));
+        crosshair.Color = new Vector3(1, 1, 1);
+        crosshair.Size = 16;
     }
     private void InitFpsCounter()
     {
         _fpsCounter = new FpsCounter(1.0, 0.25);
-        
+
+
+        var text = FastText(new Vector3(24, 24, 0));
+        _fpsCounter.OnFpsChanged += fps => text.SetTextContent($"FPS: {fps}");
+    }
+
+    private TextObject FastText(Vector3 position)
+    {
         var pixelFont = GameContext.FontRepository.Get("Pixel");
         var textShader = GameContext.ShaderRepository.Get("text");
 
         var text = SOR.Register(new TextObject(pixelFont, textShader));
-        text.Transform.Position = new Vector3(24, 24, 0);
+        text.Transform.Position = position;
         text.Transform.Scale = new Vector3(2);
-        
-        _fpsCounter.OnFpsChanged += fps => text.SetTextContent($"FPS: {fps}");
+        return text;
     }
 
     public override void KeyDown(Keys key)
@@ -153,8 +181,17 @@ public class DemoScene : Scene
     {
         Controller.ProcessMouseStreamInput();
         Controller.ProcessKeyboardStreamInput((float)deltaTime);
+        var ray = new Ray
+        {
+            Length = 25,
+            Origin = (System.Numerics.Vector3)Camera.Position,
+            Direction = (System.Numerics.Vector3)Camera.Front
+        };
+        var rayHit = _world.Raycast(ray);
+        _rayHit.Value = rayHit;
+        _rayHit.Update(deltaTime);
     }
-    
+
     public override void FixedUpdate(double deltaTime)
     {
         base.FixedUpdate(deltaTime);
@@ -167,7 +204,7 @@ public class DemoScene : Scene
             ViewMatrix = (Matrix4x4)Camera.GetViewMatrix()
         };
         var chunkPos = Chunk.GlobalToChunk(player.Position.ToVector3Int());
-        _playerPositionText.SetTextContent($"xyz: {player.Position.RoundTo(2).FancyString()}");
+        _playerPositionText.SetTextContent($"xyz: {player.Position.FancyString()}");
         _chunkPositionText.SetTextContent($"chunk xyz: {chunkPos}");
 
         _chunkLoadingSystem.Update(deltaTime, player);

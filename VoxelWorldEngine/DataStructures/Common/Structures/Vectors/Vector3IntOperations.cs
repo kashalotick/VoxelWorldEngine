@@ -82,6 +82,9 @@ public partial struct Vector3Int : IEquatable<Vector3Int>
     
     // type cast
 
+    // public static implicit operator Vector3(Vector3Int vector)
+    //     => new Vector3(vector.X, vector.Y, vector.Z);
+
     public static explicit operator Vector3(Vector3Int vector) 
         => new Vector3(vector.X, vector.Y, vector.Z);
 }

@@ -110,6 +110,7 @@ public class GameWorld : ILoadable, IRenderable
 
             var model = chunk.Value.Transform.GetModelMatrix();
             _worldShader.SetMatrix4("model", model);
+            
             var normalMatrix = new Matrix3(chunk.Value.Transform.GetModelMatrix());
             normalMatrix = normalMatrix.Inverted();
             normalMatrix = normalMatrix.Transposed();

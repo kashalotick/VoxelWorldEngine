@@ -47,6 +47,7 @@ public static class OctreeMath
     }
     
     
+    
     // public static int FindWayCodeTo(Vector3Int.Vector3Int position, int size)
     // {
     //     var depth = int.Log2(size);

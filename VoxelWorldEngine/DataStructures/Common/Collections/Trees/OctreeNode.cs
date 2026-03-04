@@ -10,6 +10,7 @@ public partial class Octree<T>
     {
         private LinearOctree<T> _linearOctree { get; init; }
         private int LinearIndex { get; init; }
+        private int ParentLinearIndex { get; init; }
 
         public int Depth { get; init; }
         public int Size => 1 << (_linearOctree.MaxDepth - Depth);
@@ -39,9 +40,11 @@ public partial class Octree<T>
                 LinearIndex = childLinearIndex,
                 Depth = Depth + 1,
                 Min = corner,
+                ParentLinearIndex = LinearIndex
             };
             return child;
         }
+        
 
 
 

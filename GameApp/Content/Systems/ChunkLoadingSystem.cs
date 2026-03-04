@@ -18,7 +18,6 @@ public class ChunkLoadingSystem : ILoadable
     private Vector3Int? _activeChunkPosition;
 
 
-
     public ChunkLoadingSystem(World world)
     {
         _chunkLoader = new ChunkLoader(world);
@@ -166,7 +165,7 @@ public class ChunkLoadingSystem : ILoadable
     private const int MaxWorkers = 8;
     private const int MinWorkers = 2;
     private const int QueueTriggerSize = 81;
-    
+
     private long _lastScaleUpTime = 0;
     private long _lastScaleDownTime = 0;
     private const long ScaleUpCooldownMs = 500;
@@ -178,12 +177,7 @@ public class ChunkLoadingSystem : ILoadable
         {
             new Thread(ChunkWorker) { IsBackground = true }.Start();
             Interlocked.Increment(ref _activeWorkers);
-        }    }
-    private void StartWorkers()
-    {
-        // Console.WriteLine($"start workers: {_activeWorkers} for (missing/ready queue/total/max) chunks");
-
-
+        }
     }
 
     private void AdjustWorkers()
@@ -191,14 +185,14 @@ public class ChunkLoadingSystem : ILoadable
         long now = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         int queueSize = _missingChunks.Count;
 
-        if (queueSize > QueueTriggerSize * _activeWorkers 
+        if (queueSize > QueueTriggerSize * _activeWorkers
             && _activeWorkers < MaxWorkers
             && now - _lastScaleUpTime > ScaleUpCooldownMs)
         {
             AddWorker();
             _lastScaleUpTime = now;
         }
-        else if (queueSize < 10 
+        else if (queueSize < 10
                  && _activeWorkers > MinWorkers
                  && now - _lastScaleDownTime > ScaleDownCooldownMs)
         {
