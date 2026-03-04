@@ -7,6 +7,14 @@ namespace VoxelWorldEngine.Utils;
 public static class VectorExtension
 {
     public static Vector3Int ToVector3Int(this Vector3 vector) => new((int)vector.X, (int)vector.Y, (int)vector.Z);
+    
+    public static Vector3Int FloorToVector3Int(this Vector3 vector) => new(
+        (int)MathF.Floor(vector.X),
+        (int)MathF.Floor(vector.Y),
+        (int)MathF.Floor(vector.Z)
+    );
+
+    
     public static Vector2Int ToVector2Int(Vector2 vector) => new((int)vector.X, (int)vector.Y);
     
 

@@ -71,7 +71,7 @@ public class LineMesh : Mesh<LineVertex, uint>
     }
 
     // Перевизначаємо Render — промінь це ЛІНІЯ, не трикутники
-    public new void Render()
+    public override void Render()
     {
         if (Vao == 0) return;
 

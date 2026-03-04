@@ -38,10 +38,7 @@ public class VoxelOctree : Octree<Voxel>, IRaycastable
             }
         }
     }
-
-    private readonly (OctreeNode node, float tIn)[] _childBuffer = new (OctreeNode, float)[8];
-    private readonly Stack<(OctreeNode node, float tIn)> _rayStack = new();
-
+    
     public RayHit Raycast(Ray ray)
     {
         var root = Root();

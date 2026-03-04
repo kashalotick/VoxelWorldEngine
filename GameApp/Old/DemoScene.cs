@@ -2,6 +2,7 @@
 using GameApp.Content;
 using GameApp.Content.Services;
 using GameApp.Content.Systems;
+using GameApp.Content.VoxelSelectionSystem;
 using GameApp.Debug;
 using LearningOpenTK.Content;
 using LearningOpenTK.Content.Scenes;
@@ -32,7 +33,9 @@ public class DemoScene : Scene
     private const float TextUpdateInterval = 1 / 60f;
     private ThrottleReactive<RayHit> _rayHit = new(TextUpdateInterval);
     private RayShooter _rayShooter;
-    
+    private Reactive<Vector3Int?> _hitVoxelPosition = new();
+    private VoxelSelection _voxelSelection;
+
     private World _world;
     private GameWorld _gameWorld;
     private TextObject _playerPositionText;
@@ -96,8 +99,12 @@ public class DemoScene : Scene
         InitRaycastTracker();
         InitCrosshair();
 
-        _rayShooter = new RayShooter(GameContext.ShaderRepository.Get("debugray"));
+        // raycasting
+        var debugLinesShader = GameContext.ShaderRepository.Get("debugray");
+        _rayShooter = new RayShooter(debugLinesShader);
         _rayShooter.Load();
+        _voxelSelection = SOR.Register(new VoxelSelection(debugLinesShader));
+        _hitVoxelPosition.OnChanged += voxelPosition => _voxelSelection.SetVoxelPosition(voxelPosition);
     }
 
     protected override void Render(RenderContext renderContext)
@@ -120,7 +127,7 @@ public class DemoScene : Scene
         shader.SetVector3("lightColor", lightColor);
         shader.SetVector3("lightDirection", lightDirection);
 
-        var ambientColor = new Vector4(0.95f, 0.95f, 1, 0.3f);
+        var ambientColor = new Vector4(0.95f, 0.95f, 1, 0.4f);
         shader.SetVector4("ambientColor", ambientColor);
         var shininess = 64f;
         shader.SetFloat("shininess", shininess);
@@ -141,7 +148,6 @@ public class DemoScene : Scene
             rayOutText.SetTextContent($"Ray in: {hit.HitIn.FancyString()}");
             rayInText.SetTextContent($"Ray out: {hit.HitOut.FancyString()}");
         };
-
     }
 
     private void InitPositionTracker()
@@ -159,6 +165,7 @@ public class DemoScene : Scene
         crosshair.Color = new Vector3(1, 1, 1);
         crosshair.Size = 16;
     }
+
     private void InitFpsCounter()
     {
         _fpsCounter = new FpsCounter(1.0, 0.25);
@@ -183,13 +190,18 @@ public class DemoScene : Scene
     {
         Controller.ProcessInput(key);
     }
-    
+
 
     public override void Update(double deltaTime)
     {
         Controller.ProcessMouseStreamInput();
         Controller.ProcessKeyboardStreamInput((float)deltaTime);
 
+        ProcessRaycast(deltaTime);
+    }
+
+    private void ProcessRaycast(double deltaTime)
+    {
         var ray = new Ray
         {
             Length = 25,
@@ -197,16 +209,26 @@ public class DemoScene : Scene
             Direction = (System.Numerics.Vector3)Camera.Front
         };
         var rayHit = _world.Raycast(ray);
-        
+
         if (GameContext.Input.Mouse.IsButtonPressed(MouseButton.Left))
         {
             _rayShooter.Update(ray, rayHit);
         }
-        
+
+
+        if (rayHit.IsHit)
+        {
+            var insidePoint = rayHit.HitIn + ray.Direction * 0.001f;
+            _hitVoxelPosition.Value = insidePoint.FloorToVector3Int();
+        }
+        else
+        {
+            _hitVoxelPosition.Value = null;
+        }
+
         _rayHit.Value = rayHit;
         _rayHit.Update(deltaTime);
     }
-    
 
 
     public override void FixedUpdate(double deltaTime)

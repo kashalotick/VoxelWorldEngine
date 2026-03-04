@@ -1,4 +1,5 @@
-﻿using VoxelWorldEngine.Core.Raycasting;
+﻿using System.Numerics;
+using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
@@ -40,8 +41,7 @@ public class Chunk
             MathHelper.FloorDiv(position.Z, ChunkSize)
         );
     }
-
-
+    
     public static Vector3Int GlobalToLocal(Vector3Int position)
     {
         return new Vector3Int(
