@@ -15,34 +15,18 @@ public static class Raycaster
         out float tMax
     )
     {
-        tMin = float.NegativeInfinity;
-        tMax = float.PositiveInfinity;
+        var invDir = ray.InvDirection; // кешуй 1/dir один раз на Ray!
 
-        for (int axis = 0; axis < 3; axis++)
-        {
-            float origin = axis == 0 ? ray.Origin.X : axis == 1 ? ray.Origin.Y : ray.Origin.Z;
-            float dir = axis == 0 ? ray.Direction.X : axis == 1 ? ray.Direction.Y : ray.Direction.Z;
-            float bMin = axis == 0 ? boxMin.X : axis == 1 ? boxMin.Y : boxMin.Z;
-            float bMax = axis == 0 ? boxMax.X : axis == 1 ? boxMax.Y : boxMax.Z;
+        float tx1 = (boxMin.X - ray.Origin.X) * invDir.X;
+        float tx2 = (boxMax.X - ray.Origin.X) * invDir.X;
+        float ty1 = (boxMin.Y - ray.Origin.Y) * invDir.Y;
+        float ty2 = (boxMax.Y - ray.Origin.Y) * invDir.Y;
+        float tz1 = (boxMin.Z - ray.Origin.Z) * invDir.Z;
+        float tz2 = (boxMax.Z - ray.Origin.Z) * invDir.Z;
 
-            if (MathF.Abs(dir) < 1e-8f)
-            {
-                // Промінь паралельний цій осі
-                if (origin < bMin || origin > bMax)
-                    return false;
-            }
-            else
-            {
-                float t1 = (bMin - origin) / dir;
-                float t2 = (bMax - origin) / dir;
-                if (t1 > t2) (t1, t2) = (t2, t1);
-                tMin = MathF.Max(tMin, t1);
-                tMax = MathF.Min(tMax, t2);
-                if (tMin > tMax)
-                    return false;
-            }
-        }
+        tMin = MathF.Max(MathF.Max(MathF.Min(tx1, tx2), MathF.Min(ty1, ty2)), MathF.Min(tz1, tz2));
+        tMax = MathF.Min(MathF.Min(MathF.Max(tx1, tx2), MathF.Max(ty1, ty2)), MathF.Max(tz1, tz2));
 
-        return true;
+        return tMax >= tMin;
     }
 }
