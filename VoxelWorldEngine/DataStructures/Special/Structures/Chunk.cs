@@ -12,8 +12,17 @@ public class Chunk
 {
     public MeshData Mesh { get; set; }
     public VoxelOctree Octree { get; set; }
-    public Vector3Int Position { get; set; }
-    public Vector3Int GlobalPosition => ChunkToGlobal(Position);
+    public Vector3Int Position
+    {
+        get;
+        set
+        {
+            field = value;
+            GlobalPosition = ChunkToGlobal(Position);
+        }
+    }
+
+    public Vector3Int GlobalPosition {get; private set;}
     
     // public Vector3Int Min => GlobalPosition;
     // public Vector3Int Max => GlobalPosition + Vector3Int.One * ChunkSize;

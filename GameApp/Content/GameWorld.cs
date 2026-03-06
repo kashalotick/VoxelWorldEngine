@@ -93,7 +93,6 @@ public class GameWorld : ILoadable, IRenderable
         _worldShader.SetVector3("viewPos", context.CameraPosition);
 
         var chunks = _chunks.Count;
-        var chunksWithMesh = 0;
 
         foreach (var chunk in _chunks)
         {
@@ -101,31 +100,19 @@ public class GameWorld : ILoadable, IRenderable
             
             if (_world.Chunks.TryGetValue(chunk.Key, out var chunkData))
             {
-                if (!context.IsInFrustum(
-                        (Vector3)(System.Numerics.Vector3)chunkData.GlobalPosition,
-                        (Vector3)(System.Numerics.Vector3)(chunkData.GlobalPosition + new Vector3Int(Chunk.ChunkSize))
-                    ))
+                var globalPos = (Vector3)(System.Numerics.Vector3)chunkData.GlobalPosition; // TODO
+                if (!context.IsInFrustum(globalPos, globalPos + new Vector3(Chunk.ChunkSize)))
                     continue;
             }
 
             var model = chunk.Value.Transform3D.GetModelMatrix();
             _worldShader.SetMatrix4("model", model);
             
-            var normalMatrix = new Matrix3(chunk.Value.Transform3D.GetModelMatrix());
-            normalMatrix = normalMatrix.Inverted();
-            normalMatrix = normalMatrix.Transposed();
+            var normalMatrix = chunk.Value.Transform3D.GetCubeNormalMatrix(); // TODO: make caching
             _worldShader.SetMatrix3("normalMatrix", normalMatrix);
 
 
-            chunk.Value.Mesh?.Render();
-            chunksWithMesh++;
-            // chunk.Render(context);
-        }
-
-        if (chunksWithMesh != _previousChunksWithMesh)
-        {
-            _previousChunksWithMesh = chunksWithMesh;
-            // Console.WriteLine($"{chunksWithMesh}/{chunks} chunks rendered");
+            chunk.Value.Mesh.Render();
         }
     }
 
