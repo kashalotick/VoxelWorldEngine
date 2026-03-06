@@ -1,6 +1,7 @@
 using GameApp.Debug;
 using LearningOpenTK.Content.Input;
 using LearningOpenTK.Core;
+using LearningOpenTK.Core.Input;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
@@ -13,9 +14,22 @@ public class PlayerController : FreeCameraController
     {
         _rayShooter =  rayShooter;
     }
-    
-    
 
+
+    public override void OnKeyUp(KeyboardKeyEventArgs e, KeyboardState keyboard)
+    {
+        base.OnKeyUp(e, keyboard);
+        switch (e.Key)
+        {
+            case Keys.F11:
+                RequestWindowAction(new ToggleFullscreenWindow());
+                break;
+            case Keys.Escape:
+                RequestWindowAction(new CloseWindow
+                    ());
+                break;
+        }
+    }
 
     public override void OnMouseDown(MouseButtonEventArgs e, MouseState mouse)
     {

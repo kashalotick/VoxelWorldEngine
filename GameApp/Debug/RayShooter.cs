@@ -56,8 +56,8 @@ public class RayShooter : ILoadable, IRenderable
         _traced = (PrevRay, PrevHit);
         _rayMesh.UpdateRay(_traced.ray, _traced.hit);
         var hitline = (bool)PrevHit.IsHit ? $"{PrevHit.HitIn.FancyString()} -> {PrevHit.HitOut.FancyString()}" : "";
-        Console.WriteLine($"\nRay: {PrevRay.Origin.FancyString()} -> {PrevRay.Direction.FancyString()}"
-                          + $"\nHit: {PrevHit.IsHit}  {hitline}");
+        // Console.WriteLine($"\nRay: {PrevRay.Origin.FancyString()} -> {PrevRay.Direction.FancyString()}"
+        //                   + $"\nHit: {PrevHit.IsHit}  {hitline}");
 
         _rayHitPointsMesh.UpdateHitPoints(_traced.ray, _traced.hit);
     }

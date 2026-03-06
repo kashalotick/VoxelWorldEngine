@@ -6,19 +6,15 @@ using GameApp.Content.Systems;
 using GameApp.Content.VoxelSelectionSystem;
 using GameApp.Debug;
 using LearningOpenTK.Content;
-using LearningOpenTK.Content.Input;
-using LearningOpenTK.Content.Scenes;
-using LearningOpenTK.Content.Ui;
 using LearningOpenTK.Content.Ui.DynamicDraw;
 using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.DTO;
+using LearningOpenTK.Core.Input;
 using LearningOpenTK.Core.Scenes;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
-using LearningOpenTK.Text;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
@@ -124,6 +120,8 @@ public class DemoScene : Scene
         Camera.LookAt(Vector3.Zero);
         
         ControllerContext.SetState(new PlayerController(Camera, _rayShooter));
+        
+        SceneContext.RequestWindowAction(new GrabCursor());
 
     }
 
@@ -222,7 +220,7 @@ public class DemoScene : Scene
 
     public override void Update(double deltaTime)
     {
-        // ProcessRaycast(deltaTime);
+        ProcessRaycast(deltaTime);
     }
 
     private void ProcessRaycast(double deltaTime)
