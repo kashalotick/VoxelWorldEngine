@@ -14,14 +14,14 @@ public sealed class VoxelSelection : ILoadable, IRenderable
 {
     private IShader _shader;
     private Vector3Int? _voxelPosition;
-    private Transform _transform;
+    private Transform3D _transform3D;
     private Vector3 _color;
     private CubeEdgeMesh _mesh;
 
     public VoxelSelection(IShader shader)
     {
         _shader = shader;
-        _transform = new Transform
+        _transform3D = new Transform3D
         {
             Scale = Vector3.One * 1.01f,
         };
@@ -40,7 +40,7 @@ public sealed class VoxelSelection : ILoadable, IRenderable
         if (voxelPosition != null)
         {
             var scaleOffset = Vector3.One * 0.005f;
-            _transform.Position = (Vector3)(System.Numerics.Vector3)voxelPosition - scaleOffset;
+            _transform3D.Position = (Vector3)(System.Numerics.Vector3)voxelPosition - scaleOffset;
             
 
         }
@@ -52,7 +52,7 @@ public sealed class VoxelSelection : ILoadable, IRenderable
         if (_voxelPosition == null) return;
         _shader.Use();
         
-        var viewProjection = _transform.GetModelMatrix() * context.ViewMatrix * context.ProjectionMatrix3D;
+        var viewProjection = _transform3D.GetModelMatrix() * context.ViewMatrix * context.ProjectionMatrix3D;
         _shader.SetMatrix4("uViewProjection", viewProjection);
         _mesh.Render();
     }

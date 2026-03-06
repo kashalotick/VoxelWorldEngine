@@ -68,7 +68,7 @@ public class GameWorld : ILoadable, IRenderable
 
         var obj = new WorldObject(mesh, _worldShader, _worldTexture);
 
-        obj.Transform.Position = (Vector3)(System.Numerics.Vector3)chunk.GlobalPosition;
+        obj.Transform3D.Position = (Vector3)(System.Numerics.Vector3)chunk.GlobalPosition;
         return obj;
     }
 
@@ -108,10 +108,10 @@ public class GameWorld : ILoadable, IRenderable
                     continue;
             }
 
-            var model = chunk.Value.Transform.GetModelMatrix();
+            var model = chunk.Value.Transform3D.GetModelMatrix();
             _worldShader.SetMatrix4("model", model);
             
-            var normalMatrix = new Matrix3(chunk.Value.Transform.GetModelMatrix());
+            var normalMatrix = new Matrix3(chunk.Value.Transform3D.GetModelMatrix());
             normalMatrix = normalMatrix.Inverted();
             normalMatrix = normalMatrix.Transposed();
             _worldShader.SetMatrix3("normalMatrix", normalMatrix);

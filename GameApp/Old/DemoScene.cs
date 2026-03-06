@@ -7,9 +7,12 @@ using GameApp.Debug;
 using LearningOpenTK.Content;
 using LearningOpenTK.Content.Scenes;
 using LearningOpenTK.Content.Ui;
+using LearningOpenTK.Content.Ui.DynamicDraw;
+using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Scenes;
+using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
 using LearningOpenTK.Text;
 using OpenTK.Graphics.OpenGL4;
@@ -19,6 +22,7 @@ using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.Utils;
+using Vector2 = OpenTK.Mathematics.Vector2;
 using Vector3 = OpenTK.Mathematics.Vector3;
 using Vector4 = OpenTK.Mathematics.Vector4;
 
@@ -27,7 +31,8 @@ namespace GameApp.Old;
 public class DemoScene : Scene
 {
     private ChunkLoadingSystem _chunkLoadingSystem; // temp
-    private TextObject _chunkPositionText;
+    protected CameraController Controller;
+
     private FpsCounter _fpsCounter;
 
     private const float TextUpdateInterval = 1 / 60f;
@@ -38,8 +43,9 @@ public class DemoScene : Scene
 
     private World _world;
     private GameWorld _gameWorld;
-    private TextObject _playerPositionText;
-    protected CameraController Controller;
+
+    private DynamicText _chunkPositionText;
+    private DynamicText _playerPositionText;
 
     public DemoScene(GameContext gameContext) : base(gameContext)
     {
@@ -94,10 +100,21 @@ public class DemoScene : Scene
         LightComposition(cubeShader, diamondTexture);
 
         // text
-        InitFpsCounter();
-        InitPositionTracker();
-        InitRaycastTracker();
+        InitDebugText();
         InitCrosshair();
+        // var textShader = GameContext.ShaderRepository.Get("text");
+        // var font = GameContext.FontRepository.Get("Pixel");
+        // var staticText = SOR.Register(new StaticText(textShader, font, "Hello world!")
+        // {
+        //     Transform =
+        //     {
+        //         Scale = 4.25f,
+        //         Anchor = new Vector2(0.5f, 1f),
+        //         Pivot = new Vector2(0.5f, 0.5f),
+        //         Offset = new Vector2(0, -32)
+        //     },
+        //     Color = new Vector3(1, 1, 1)
+        // });
 
         // raycasting
         var debugLinesShader = GameContext.ShaderRepository.Get("debugray");
@@ -133,37 +150,48 @@ public class DemoScene : Scene
         shader.SetFloat("shininess", shininess);
     }
 
-    private void InitRaycastTracker()
+
+    private void InitCrosshair()
     {
-        var rayInText = FastText(new Vector3(24, 128, 0));
-        var rayOutText = FastText(new Vector3(24, 128 + 32, 0));
-        var rayIsHitText = FastText(new Vector3(24, 128 + 64, 0));
-        var aabb = FastText(new Vector3(24, 128 + 96, 0));
+        var textShader = GameContext.ShaderRepository.Get("text");
+        var crosshairTexture = GameContext.TextureRepository.Get("Crosshair");
+        var crosshair = SOR.Register(new Crosshair(textShader, crosshairTexture, 16));
+        crosshair.Color = new Vector3(1, 1, 1);
+    }
+
+
+    private void InitDebugText()
+    {
+        var textShader = GameContext.ShaderRepository.Get("text");
+        var empty = GameContext.TextureRepository.Get("Empty");
+        SOR.Register(new StaticElement(textShader, empty)
+        {
+            Transform =
+            {
+                Width = 420,
+                Height = 256,
+                Anchor = (0, 1),
+                Pivot = (0, 1),
+                Scale = 1,
+            },
+            ZIndex = 0,
+            Color = (0, 0, 0),
+        });
+        
+        InitFpsCounter();
+
+        _playerPositionText = FastText(new Vector2(24, 24 + 2 * 32));
+        _chunkPositionText = FastText(new Vector2(24, 24 + 3 * 32));
+
+        var rayIsHitText = FastText(new Vector2(24, 24 + 5 * 32));
+        var aabb = FastText(new Vector2(24, 24 + 6 * 32));
 
 
         _rayHit.OnChanged += hit =>
         {
             aabb.SetTextContent($"AABB: {hit.HitIn.ToVector3Int()} / {hit.HitIn.ToVector3Int() + Vector3Int.One}");
             rayIsHitText.SetTextContent($"Ray hit: {hit.IsHit}");
-            rayOutText.SetTextContent($"Ray in: {hit.HitIn.FancyString()}");
-            rayInText.SetTextContent($"Ray out: {hit.HitOut.FancyString()}");
         };
-    }
-
-    private void InitPositionTracker()
-    {
-        _chunkPositionText = FastText(new Vector3(24, 24 + 2 * 32, 0));
-        _playerPositionText = FastText(new Vector3(24, 24 + 32, 0));
-    }
-
-
-    private void InitCrosshair()
-    {
-        var textShader = GameContext.ShaderRepository.Get("text");
-        var crosshairTexture = GameContext.TextureRepository.Get("Crosshair");
-        var crosshair = SOR.Register(new Crosshair(crosshairTexture, textShader));
-        crosshair.Color = new Vector3(1, 1, 1);
-        crosshair.Size = 16;
     }
 
     private void InitFpsCounter()
@@ -171,18 +199,20 @@ public class DemoScene : Scene
         _fpsCounter = new FpsCounter(1.0, 0.25);
 
 
-        var text = FastText(new Vector3(24, 24, 0));
+        var text = FastText(new Vector2(24, 24));
         _fpsCounter.OnFpsChanged += fps => text.SetTextContent($"FPS: {fps}");
     }
 
-    private TextObject FastText(Vector3 position)
+    private DynamicText FastText(Vector2 position)
     {
         var pixelFont = GameContext.FontRepository.Get("Pixel");
         var textShader = GameContext.ShaderRepository.Get("text");
 
-        var text = SOR.Register(new TextObject(pixelFont, textShader));
-        text.Transform.Position = position;
-        text.Transform.Scale = new Vector3(2);
+        var text = SOR.Register(new DynamicText(textShader, pixelFont, " "));
+
+        text.Transform.Anchor = new Vector2(0, 1);
+        text.Transform.Offset = position with { Y = -position.Y - 16 };
+        text.Transform.Scale = 2;
         return text;
     }
 
