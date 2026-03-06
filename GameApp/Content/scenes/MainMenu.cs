@@ -1,6 +1,6 @@
 ﻿namespace GameApp.Content.Scenes;
 
-public class MainMenu 
+public class MainMenu
 {
     
 }

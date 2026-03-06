@@ -1,10 +1,12 @@
 ﻿using System.Numerics;
 using GameApp.Content;
+using GameApp.Content.Scenes;
 using GameApp.Content.Services;
 using GameApp.Content.Systems;
 using GameApp.Content.VoxelSelectionSystem;
 using GameApp.Debug;
 using LearningOpenTK.Content;
+using LearningOpenTK.Content.Input;
 using LearningOpenTK.Content.Scenes;
 using LearningOpenTK.Content.Ui;
 using LearningOpenTK.Content.Ui.DynamicDraw;
@@ -31,7 +33,6 @@ namespace GameApp.Old;
 public class DemoScene : Scene
 {
     private ChunkLoadingSystem _chunkLoadingSystem; // temp
-    protected CameraController Controller;
 
     private FpsCounter _fpsCounter;
 
@@ -61,13 +62,6 @@ public class DemoScene : Scene
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         // GL.Enable(EnableCap.Multisample);
 
-
-        Camera = new Camera(new Vector3(1, 0, 0),
-            GameContext.ScreenWidth / GameContext.ScreenHeight); // TODO: make injection for position
-        Controller = new CameraController(GameContext.Input, Camera);
-        Controller.ExitRequested += RequestCloseWindow;
-
-        Camera.LookAt(Vector3.Zero);
 
 
         var chunkShader = GameContext.ShaderRepository.Get("chunk");
@@ -122,6 +116,15 @@ public class DemoScene : Scene
         _rayShooter.Load();
         _voxelSelection = SOR.Register(new VoxelSelection(debugLinesShader));
         _hitVoxelPosition.OnChanged += voxelPosition => _voxelSelection.SetVoxelPosition(voxelPosition);
+        
+        
+        
+        Camera = new Camera(new Vector3(1, 0, 0),
+            GameContext.ScreenWidth / GameContext.ScreenHeight); // TODO: make injection for position
+        Camera.LookAt(Vector3.Zero);
+        
+        ControllerContext.SetState(new PlayerController(Camera, _rayShooter));
+
     }
 
     protected override void Render(RenderContext renderContext)
@@ -216,18 +219,10 @@ public class DemoScene : Scene
         return text;
     }
 
-    public override void KeyDown(Keys key)
-    {
-        Controller.ProcessInput(key);
-    }
-
 
     public override void Update(double deltaTime)
     {
-        Controller.ProcessMouseStreamInput();
-        Controller.ProcessKeyboardStreamInput((float)deltaTime);
-
-        ProcessRaycast(deltaTime);
+        // ProcessRaycast(deltaTime);
     }
 
     private void ProcessRaycast(double deltaTime)
@@ -238,17 +233,11 @@ public class DemoScene : Scene
             Origin = (System.Numerics.Vector3)Camera.Position,
             Direction = (System.Numerics.Vector3)Camera.Front
         };
-        var rayHit = _world.Raycast(ray);
-
-        if (GameContext.Input.Mouse.IsButtonPressed(MouseButton.Left))
-        {
-            _rayShooter.Update(ray, rayHit);
-        }
-
-
+        var rayHit = _rayShooter.Shoot(ray, _world);
+        
         if (rayHit.IsHit)
         {
-            var insidePoint = rayHit.HitIn + ray.Direction * 0.001f;
+            var insidePoint = rayHit.HitIn + _rayShooter.PrevRay.Direction * 0.001f;
             _hitVoxelPosition.Value = insidePoint.FloorToVector3Int();
         }
         else

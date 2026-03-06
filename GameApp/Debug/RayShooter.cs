@@ -12,7 +12,9 @@ public class RayShooter : ILoadable, IRenderable
 {
     private IShader _shader;
 
-    private (Ray ray, RayHit hit) _shotRay = new();
+    public Ray PrevRay { get; private set; }
+    public RayHit PrevHit {get; private set;}
+    private (Ray ray, RayHit hit) _traced = new();
     private LineMesh _rayMesh;
     private RayHitPointsMesh _rayHitPointsMesh;
 
@@ -37,22 +39,29 @@ public class RayShooter : ILoadable, IRenderable
 
         _rayMesh.Render();
 
-   
+
         _rayHitPointsMesh.Render();
-        
     }
 
-    public void Update(Ray ray, RayHit? hit = null)
+    public RayHit Shoot(Ray ray, IRaycastable target)
     {
-        _shotRay = (ray, hit ?? new RayHit());
-        _rayMesh.UpdateRay(_shotRay.ray, _shotRay.hit);
-        var hitline = (bool)hit?.IsHit ? $"{hit?.HitIn.FancyString()} -> {hit?.HitOut.FancyString()}" : "";
-        Console.WriteLine($"\nRay: {ray.Origin.FancyString()} -> {ray.Direction.FancyString()}"
-                          + $"\nHit: {hit?.IsHit}  {hitline}");
-  
-        _rayHitPointsMesh.UpdateHitPoints(_shotRay.ray, _shotRay.hit);
-        
+        var rayHit = target.Raycast(ray);
+        PrevRay = ray;
+        PrevHit =  rayHit;
+        return rayHit;
     }
+
+    public void Trace()
+    {
+        _traced = (PrevRay, PrevHit);
+        _rayMesh.UpdateRay(_traced.ray, _traced.hit);
+        var hitline = (bool)PrevHit.IsHit ? $"{PrevHit.HitIn.FancyString()} -> {PrevHit.HitOut.FancyString()}" : "";
+        Console.WriteLine($"\nRay: {PrevRay.Origin.FancyString()} -> {PrevRay.Direction.FancyString()}"
+                          + $"\nHit: {PrevHit.IsHit}  {hitline}");
+
+        _rayHitPointsMesh.UpdateHitPoints(_traced.ray, _traced.hit);
+    }
+
 
     public void Dispose()
     {
