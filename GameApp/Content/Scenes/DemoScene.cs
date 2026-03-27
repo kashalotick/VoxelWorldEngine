@@ -1,6 +1,4 @@
 ﻿using System.Numerics;
-using GameApp.Content;
-using GameApp.Content.Scenes;
 using GameApp.Content.Services;
 using GameApp.Content.Systems;
 using GameApp.Content.VoxelSelectionSystem;
@@ -24,7 +22,7 @@ using Vector2 = OpenTK.Mathematics.Vector2;
 using Vector3 = OpenTK.Mathematics.Vector3;
 using Vector4 = OpenTK.Mathematics.Vector4;
 
-namespace GameApp.Old;
+namespace GameApp.Content.Scenes;
 
 public class DemoScene : Scene
 {
@@ -47,9 +45,7 @@ public class DemoScene : Scene
     public DemoScene(GameContext gameContext) : base(gameContext)
     {
     }
-
-    public override bool IsCursorLocked => true;
-
+    
     protected override void Load()
     {
         GL.Enable(EnableCap.DepthTest);
@@ -92,7 +88,7 @@ public class DemoScene : Scene
         // text
         InitDebugText();
         InitCrosshair();
-        // var textShader = GameContext.ShaderRepository.Get("text");
+        // var textShader = GameContext.ShaderRepository.Get("plain");
         // var font = GameContext.FontRepository.Get("Pixel");
         // var staticText = SOR.Register(new StaticText(textShader, font, "Hello world!")
         // {
@@ -107,7 +103,7 @@ public class DemoScene : Scene
         // });
 
         // raycasting
-        var debugLinesShader = GameContext.ShaderRepository.Get("debugray");
+        var debugLinesShader = GameContext.ShaderRepository.Get("line");
         _rayShooter = new RayShooter(debugLinesShader);
         _rayShooter.Load();
         _voxelSelection = SOR.Register(new VoxelSelection(debugLinesShader));
@@ -154,7 +150,7 @@ public class DemoScene : Scene
 
     private void InitCrosshair()
     {
-        var textShader = GameContext.ShaderRepository.Get("text");
+        var textShader = GameContext.ShaderRepository.Get("plain");
         var crosshairTexture = GameContext.TextureRepository.Get("Crosshair");
         var crosshair = SOR.Register(new Crosshair(textShader, crosshairTexture, 16));
         crosshair.Color = new Vector3(1, 1, 1);
@@ -163,7 +159,7 @@ public class DemoScene : Scene
 
     private void InitDebugText()
     {
-        var textShader = GameContext.ShaderRepository.Get("text");
+        var textShader = GameContext.ShaderRepository.Get("plain");
         var empty = GameContext.TextureRepository.Get("Empty");
         SOR.Register(new StaticElement(textShader, empty)
         {
@@ -207,7 +203,7 @@ public class DemoScene : Scene
     private DynamicText FastText(Vector2 position)
     {
         var pixelFont = GameContext.FontRepository.Get("Pixel");
-        var textShader = GameContext.ShaderRepository.Get("text");
+        var textShader = GameContext.ShaderRepository.Get("plain");
 
         var text = SOR.Register(new DynamicText(textShader, pixelFont, " "));
 

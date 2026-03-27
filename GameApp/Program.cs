@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using GameApp.Old;
+using GameApp.Content.Scenes;
 using LearningOpenTK.Core;
 using LearningOpenTK.Entities.World;
 using LearningOpenTK.Resources;
@@ -15,8 +15,12 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        // var defaultScene = (GameContext gc) => new DemoScene(gc);
+        var defaultScene = (GameContext gc) => new MainMenu(gc);
+
         var game = new Game(1200, 900, "Voxel engine test",
-            gc => new DemoScene(gc));
+            defaultScene);
+
         game.Run();
     }
 }

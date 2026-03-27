@@ -34,16 +34,16 @@
       <None Update="Assets\Fonts\Pixel.png">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Assets\Shaders\text.frag">
+      <None Update="Assets\Shaders\plain.frag">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Assets\Shaders\text.vert">
+      <None Update="Assets\Shaders\plain.vert">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Assets\Shaders\debugray.frag">
+      <None Update="Assets\Shaders\line.frag">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-      <None Update="Assets\Shaders\debugray.vert">
+      <None Update="Assets\Shaders\line.vert">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
