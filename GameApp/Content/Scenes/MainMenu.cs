@@ -1,4 +1,5 @@
 ﻿using GameApp.Content.scenes;
+using GameApp.Content.Scenes.WorldScene;
 using GameApp.Content.Ui;
 using LearningOpenTK.Content;
 using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
@@ -48,17 +49,7 @@ public class MainMenu : Scene
         _pixelFont = GameContext.FontRepository.Get("Pixel");
 
         var ui = SOR.Register(new UiLayout());
-
-
-        // var fpsText = new DynamicText(_plainShader, _pixelFont, "FPS");
-        // fpsText.Transform.Anchor = (.5f, .5f);
-        // fpsText.Transform.Pivot = (.5f, .5f);
-        // fpsText.Transform.Scale = 2;
-        // ui.Add(fpsText);
-        // fpsText.SetTextContent("FSPS");
-        // fps.OnFpsChanged += f => fpsText.SetTextContent($"FPS: {f}");
-        //
-
+        
 
         ui.Add(CreateExitButton());
         ui.Add(CreateNewWorldButton());
