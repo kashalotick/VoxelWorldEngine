@@ -18,6 +18,16 @@ public class UiController : SceneController
         GameContext = gameContext;
     }
 
+    public override void OnKeyUp(KeyboardKeyEventArgs e, KeyboardState keyboard)
+    {
+        switch (e.Key)
+        {
+            case Keys.F11:
+                RequestWindowAction(new ToggleFullscreenWindow());
+                break;
+        }
+    }
+
     public override void OnTextInput(TextInputEventArgs e, KeyboardState keyboard)
     {
         Console.WriteLine($"text input: {e.AsString}");

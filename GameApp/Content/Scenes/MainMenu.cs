@@ -1,4 +1,5 @@
 ﻿using GameApp.Content.scenes;
+using GameApp.Content.Ui;
 using LearningOpenTK.Content;
 using LearningOpenTK.Content.Ui.DynamicDraw;
 using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
@@ -24,6 +25,17 @@ public class MainMenu : Scene
     public MainMenu(GameContext gameContext) : base(gameContext)
     {
     }
+
+    public override void StateEnter()
+    {
+        ((IScene)this).Load();
+    }
+
+    public override void StateExit()
+    {
+        ((IScene)this).Dispose();
+    }
+
 
     protected override void Load()
     {
@@ -51,7 +63,16 @@ public class MainMenu : Scene
         //
 
 
-        AddExitButton(ui);
+        ui.Add(CreateExitButton());
+        ui.Add(CreateNewWorldButton());
+
+
+        var worldTile = new WorldTile(_plainShader, _emptyTexture, _pixelFont, "World", 123432, 23949134);
+        worldTile.Play += Play;
+        worldTile.Delete += Delete;
+
+        ui.Add(worldTile);
+
 
         var controller = new UiController(GameContext);
         controller.Click += ui.HandleClick;
@@ -61,34 +82,66 @@ public class MainMenu : Scene
         SceneContext.RequestWindowAction(new ResetCursor());
     }
 
-    private void AddExitButton(UiLayout ui)
+    private UiElement CreateExitButton()
     {
-        var button = new Button(_plainShader, _emptyTexture);
+        var button = new ButtonWithLabel(_plainShader, _emptyTexture, _pixelFont, "Exit", (1, 1, 1));
         button.Transform = new RectTransform()
         {
-            Width = 96,
-            Height = 48,
+            Width = 48,
+            Height = 24,
             Anchor = (1, 0),
             Pivot = (1, 0),
             Offset = (-32, 32),
-            Scale = 2,
+            Scale = 4,
         };
         button.Color = (0.937f, 0.259f, 0.259f);
         button.HoverColor = (1.0f, 0.435f, 0.435f);
-        button.ZIndex = 1;
-        var label = new StaticText(_plainShader, _pixelFont, "Exit", (1, 1, 1));
-        label.Transform = new RectTransform()
+
+
+        button.Click += Exit;
+
+        return button;
+    }
+
+    private UiElement CreateNewWorldButton()
+    {
+        var button = new ButtonWithLabel(_plainShader, _emptyTexture, _pixelFont, "Create new world", (1, 1, 1));
+        button.Transform = new RectTransform()
         {
-            Anchor = (1, 0),
+            Width = 120,
+            Height = 24,
+            Anchor = (0, 0),
             Pivot = (0, 0),
-            Offset = (-32-96-40, 32+30),
+            Offset = (32, 32),
             Scale = 4,
         };
-        label.ZIndex = 2;
+        button.Color = new(0);
+        button.HoverColor = new(0);
+        button.TextHoverColor = new(0.8f);
 
-        button.Click += () => SceneContext.RequestWindowAction(new CloseWindow());
 
-        ui.Add(button);
-        ui.Add(label);
+        button.Click += CreateNew;
+
+        return button;
+    }
+
+    private void Play()
+    {
+        SceneContext.SetState(new DemoScene(GameContext));
+
+    }
+    private void Delete()
+    {
+        Console.WriteLine("Delete");
+    }
+
+    private void Exit()
+    {
+        SceneContext.RequestWindowAction(new CloseWindow());
+    }
+
+    private void CreateNew()
+    {
+        SceneContext.SetState(new NewWorld(GameContext));
     }
 }

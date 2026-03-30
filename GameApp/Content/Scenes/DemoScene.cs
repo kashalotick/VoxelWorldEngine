@@ -46,6 +46,16 @@ public class DemoScene : Scene
     {
     }
     
+    public override void StateEnter()
+    {
+        ((IScene)this).Load();
+    }
+
+    public override void StateExit()
+    {
+        ((IScene)this).Dispose();
+    }
+    
     protected override void Load()
     {
         GL.Enable(EnableCap.DepthTest);
@@ -55,6 +65,7 @@ public class DemoScene : Scene
         // GL.Enable(EnableCap.Multisample);
 
 
+        
 
         var chunkShader = GameContext.ShaderRepository.Get("chunk");
         var cubeShader = GameContext.ShaderRepository.Get("shader");

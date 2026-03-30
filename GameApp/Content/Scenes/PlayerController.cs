@@ -10,9 +10,10 @@ namespace GameApp.Content.Scenes;
 public class PlayerController : FreeCameraController
 {
     private RayShooter _rayShooter;
+
     public PlayerController(Camera camera, RayShooter rayShooter) : base(camera)
     {
-        _rayShooter =  rayShooter;
+        _rayShooter = rayShooter;
     }
 
 
@@ -25,8 +26,7 @@ public class PlayerController : FreeCameraController
                 RequestWindowAction(new ToggleFullscreenWindow());
                 break;
             case Keys.Escape:
-                RequestWindowAction(new CloseWindow
-                    ());
+                RequestWindowAction(new CloseWindow());
                 break;
         }
     }
