@@ -1,13 +1,10 @@
 ﻿using GameApp.Content.scenes;
 using GameApp.Content.Ui;
 using LearningOpenTK.Content;
-using LearningOpenTK.Content.Ui.DynamicDraw;
 using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
-using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.Components;
 using LearningOpenTK.Core.Input;
-using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Core.Scenes;
 using LearningOpenTK.Engine.Resources.Fonts;
 using LearningOpenTK.Engine.UI;

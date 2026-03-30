@@ -1,5 +1,4 @@
-﻿using LearningOpenTK.Core;
-using LearningOpenTK.Core.DTO;
+﻿using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;

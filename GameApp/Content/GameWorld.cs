@@ -1,5 +1,4 @@
-﻿using LearningOpenTK.Core;
-using LearningOpenTK.Core.DTO;
+﻿using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Entities.World;
 using LearningOpenTK.Resources.Interfaces;
@@ -8,7 +7,6 @@ using OpenTK.Mathematics;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
-using Vector3 = OpenTK.Mathematics.Vector3;
 
 namespace GameApp.Content;
 

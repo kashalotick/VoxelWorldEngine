@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using GameApp.Content.Services;
+﻿using GameApp.Content.Services;
 using GameApp.Content.Systems;
 using GameApp.Content.VoxelSelectionSystem;
 using GameApp.Debug;
@@ -13,14 +12,12 @@ using LearningOpenTK.Core.Scenes;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.Utils;
-using Vector2 = OpenTK.Mathematics.Vector2;
-using Vector3 = OpenTK.Mathematics.Vector3;
-using Vector4 = OpenTK.Mathematics.Vector4;
 
 namespace GameApp.Content.Scenes;
 
@@ -261,10 +258,10 @@ public class DemoScene : Scene
 
         var player = new Player
         {
-            Position = (System.Numerics.Vector3)Camera.Position,
-            ViewDirection = (System.Numerics.Vector3)Camera.Front,
+            Position = Camera.Position,
+            ViewDirection = Camera.Front,
             ChunkViewRadius = 4,
-            ViewMatrix = (Matrix4x4)Camera.GetViewMatrix()
+            ViewMatrix = Camera.GetViewMatrix()
         };
         var chunkPos = Chunk.GlobalToChunk(player.Position.ToVector3Int());
         _playerPositionText.SetTextContent($"xyz: {player.Position.FancyString()}");
