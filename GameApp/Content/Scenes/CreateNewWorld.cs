@@ -1,4 +1,5 @@
 ﻿using GameApp.Content.scenes;
+using GameApp.Content.Services;
 using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
 using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Core;
@@ -12,15 +13,20 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace GameApp.Content.Scenes;
 
-public class NewWorld : Scene
+public class CreateNewWorld : Scene
 {
     private Shader _plainShader;
     private Texture _emptyTexture;
     private Font _pixelFont;
+    
+    private WorldRepository _repository;
+    private int _slot;
 
     
-    public NewWorld(GameContext gameContext) : base(gameContext)
+    public CreateNewWorld(GameContext gameContext, WorldRepository repository, int slot) : base(gameContext)
     {
+        _repository = repository;
+        _slot = slot;
     }
 
 
@@ -64,12 +70,12 @@ public class NewWorld : Scene
 
     private UiElement CreateHeading()
     {
-        var label = new StaticText(_plainShader, _pixelFont, "Create new world", new(1));
+        var label = new StaticText(_plainShader, _pixelFont, $"Create world #{_slot}", new(1));
         label.Transform = new RectTransform()
         {
             Anchor = (0, 1),
             Pivot = (0, 1),
-            Offset = (32 + 20*4 + 20, -32),
+            Offset = (32 + 20*4 + 20, -43),
             Scale = 4,
         };
         

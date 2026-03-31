@@ -10,7 +10,7 @@ public class Program
     {
         // var defaultScene = (GameContext gc) => new DemoScene(gc);
         var defaultScene = (GameContext gc) => new MainMenu(gc);
-        // var defaultScene = (GameContext gc) => new NewWorld(gc);
+        // var defaultScene = (GameContext gc) => new CreateNewWorld(gc);
 
         var game = new Game(1200, 900, "Voxel engine test",
             defaultScene);

@@ -15,49 +15,33 @@ public class WorldTile : StaticElement
     public event Action Play;
     public event Action Delete;
 
-
-    private IFont _font;
-    private string _name;
-    private int _seed;
-    private double _playtime;
-
-    private UiElement _label;
+    private const int TileWidth = 220;
+    private const int TileHeight = 20;
 
     public WorldTile(
         IShader shader,
         ITexture texture,
         IFont font,
-        string name,
-        int seed,
-        double playtime
+        WorldInfo info
     ) : base(shader, texture)
     {
         Transform = new RectTransform
         {
-            Width = 160,
-            Height = 20,
-            Anchor = (0, 0.5f),
-            Pivot = (0, 0),
-            Offset = (32, 0),
+            Width = TileWidth,
+            Height = TileHeight,
             Scale = 4,
         };
-        Color = new(0.1f);
+        Color = new(0);
 
-        _font = font;
-        _name = name;
-        _seed = seed;
-        _playtime = playtime;
-
-        AddWorldName();
-        AddWorldSeed();
-        AddPlaytime();
-        AddPlayButton();
-        AddDeleteButton();
+        AddWorldName(font, info.Name);
+        AddSubInfo(font, info.Seed, info.PlayTime);
+        AddPlayButton(shader, texture);
+        AddDeleteButton(shader, texture);
     }
 
-    private void AddWorldName()
+    private void AddWorldName(IFont font, string name)
     {
-        var label = new DynamicText(Shader, _font, _name, new(1));
+        var label = new DynamicText(Shader, font, name, new(1));
         label.Transform = new RectTransform
         {
             Width = label.Transform.Width,
@@ -65,76 +49,54 @@ public class WorldTile : StaticElement
             Anchor = (0, 1),
             Pivot = (0, 1),
         };
-        _label = label;
         AddChild(label);
     }
-
-    private void AddWorldSeed()
+    
+    private void AddSubInfo(IFont font, int seed, double playtime)
     {
-        var label = new StaticText(Shader, _font, _seed.ToString(), new(0.5f));
+        var elapsed = (int)playtime;
+        var hours = elapsed / 3600;
+        var minutes = elapsed % 3600 / 60;
+        var seconds = elapsed % 60;
+        var label = new StaticText(Shader, font, $"{hours:00}:{minutes:00}:{seconds:00} | {seed}", new(0.5f));
         label.Transform = new RectTransform
         {
-            Anchor = (0, 1),
-            Pivot = (0, 1),
-            Offset = (_label.Transform.Width + 4, -label.Transform.Height + label.Transform.Height * 0.75f),
+            Anchor = (0, 0),
+            Pivot = (0, 0),
             Scale = 0.75f
         };
         AddChild(label);
     }
 
-    private void AddPlaytime()
+    private void AddPlayButton(IShader shader, ITexture texture)
     {
-        var elapsed = (int)_playtime;
-        var hours = elapsed / (60 * 24);
-        elapsed -= hours * 60 * 24;
-        var minutes = elapsed / (60);
-        elapsed -= minutes * 60;
-        var seconds = elapsed;
-
-        var playtimeString = $"{hours:00}:{minutes:00}:{seconds:00}";
-        var playtime = $"{_playtime}";
-        var label = new StaticText(Shader, _font, playtimeString, new(0.5f));
-        label.Transform = new RectTransform
+        var button = new Button(shader, texture);
+        button.Transform = new RectTransform
         {
-            Anchor = (0, 1),
-            Pivot = (0, 1),
-            Offset = (0, -_label.Transform.Height - 1),
-            Scale = 0.75f
-        };
-        AddChild(label);
-    }
-
-    private void AddPlayButton()
-    {
-        var button = new Button(Shader, Texture);
-        button.Transform = new RectTransform()
-        {
-            Width = 20,
-            Height = 20,
+            Width = TileHeight,
+            Height = TileHeight,
             Anchor = (1, 1),
             Pivot = (1, 1),
         };
         button.Color = new(1);
         button.HoverColor = (0.690f, 0.984f, 0.612f);
-
         button.Click += () => Play?.Invoke();
         AddChild(button);
     }
 
-    private void AddDeleteButton()
+    private void AddDeleteButton(IShader shader, ITexture texture)
     {
-        var button = new Button(Shader, Texture);
-        button.Transform = new RectTransform()
+        var button = new Button(shader, texture);
+        button.Transform = new RectTransform
         {
-            Width = 20,
-            Height = 20,
+            Width = TileHeight,
+            Height = TileHeight,
             Anchor = (1, 1),
             Pivot = (1, 1),
-            Offset = (-24, 0),
+            Offset = (-(TileHeight + 4), 0),
         };
         button.Color = (0.937f, 0.259f, 0.259f);
         button.HoverColor = (1.0f, 0.435f, 0.435f);
-
         button.Click += () => Delete?.Invoke();
         AddChild(button);
     }

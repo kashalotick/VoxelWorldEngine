@@ -6,14 +6,14 @@ namespace VoxelWorldEngine.Core;
 
 public class ChunkLoader
 {
-    private readonly World _world;
+    private readonly VoxelWorld _voxelWorld;
     private readonly ChunkBuilder _chunkBuilder;
     private readonly MeshBuilder _meshBuilder;
     
-    public ChunkLoader(World world)
+    public ChunkLoader(VoxelWorld voxelWorld)
     {
-        _world = world;
-        _chunkBuilder = new ChunkBuilder(_world.Seed);
+        _voxelWorld = voxelWorld;
+        _chunkBuilder = new ChunkBuilder(_voxelWorld.Seed);
         _meshBuilder = new MeshBuilder();
     }
     

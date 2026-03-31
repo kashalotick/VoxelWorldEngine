@@ -30,7 +30,7 @@ public class DemoScene : Scene
     private Reactive<Vector3Int?> _hitVoxelPosition = new();
     private VoxelSelection _voxelSelection;
  
-    private World _world;
+    private VoxelWorld _voxelWorld;
     private GameWorld _gameWorld;
  
     public DemoScene(GameContext gameContext) : base(gameContext)
@@ -64,14 +64,14 @@ public class DemoScene : Scene
         var cubeShader    = GameContext.ShaderRepository.Get("shader");
         var stoneTexture  = GameContext.TextureRepository.Get("Stone");
  
-        _world = new WorldService().GenerateWorld(124);
+        _voxelWorld = new WorldRepository().GenerateWorld(124);
  
-        _gameWorld = new GameWorld(_world, chunkShader, stoneTexture);
-        _world.ChunkAdded   += _gameWorld.AddChunk;
-        _world.ChunkRemoved += _gameWorld.RemoveChunk;
+        _gameWorld = new GameWorld(_voxelWorld, chunkShader, stoneTexture);
+        _voxelWorld.ChunkAdded   += _gameWorld.AddChunk;
+        _voxelWorld.ChunkRemoved += _gameWorld.RemoveChunk;
         _gameWorld.Load();
  
-        _chunkLoadingSystem = SOR.Register(new ChunkLoadingSystem(_world));
+        _chunkLoadingSystem = SOR.Register(new ChunkLoadingSystem(_voxelWorld));
  
         LightComposition(chunkShader, stoneTexture);
         LightComposition(cubeShader,  stoneTexture);
@@ -139,7 +139,7 @@ public class DemoScene : Scene
             Direction = (System.Numerics.Vector3)Camera.Front
         };
  
-        var rayHit = _rayShooter.Shoot(ray, _world);
+        var rayHit = _rayShooter.Shoot(ray, _voxelWorld);
  
         _hitVoxelPosition.Value = rayHit.IsHit
             ? (rayHit.HitIn + _rayShooter.PrevRay.Direction * 0.001f).FloorToVector3Int()

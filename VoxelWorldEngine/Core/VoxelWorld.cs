@@ -7,13 +7,13 @@ using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.Core;
 
-public class World : IRaycastable
+public class VoxelWorld : IRaycastable
 {
     public event Action<Chunk> ChunkAdded;
     public event Action<Chunk> ChunkUpdated;
     public event Action<Vector3Int> ChunkRemoved;
     
-    public World(int seed)
+    public VoxelWorld(int seed)
     {
         Seed = seed;
     }

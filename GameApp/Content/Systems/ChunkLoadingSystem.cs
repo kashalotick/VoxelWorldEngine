@@ -14,14 +14,14 @@ public class ChunkLoadingSystem : ILoadable
     private const int ChunkPerFrameLimit = 5;
     private ChunkLoader _chunkLoader;
 
-    private World _world;
+    private VoxelWorld _voxelWorld;
     private Vector3Int? _activeChunkPosition;
 
 
-    public ChunkLoadingSystem(World world)
+    public ChunkLoadingSystem(VoxelWorld voxelWorld)
     {
-        _chunkLoader = new ChunkLoader(world);
-        _world = world;
+        _chunkLoader = new ChunkLoader(voxelWorld);
+        _voxelWorld = voxelWorld;
     }
 
 
@@ -60,7 +60,7 @@ public class ChunkLoadingSystem : ILoadable
             if (!_requestedNewChunks.Contains(chunk.Position)) continue;
 
             _requestedNewChunks.Remove(chunk.Position);
-            _world.AddChunk(chunk);
+            _voxelWorld.AddChunk(chunk);
             chunksProcessed++;
         }
 
@@ -71,7 +71,7 @@ public class ChunkLoadingSystem : ILoadable
     {
         foreach (var chunkPosition in _chunksToRemove)
         {
-            _world.RemoveChunk(chunkPosition);
+            _voxelWorld.RemoveChunk(chunkPosition);
         }
 
         _chunksToRemove.Clear();
@@ -99,7 +99,7 @@ public class ChunkLoadingSystem : ILoadable
             //     continue;
             // }
 
-            if (!_world.Chunks.ContainsKey(chunkPosition) && !_requestedNewChunks.Contains(chunkPosition))
+            if (!_voxelWorld.Chunks.ContainsKey(chunkPosition) && !_requestedNewChunks.Contains(chunkPosition))
             {
                 _requestedNewChunks.Add(chunkPosition);
                 lock (_missingChunks)
@@ -112,7 +112,7 @@ public class ChunkLoadingSystem : ILoadable
             }
         }
 
-        var toRemove = _world.Chunks.Keys.Except(shouldBeLoaded).ToHashSet();
+        var toRemove = _voxelWorld.Chunks.Keys.Except(shouldBeLoaded).ToHashSet();
         var pendingToCancel = _requestedNewChunks.Except(shouldBeLoaded).ToHashSet();
 
         _chunksToRemove = toRemove;
@@ -209,12 +209,12 @@ public class ChunkLoadingSystem : ILoadable
         new Thread(ChunkWorker) { IsBackground = true }.Start();
 
         // Console.WriteLine(
-        //     $"+ worker: {_activeWorkers} for {_missingChunks.Count}/{_readyChunks.Count}/{_world.Chunks.Count}/{maxChunks} chunks");
+        //     $"+ worker: {_activeWorkers} for {_missingChunks.Count}/{_readyChunks.Count}/{_voxelWorld.Chunks.Count}/{maxChunks} chunks");
     }
 
     private void ChunkWorker()
     {
-        var chunkLoader = new ChunkLoader(_world);
+        var chunkLoader = new ChunkLoader(_voxelWorld);
         while (true)
         {
             _signal.Wait();
@@ -227,7 +227,7 @@ public class ChunkLoadingSystem : ILoadable
                     {
                         Interlocked.Decrement(ref _activeWorkers);
                         // Console.WriteLine(
-                        //     $"- worker: {_activeWorkers} for {_missingChunks.Count}/{_readyChunks.Count}/{_world.Chunks.Count}/{maxChunks} chunks");
+                        //     $"- worker: {_activeWorkers} for {_missingChunks.Count}/{_readyChunks.Count}/{_voxelWorld.Chunks.Count}/{maxChunks} chunks");
                         return;
                     }
 

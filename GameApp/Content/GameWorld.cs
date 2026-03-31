@@ -16,13 +16,13 @@ public class GameWorld : ILoadable, IRenderable
 {
     private IShader _worldShader;
     private ITexture _worldTexture;
-    private World _world;
+    private VoxelWorld _voxelWorld;
 
     private Dictionary<Vector3Int, WorldObject> _chunks = new();
 
-    public GameWorld(World world, IShader shader, ITexture texture)
+    public GameWorld(VoxelWorld voxelWorld, IShader shader, ITexture texture)
     {
-        _world = world;
+        _voxelWorld = voxelWorld;
         _worldShader = shader;
         _worldTexture = texture;
     }
@@ -96,7 +96,7 @@ public class GameWorld : ILoadable, IRenderable
         {
             if (chunk.Value.Mesh == null) continue;
             
-            if (_world.Chunks.TryGetValue(chunk.Key, out var chunkData))
+            if (_voxelWorld.Chunks.TryGetValue(chunk.Key, out var chunkData))
             {
                 var globalPos = (Vector3)(System.Numerics.Vector3)chunkData.GlobalPosition; // TODO
                 if (!context.IsInFrustum(globalPos, globalPos + new Vector3(Chunk.ChunkSize)))
