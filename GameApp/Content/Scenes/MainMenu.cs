@@ -166,9 +166,9 @@ public class MainMenu : Scene
  
     private void OnCreateWorld(int slot)
     {
-        _repository.CreateSlot(slot, "New world");
-        RebuildUi();
-        // SceneContext.SetState(new CreateNewWorld(GameContext, _repository, slot));
+        // _repository.CreateSlot(slot, "New world");
+        // RebuildUi();
+        SceneContext.SetState(new CreateNewWorld(GameContext, _repository, slot));
     }
  
     private void RebuildUi()
