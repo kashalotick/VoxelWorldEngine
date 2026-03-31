@@ -51,8 +51,7 @@ public class CreateNewWorld : Scene
         _emptyTexture = GameContext.TextureRepository.Get("empty");
         _pixelFont = GameContext.FontRepository.Get("Pixel");
 
-        var ui = SOR.Register(new UiLayout());
-        
+        var ui = SOR.Register(new UiLayout(GameContext.ScreenWidth, GameContext.ScreenHeight));        
         ui.Add(CreateHeading());
         ui.Add(CreateBackButton());
         

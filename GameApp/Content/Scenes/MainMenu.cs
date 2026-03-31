@@ -56,8 +56,8 @@ public class MainMenu : Scene
         _pixelFont = GameContext.FontRepository.Get("Pixel");
         _repository = new WorldRepository();
 
-        var ui = SOR.Register(new UiLayout());
-
+        var ui = SOR.Register(new UiLayout(GameContext.ScreenWidth, GameContext.ScreenHeight));
+        
         ui.Add(CreateExitButton());
         ui.Add(BuildSlotList());
 
@@ -167,6 +167,7 @@ public class MainMenu : Scene
     private void OnCreateWorld(int slot)
     {
         _repository.CreateSlot(slot, "New world");
+        RebuildUi();
         // SceneContext.SetState(new CreateNewWorld(GameContext, _repository, slot));
     }
  
