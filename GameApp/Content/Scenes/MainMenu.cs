@@ -46,10 +46,10 @@ public class MainMenu : Scene
 
     protected override void Load()
     {
-        GL.Enable(EnableCap.DepthTest);
-        GL.Enable(EnableCap.CullFace);
-        GL.Enable(EnableCap.Blend);
-        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        // GL.Enable(EnableCap.DepthTest);
+        // GL.Enable(EnableCap.CullFace);
+        // GL.Enable(EnableCap.Blend);
+        // GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
         _plainShader = GameContext.ShaderRepository.Get("plain");
         _emptyTexture = GameContext.TextureRepository.Get("empty");
