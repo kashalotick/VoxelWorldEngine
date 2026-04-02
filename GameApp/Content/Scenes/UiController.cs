@@ -6,10 +6,16 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace GameApp.Content.scenes;
 
+
+// TODO: make ui controller interface
 public class UiController : SceneController
 {
     public event Action<Vector2> Click;
     public event Action<Vector2> MouseMove;
+    public event Action<KeyboardKeyEventArgs> KeyDown;
+    public event Action<TextInputEventArgs> TextInput;
+
+
 
     public GameContext GameContext { get; }
 
@@ -28,14 +34,18 @@ public class UiController : SceneController
         }
     }
 
+    public override void OnKeyDown(KeyboardKeyEventArgs e, KeyboardState keyboard)
+    {
+        KeyDown?.Invoke(e);
+    }
+
     public override void OnTextInput(TextInputEventArgs e, KeyboardState keyboard)
     {
-        Console.WriteLine($"text input: {e.AsString}");
+        TextInput?.Invoke(e);
     }
 
     public override void OnMouseUp(MouseButtonEventArgs e, MouseState mouse)
     {
-        // Console.WriteLine($"click: {e.Button}, ({mouse.Position.X}, {mouse.Position.Y}); ");
         var pos = new Vector2(mouse.Position.X, GameContext.ScreenHeight - mouse.Position.Y);
         Click?.Invoke(pos);
     }
@@ -45,9 +55,4 @@ public class UiController : SceneController
         var pos = new Vector2(mouse.Position.X, GameContext.ScreenHeight - mouse.Position.Y);
         MouseMove?.Invoke(pos);
     }
-
-    // public override void OnMouseWheel(MouseWheelEventArgs e, MouseState mouse)
-    // {
-    //     Console.WriteLine($"scroll: {e.OffsetY}");
-    // }
 }

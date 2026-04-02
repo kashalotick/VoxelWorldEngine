@@ -41,7 +41,8 @@ public class WorldTile : StaticElement
 
     private void AddWorldName(IFont font, string name)
     {
-        var label = new DynamicText(Shader, font, name, new(1));
+        var label = new DynamicText(Shader, font, name);
+        label.Color = new(1);
         label.Transform = new RectTransform
         {
             Width = label.Transform.Width,

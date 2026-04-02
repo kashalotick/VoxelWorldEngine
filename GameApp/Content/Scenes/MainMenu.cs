@@ -64,6 +64,8 @@ public class MainMenu : Scene
         var controller = new UiController(GameContext);
         controller.Click += ui.HandleClick;
         controller.MouseMove += ui.HandleMouseMove;
+        controller.KeyDown +=  ui.HandleKeyDown;
+        controller.TextInput +=  ui.HandleTextInput;
 
         ControllerContext.SetState(controller);
         SceneContext.RequestWindowAction(new ResetCursor());
@@ -135,7 +137,7 @@ public class MainMenu : Scene
 
     private UiElement CreateExitButton()
     {
-        var button = new ButtonWithLabel(_plainShader, _emptyTexture, _pixelFont, "Exit");
+        var button = new ButtonWithLabel(_plainShader, _emptyTexture, _pixelFont, "OnExit");
         button.Transform = new RectTransform
         {
             Width = 48,
@@ -148,7 +150,7 @@ public class MainMenu : Scene
         button.Color = (0.937f, 0.259f, 0.259f);
         button.TextColor = new(1);
         button.HoverColor = (1.0f, 0.435f, 0.435f);
-        button.Click += Exit;
+        button.Click += OnExit;
         return button;
     }
 
@@ -178,7 +180,7 @@ public class MainMenu : Scene
     }
 
 
-    private void Exit()
+    private void OnExit()
     {
         SceneContext.RequestWindowAction(new CloseWindow());
     }

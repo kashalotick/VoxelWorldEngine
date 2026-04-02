@@ -25,11 +25,10 @@ public class WorldRepository
         return slots;
     }
     
-    public WorldInfo CreateSlot(int slot, string name)
+    public WorldInfo CreateSlot(int slot, string name, int seed)
     {
         ValidateSlot(slot);
 
-        var seed = Random.Shared.Next();
         var info = new WorldInfo(slot, name, seed);
 
         Directory.CreateDirectory(SlotPath(slot));
