@@ -57,18 +57,43 @@ public class MainMenu : Scene
         _repository = new WorldRepository();
 
         var ui = SOR.Register(new UiLayout(GameContext.ScreenWidth, GameContext.ScreenHeight));
-        
-        ui.Add(CreateExitButton());
+
+        ui.Add(CreateBackground());
+        ui.Add(CreateHeading());
         ui.Add(BuildSlotList());
+        ui.Add(CreateExitButton());
 
         var controller = new UiController(GameContext);
         controller.Click += ui.HandleClick;
         controller.MouseMove += ui.HandleMouseMove;
-        controller.KeyDown +=  ui.HandleKeyDown;
-        controller.TextInput +=  ui.HandleTextInput;
+        controller.KeyDown += ui.HandleKeyDown;
+        controller.TextInput += ui.HandleTextInput;
 
         ControllerContext.SetState(controller);
         SceneContext.RequestWindowAction(new ResetCursor());
+    }
+
+    private UiElement CreateBackground()
+    {
+        var bg = new BackGround(_plainShader, _emptyTexture);
+
+        bg.Color = ColorStyle.Background;
+
+        return bg;
+    }
+
+    private UiElement CreateHeading()
+    {
+        var label = new StaticText(_plainShader, _pixelFont, $"Voxel Game Prototype", new(1));
+        label.Transform = new RectTransform()
+        {
+            Anchor = (0.5f, 1),
+            Pivot = (0.5f, 1),
+            Offset = (0, -64),
+            Scale = 8,
+        };
+
+        return label;
     }
 
     private ListElement BuildSlotList()
@@ -78,14 +103,14 @@ public class MainMenu : Scene
             Orientation = ListOrientation.Vertical,
             Gap = 16,
             AutoSize = true,
-            Color = new (0)
+            Color = new(0)
         };
 
         list.Transform = new RectTransform
         {
             Anchor = (0, 0.5f),
             Pivot = (0, 0.5f),
-            Offset = (32, 0),
+            Offset = (32, -32),
             Scale = 4,
         };
 
@@ -137,7 +162,7 @@ public class MainMenu : Scene
 
     private UiElement CreateExitButton()
     {
-        var button = new ButtonWithLabel(_plainShader, _emptyTexture, _pixelFont, "OnExit");
+        var button = new ButtonWithLabel(_plainShader, _emptyTexture, _pixelFont, "Exit");
         button.Transform = new RectTransform
         {
             Width = 48,
@@ -159,20 +184,20 @@ public class MainMenu : Scene
     {
         SceneContext.SetState(new DemoScene(GameContext));
     }
-    
+
     private void OnDelete(int slot)
     {
         _repository.DeleteSlot(slot);
         RebuildUi();
     }
- 
+
     private void OnCreateWorld(int slot)
     {
         // _repository.CreateSlot(slot, "New world");
         // RebuildUi();
         SceneContext.SetState(new CreateNewWorld(GameContext, _repository, slot));
     }
- 
+
     private void RebuildUi()
     {
         // Простіше перезайти в сцену — всі ресурси коректно перевантажаться
