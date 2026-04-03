@@ -5,10 +5,13 @@ using LearningOpenTK.Core.Input;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace GameApp.Content.Scenes;
+namespace GameApp.Content.Scenes.WorldScene;
 
 public class PlayerController : FreeCameraController
 {
+    public event Action Pause;
+    public event Action ToggleHud;
+
     private RayShooter _rayShooter;
 
     public PlayerController(Camera camera, RayShooter rayShooter) : base(camera)
@@ -16,17 +19,20 @@ public class PlayerController : FreeCameraController
         _rayShooter = rayShooter;
     }
 
+    public override void OnKeyDown(KeyboardKeyEventArgs e, KeyboardState keyboard)
+    {
+        if (e.Key == Keys.Escape) Pause?.Invoke();
+    }
 
     public override void OnKeyUp(KeyboardKeyEventArgs e, KeyboardState keyboard)
     {
-        base.OnKeyUp(e, keyboard);
         switch (e.Key)
         {
-            case Keys.F11:
-                RequestWindowAction(new ToggleFullscreenWindow());
+            case Keys.F3:
+                ToggleHud?.Invoke();
                 break;
-            case Keys.Escape:
-                RequestWindowAction(new CloseWindow());
+            case Keys.F11:
+                RequestWindowAction(new ToggleFullscreenWindow()); // TODO: replace with event
                 break;
         }
     }

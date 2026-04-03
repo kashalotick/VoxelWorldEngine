@@ -52,17 +52,18 @@ public class MainMenu : Scene
         _repository = new WorldRepository();
 
         var ui = SOR.Register(new UiLayout(GameContext.ScreenWidth, GameContext.ScreenHeight));
-
+        ui.Enable();
         ui.Add(CreateBackground());
         ui.Add(CreateHeading());
         ui.Add(BuildSlotList());
         ui.Add(CreateExitButton());
+        ui.Add(CreateBackground());
 
         var controller = new UiController(GameContext);
         controller.Click += ui.HandleClick;
         controller.MouseMove += ui.HandleMouseMove;
-        controller.KeyDown += ui.HandleKeyDown;
-        controller.TextInput += ui.HandleTextInput;
+        // controller.KeyDown += ui.HandleKeyDown;
+        // controller.TextInput += ui.HandleTextInput;
 
         ControllerContext.SetState(controller);
         SceneContext.RequestWindowAction(new ResetCursor());
@@ -72,6 +73,7 @@ public class MainMenu : Scene
     {
         var bg = new Background(_plainShader, _emptyTexture);
         bg.Color = ColorStyle.Background;
+        bg.ZIndex = -1;
         return bg;
     }
 

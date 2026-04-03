@@ -4,7 +4,7 @@ namespace GameApp;
 
 public static class ColorStyle
 {
-    public static readonly Vector4 PauseBackground = new(0, 0, 0, 0.5f);
+    public static readonly Vector4 PauseBackground = new(0, 0, 0, 0.7f);
     public static readonly Vector4 Transparent = new(0);
 
 

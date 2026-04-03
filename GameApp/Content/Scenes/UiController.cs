@@ -12,6 +12,7 @@ public class UiController : SceneController
 {
     public event Action<Vector2> Click;
     public event Action<Vector2> MouseMove;
+    public event Action<KeyboardKeyEventArgs> KeyUp;
     public event Action<KeyboardKeyEventArgs> KeyDown;
     public event Action<TextInputEventArgs> TextInput;
 
@@ -32,6 +33,7 @@ public class UiController : SceneController
                 RequestWindowAction(new ToggleFullscreenWindow());
                 break;
         }
+        KeyUp?.Invoke(e);
     }
 
     public override void OnKeyDown(KeyboardKeyEventArgs e, KeyboardState keyboard)
