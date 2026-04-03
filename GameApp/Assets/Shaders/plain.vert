@@ -1,12 +1,10 @@
 #version 330 core
 
 layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec3 aColor;
-layout (location = 2) in float aAlpha;
-layout (location = 3) in vec2 aTexCoord;
+layout (location = 1) in vec4 aColor;
+layout (location = 2) in vec2 aTexCoord;
 
-out vec3 vColor;
-out float vAlpha;
+out vec4 vColor;
 out vec2 vTexCoord;
 
 uniform mat4 model;
@@ -19,5 +17,4 @@ void main()
 
     vTexCoord = aTexCoord;
     vColor = aColor;
-    vAlpha = aAlpha;
 }

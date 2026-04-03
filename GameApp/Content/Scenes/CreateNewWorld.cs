@@ -52,16 +52,12 @@ public class CreateNewWorld : Scene
 
     protected override void Load()
     {
-        // GL.Enable(EnableCap.DepthTest);
-        // GL.Enable(EnableCap.CullFace);
-        // GL.Enable(EnableCap.Blend);
-        // GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
         _plainShader = GameContext.ShaderRepository.Get("plain");
         _emptyTexture = GameContext.TextureRepository.Get("empty");
         _pixelFont = GameContext.FontRepository.Get("Pixel");
 
         var ui = SOR.Register(new UiLayout(GameContext.ScreenWidth, GameContext.ScreenHeight));
+        ui.Add(CreateBackground());
         ui.Add(CreateHeading());
         ui.Add(CreateBackButton());
 
@@ -78,6 +74,13 @@ public class CreateNewWorld : Scene
         SceneContext.RequestWindowAction(new ResetCursor());
     }
 
+    private UiElement CreateBackground()
+    {
+        var bg = new Background(_plainShader, _emptyTexture);
+        bg.Color = ColorStyle.Background;
+        return bg;
+    }
+
     private UiElement CreateForm()
     {
         var list = new ListElement(_plainShader, _emptyTexture);
@@ -88,7 +91,7 @@ public class CreateNewWorld : Scene
             Offset = (0, 0),
             Scale = 4,
         };
-        list.Color = ColorStyle.Black;
+        list.Color = ColorStyle.Transparent;
         list.Gap = 16;
         list.AddChild(CreateWorldNameField());
         list.AddChild(CreateWorldSeedField());
@@ -112,14 +115,21 @@ public class CreateNewWorld : Scene
 
     private TextField CreateField(Reactive<string> reactive)
     {
-        var field = new TextField(_plainShader, _emptyTexture, _pixelFont, reactive);
-        field.Transform = new RectTransform
+        var field = new TextField(_plainShader, _emptyTexture, _pixelFont, reactive)
         {
-            Width = FormWidth,
-            Height = 20,
-            Anchor = (0.5f, 0),
-            Pivot = (0.5f, 0),
-            Offset = (0, 0),
+            Transform = new RectTransform
+            {
+                Width = FormWidth,
+                Height = 20,
+                Anchor = (0.5f, 0),
+                Pivot = (0.5f, 0),
+                Offset = (0, 0),
+            },
+            Color = ColorStyle.Field.Background,
+            HoverColor = ColorStyle.Field.BackgroundHover,
+            FocusColor = ColorStyle.Field.BackgroundFocus,
+            ValueColor = ColorStyle.Field.Text,
+            PlaceholderColor = ColorStyle.Field.Placeholder,
         };
         field.ValueText.Transform.Anchor = (0.5f, 0.5f);
         field.ValueText.Transform.Pivot = (0.5f, 0.5f);
@@ -167,8 +177,8 @@ public class CreateNewWorld : Scene
             },
             Color = ColorStyle.White,
             HoverColor = ColorStyle.GreenLight,
-            TextColor = ColorStyle.Black,
-            TextHoverColor = ColorStyle.Black
+            TextColor = ColorStyle.Background,
+            TextHoverColor = ColorStyle.Background
         };
         button.Click += OnSubmit;
         return button;
@@ -176,7 +186,8 @@ public class CreateNewWorld : Scene
 
     private UiElement CreateHeading()
     {
-        var label = new StaticText(_plainShader, _pixelFont, $"Create world #{_slot}", new(1));
+        var label = new StaticText(_plainShader, _pixelFont, $"Create world #{_slot}");
+        label.Color = ColorStyle.White;
         label.Transform = new RectTransform()
         {
             Anchor = (0, 1),
@@ -213,7 +224,7 @@ public class CreateNewWorld : Scene
     {
         var worldName = _worldName.Value.Length > 0 ? _worldName.Value.Trim() : DefaultWorldName;
         var seed = new Random().Next();
-        
+
         if (_worldSeed.Value.Length > 0 && int.TryParse(_worldSeed.Value.Trim(), out var parsedSeed))
         {
             seed = parsedSeed;

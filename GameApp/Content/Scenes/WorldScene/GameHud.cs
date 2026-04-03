@@ -67,7 +67,7 @@ public class GameHud : UiLayout
                 Scale = 1,
             },
             ZIndex = 0,
-            Color = (0, 0, 0),
+            Color = ColorStyle.Black,
         });
     }
 
@@ -89,7 +89,7 @@ public class GameHud : UiLayout
 
         var crosshair = new Crosshair(shader, crosshairTexture, 16)
         {
-            Color = new Vector3(1, 1, 1)
+            Color = ColorStyle.White
         };
         Add(crosshair);
     }
@@ -103,6 +103,7 @@ public class GameHud : UiLayout
         text.Transform.Anchor = new Vector2(0, 1);
         text.Transform.Offset = position with { Y = -position.Y - 16 };
         text.Transform.Scale = 2;
+        text.Color = ColorStyle.White;
 
         Add(text);
         return text;

@@ -31,7 +31,7 @@ public class WorldTile : StaticElement
             Height = TileHeight,
             Scale = 4,
         };
-        Color = new(0);
+        Color = ColorStyle.Transparent;
 
         AddWorldName(font, info.Name);
         AddSubInfo(font, info.Seed, info.PlayTime);
@@ -59,7 +59,8 @@ public class WorldTile : StaticElement
         var hours = elapsed / 3600;
         var minutes = elapsed % 3600 / 60;
         var seconds = elapsed % 60;
-        var label = new StaticText(Shader, font, $"{hours:00}:{minutes:00}:{seconds:00} | {seed}", new(0.5f));
+        var label = new StaticText(Shader, font, $"{hours:00}:{minutes:00}:{seconds:00} | {seed}");
+        label.Color = ColorStyle.Gray;
         label.Transform = new RectTransform
         {
             Anchor = (0, 0),
@@ -80,7 +81,7 @@ public class WorldTile : StaticElement
             Pivot = (1, 1),
         };
         button.Color = new(1);
-        button.HoverColor = (0.690f, 0.984f, 0.612f);
+        button.HoverColor = ColorStyle.GreenLight;
         button.Click += () => Play?.Invoke();
         AddChild(button);
     }
@@ -96,8 +97,8 @@ public class WorldTile : StaticElement
             Pivot = (1, 1),
             Offset = (-(TileHeight + 4), 0),
         };
-        button.Color = (0.937f, 0.259f, 0.259f);
-        button.HoverColor = (1.0f, 0.435f, 0.435f);
+        button.Color = ColorStyle.White;
+        button.HoverColor = ColorStyle.RedLight;
         button.Click += () => Delete?.Invoke();
         AddChild(button);
     }

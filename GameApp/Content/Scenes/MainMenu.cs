@@ -46,11 +46,6 @@ public class MainMenu : Scene
 
     protected override void Load()
     {
-        // GL.Enable(EnableCap.DepthTest);
-        // GL.Enable(EnableCap.CullFace);
-        // GL.Enable(EnableCap.Blend);
-        // GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
-
         _plainShader = GameContext.ShaderRepository.Get("plain");
         _emptyTexture = GameContext.TextureRepository.Get("empty");
         _pixelFont = GameContext.FontRepository.Get("Pixel");
@@ -75,16 +70,16 @@ public class MainMenu : Scene
 
     private UiElement CreateBackground()
     {
-        var bg = new BackGround(_plainShader, _emptyTexture);
-
+        var bg = new Background(_plainShader, _emptyTexture);
         bg.Color = ColorStyle.Background;
-
         return bg;
     }
 
+
     private UiElement CreateHeading()
     {
-        var label = new StaticText(_plainShader, _pixelFont, $"Voxel Game Prototype", new(1));
+        var label = new StaticText(_plainShader, _pixelFont, $"Voxel Game Prototype");
+        label.Color = ColorStyle.White;
         label.Transform = new RectTransform()
         {
             Anchor = (0.5f, 1),
@@ -103,14 +98,14 @@ public class MainMenu : Scene
             Orientation = ListOrientation.Vertical,
             Gap = 16,
             AutoSize = true,
-            Color = new(0)
+            Color = ColorStyle.Transparent,
         };
 
         list.Transform = new RectTransform
         {
-            Anchor = (0, 0.5f),
-            Pivot = (0, 0.5f),
-            Offset = (32, -32),
+            Anchor = (0.5f, 0.5f),
+            Pivot = (0.5f, 0.5f),
+            Offset = (0, -32),
             Scale = 4,
         };
 
@@ -152,10 +147,10 @@ public class MainMenu : Scene
             Width = TileWidth,
             Height = TileHeight,
         };
-        button.Color = new(0);
-        button.HoverColor = new(1);
-        button.TextColor = new(1);
-        button.TextHoverColor = new(0);
+        button.Color = ColorStyle.Transparent;
+        button.HoverColor = ColorStyle.White;
+        button.TextColor = ColorStyle.White;
+        button.TextHoverColor = ColorStyle.Background;
         button.Click += () => OnCreateWorld(slot);
         return button;
     }
@@ -172,9 +167,9 @@ public class MainMenu : Scene
             Offset = (-32, 32),
             Scale = 4,
         };
-        button.Color = (0.937f, 0.259f, 0.259f);
-        button.TextColor = new(1);
-        button.HoverColor = (1.0f, 0.435f, 0.435f);
+        button.Color = ColorStyle.RedLight;
+        button.TextColor = ColorStyle.White;
+        button.HoverColor = ColorStyle.Red;
         button.Click += OnExit;
         return button;
     }
