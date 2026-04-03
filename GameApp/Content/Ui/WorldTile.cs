@@ -22,7 +22,7 @@ public class WorldTile : StaticElement
         IShader shader,
         ITexture texture,
         IFont font,
-        WorldInfo info
+        WorldMeta meta
     ) : base(shader, texture)
     {
         Transform = new RectTransform
@@ -33,8 +33,8 @@ public class WorldTile : StaticElement
         };
         Color = ColorStyle.Transparent;
 
-        AddWorldName(font, info.Name);
-        AddSubInfo(font, info.Seed, info.PlayTime);
+        AddWorldName(font, meta.Name);
+        AddSubInfo(font, meta.Seed, meta.PlayTime);
         AddPlayButton(shader, texture);
         AddDeleteButton(shader, texture);
     }

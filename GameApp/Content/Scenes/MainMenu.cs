@@ -179,7 +179,13 @@ public class MainMenu : Scene
 
     private void OnPlay(int slot)
     {
-        SceneContext.SetState(new DemoScene(GameContext));
+        var worldInfo = _repository.GetSlots()[slot];
+        if (worldInfo is null)
+        {
+            Console.WriteLine("World not found");
+            return;
+        }
+        SceneContext.SetState(new DemoScene(GameContext, _repository, worldInfo));
     }
 
     private void OnDelete(int slot)

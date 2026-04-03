@@ -1,6 +1,6 @@
 ﻿namespace GameApp.Content;
 
-public class WorldInfo
+public class WorldMeta
 {
     public string Name { get; init; }
     public int Seed { get; init; }
@@ -8,9 +8,9 @@ public class WorldInfo
     public DateTime LastPlayed { get; init; }
     public int Slot { get; init; }
     
-    public WorldInfo() { }
+    public WorldMeta() { }
 
-    public WorldInfo(int slot, string name, int seed, double playTime = 0, DateTime? lastPlayed = null)
+    public WorldMeta(int slot, string name, int seed, double playTime = 0, DateTime? lastPlayed = null)
     {
         Slot = slot;
         Name = name;

@@ -3,7 +3,6 @@ using VoxelWorldEngine.Core;
 
 namespace GameApp.Content.Services;
 
-
 /// <summary>
 ///  generate, save, load worlds
 /// </summary>
@@ -16,20 +15,20 @@ public class WorldRepository
     {
         _savesPath = savesPath;
     }
-    
-    public WorldInfo?[] GetSlots()
+
+    public WorldMeta?[] GetSlots()
     {
-        var slots = new WorldInfo?[SlotCount];
+        var slots = new WorldMeta?[SlotCount];
         for (int i = 0; i < SlotCount; i++)
             slots[i] = ReadMeta(i);
         return slots;
     }
-    
-    public WorldInfo CreateSlot(int slot, string name, int seed)
+
+    public WorldMeta CreateSlot(int slot, string name, int seed)
     {
         ValidateSlot(slot);
 
-        var info = new WorldInfo(slot, name, seed);
+        var info = new WorldMeta(slot, name, seed);
 
         Directory.CreateDirectory(SlotPath(slot));
         WriteMeta(info);
@@ -50,38 +49,68 @@ public class WorldRepository
         ValidateSlot(slot);
         return File.Exists(MetaPath(slot));
     }
-    
-    
+
+    // --- world
+    public void AddPlayTime(WorldMeta meta, double playTime)
+    {
+        var newPlayTime = meta.PlayTime + playTime;
+        var newMeta = new WorldMeta(meta.Slot, meta.Name, meta.Seed, newPlayTime, DateTime.UtcNow);
+        WriteMeta(newMeta);
+    }
+
+    public VoxelWorld LoadWorld(WorldMeta meta)
+    {
+        var voxelWorld = new VoxelWorld(meta.Seed);
+        return voxelWorld;
+    }
+
+    public WorldState? LoadState(int slot)
+    {
+        var path = StatePath(slot);
+        if (!File.Exists(path)) return null;
+        var dto = JsonSerializer.Deserialize<WorldStateDto>(File.ReadAllText(path), new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true,
+            IncludeFields = true,
+        });
+        return dto == null ? null : (WorldState)dto;
+    }
+
+    public void SaveState(int slot, WorldState state)
+    {
+        var json = JsonSerializer.Serialize((WorldStateDto)state, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+            IncludeFields = true,
+        });
+        File.WriteAllText(StatePath(slot), json);
+    }
+
     // --- internal ---
 
-    
-    private WorldInfo? ReadMeta(int slot)
+
+    private WorldMeta? ReadMeta(int slot)
     {
         var path = MetaPath(slot);
         if (!File.Exists(path)) return null;
 
         var json = File.ReadAllText(path);
-        return JsonSerializer.Deserialize<WorldInfo>(json);
+        return JsonSerializer.Deserialize<WorldMeta>(json);
     }
 
-    private void WriteMeta(WorldInfo info)
+    private void WriteMeta(WorldMeta meta)
     {
-        var json = JsonSerializer.Serialize(info, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(MetaPath(info.Slot), json);
+        var json = JsonSerializer.Serialize(meta, new JsonSerializerOptions { WriteIndented = true });
+        File.WriteAllText(MetaPath(meta.Slot), json);
     }
 
     private string SlotPath(int slot) => Path.Combine(_savesPath, $"slot_{slot}");
     private string MetaPath(int slot) => Path.Combine(SlotPath(slot), "meta.json");
+    private string StatePath(int slot) => Path.Combine(SlotPath(slot), "state.json");
 
     private static void ValidateSlot(int slot)
     {
         if (slot < 0 || slot >= SlotCount)
             throw new ArgumentOutOfRangeException(nameof(slot), $"Slot must be 0–{SlotCount - 1}");
-    }
-    
-    
-    public VoxelWorld GenerateWorld(int? seed = null)
-    {
-        return new VoxelWorld(seed ??  new Random().Next());
     }
 }

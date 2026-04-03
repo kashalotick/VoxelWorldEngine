@@ -40,8 +40,16 @@ public class DemoScene : Scene
     private VoxelWorld _voxelWorld;
     private GameWorld _gameWorld;
 
-    public DemoScene(GameContext gameContext) : base(gameContext)
+    private WorldRepository _worldRepository;
+    private WorldMeta _worldMeta;
+    private WorldState _worldState;
+
+    private double _elapsedTime;
+
+    public DemoScene(GameContext gameContext, WorldRepository repository, WorldMeta worldMeta) : base(gameContext)
     {
+        _worldRepository = repository;
+        _worldMeta = worldMeta;
     }
 
     public override void StateEnter() => ((IScene)this).Load();
@@ -59,8 +67,9 @@ public class DemoScene : Scene
         LoadPause();
         LoadHud();
 
-        Camera = new Camera(new Vector3(1, 0, 0), GameContext.ScreenWidth / GameContext.ScreenHeight);
-        Camera.LookAt(Vector3.Zero);
+        Console.WriteLine(_worldState.Player.Position);
+        Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
+        Camera.LookAt(_worldState.Player.Position + _worldState.Player.ViewDirection);
 
         _playerController = new PlayerController(Camera, _rayShooter);
         _playerController.Pause += OnPause;
@@ -77,7 +86,9 @@ public class DemoScene : Scene
         var cubeShader = GameContext.ShaderRepository.Get("shader");
         var stoneTexture = GameContext.TextureRepository.Get("Stone");
 
-        _voxelWorld = new WorldRepository().GenerateWorld(124);
+        _voxelWorld = _worldRepository.LoadWorld(_worldMeta);
+        var worldState = _worldRepository.LoadState(_worldMeta.Slot);
+        _worldState = worldState ?? new WorldState();
 
         _gameWorld = new GameWorld(_voxelWorld, chunkShader, stoneTexture);
         _voxelWorld.ChunkAdded += _gameWorld.AddChunk;
@@ -141,6 +152,7 @@ public class DemoScene : Scene
 
     public override void Update(double deltaTime)
     {
+        _elapsedTime += deltaTime;
         ProcessRaycast(deltaTime);
     }
 
@@ -148,18 +160,14 @@ public class DemoScene : Scene
     {
         base.FixedUpdate(deltaTime);
 
-        var player = new Player
-        {
-            Position = Camera.Position,
-            ViewDirection = Camera.Front,
-            ChunkViewRadius = 4,
-            ViewMatrix = Camera.GetViewMatrix()
-        };
+        _worldState.Player.ViewDirection = Camera.Front;
+        _worldState.Player.Position = Camera.Position;
+        _worldState.Player.ViewMatrix = Camera.GetViewMatrix();
 
-        _hud.UpdatePlayerPosition(player.Position);
-        _hud.UpdateChunkPosition(Chunk.GlobalToChunk(player.Position.ToVector3Int()));
+        _hud.UpdatePlayerPosition(_worldState.Player.Position);
+        _hud.UpdateChunkPosition(Chunk.GlobalToChunk(_worldState.Player.Position.ToVector3Int()));
 
-        _chunkLoadingSystem.Update(deltaTime, player);
+        _chunkLoadingSystem.Update(deltaTime, _worldState.Player);
     }
 
     private void ProcessRaycast(double deltaTime)
@@ -192,7 +200,9 @@ public class DemoScene : Scene
 
     private void SaveWorld()
     {
-        Console.WriteLine("Save world");
+        _worldRepository.SaveState(_worldMeta.Slot, _worldState);
+        _worldRepository.AddPlayTime(_worldMeta, _elapsedTime);
+        _elapsedTime = 0;
     }
 
     private void OnToggleHud()
@@ -222,7 +232,6 @@ public class DemoScene : Scene
     {
         SaveWorld();
     }
-
 
     private void OnSaveAndExit()
     {
