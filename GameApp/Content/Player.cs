@@ -30,7 +30,7 @@ public record PlayerDto
     {
         return new Player
         {
-            Position = (Vector3)dto.Position,
+            Position = (Vector3)(dto.Position),
             ViewDirection = (Vector3)dto.ViewDirection,
             ChunkViewRadius = dto.ChunkViewRadius
         };

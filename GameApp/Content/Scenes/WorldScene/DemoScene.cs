@@ -67,9 +67,9 @@ public class DemoScene : Scene
         LoadPause();
         LoadHud();
 
-        Console.WriteLine(_worldState.Player.Position);
         Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
-        Camera.LookAt(_worldState.Player.Position + _worldState.Player.ViewDirection);
+        var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero ? Vector3.UnitX : _worldState.Player.ViewDirection;
+        Camera.LookAt(_worldState.Player.Position + viewDirection);
 
         _playerController = new PlayerController(Camera, _rayShooter);
         _playerController.Pause += OnPause;

@@ -26,7 +26,7 @@ public record WorldStateDto
     {
         return new WorldState()
         {
-            Player = (Player)dto.Player
+            Player = (Player)dto.Player ?? new Player()
         };
     }
 }

@@ -207,17 +207,23 @@ public class ChunkLoadingSystem : ILoadable
     {
         Interlocked.Increment(ref _activeWorkers);
         new Thread(ChunkWorker) { IsBackground = true }.Start();
-
-        // Console.WriteLine(
-        //     $"+ worker: {_activeWorkers} for {_missingChunks.Count}/{_readyChunks.Count}/{_voxelWorld.Chunks.Count}/{maxChunks} chunks");
     }
+    private CancellationTokenSource _cts = new();
+    private volatile bool _disposed = false;
 
     private void ChunkWorker()
     {
         var chunkLoader = new ChunkLoader(_voxelWorld);
-        while (true)
+        while (!_disposed)
         {
-            _signal.Wait();
+            try
+            {
+                _signal.Wait(_cts.Token); // виходить чисто при Cancel
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
             Vector3Int pos;
             lock (_missingChunks)
             {
@@ -226,8 +232,6 @@ public class ChunkLoadingSystem : ILoadable
                     if (_activeWorkers > MinWorkers)
                     {
                         Interlocked.Decrement(ref _activeWorkers);
-                        // Console.WriteLine(
-                        //     $"- worker: {_activeWorkers} for {_missingChunks.Count}/{_readyChunks.Count}/{_voxelWorld.Chunks.Count}/{maxChunks} chunks");
                         return;
                     }
 
@@ -247,8 +251,8 @@ public class ChunkLoadingSystem : ILoadable
 
     public void Dispose()
     {
-        _signal.Dispose();
-        // _missingChunks.CompleteAdding();
-        // _missingChunks.Dispose();
+        _disposed = true;
+        _cts.Cancel();
+        _signal.Release(MaxWorkers);
     }
 }
