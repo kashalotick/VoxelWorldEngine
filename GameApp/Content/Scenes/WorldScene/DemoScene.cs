@@ -8,6 +8,7 @@ using LearningOpenTK.Core;
 using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Input;
 using LearningOpenTK.Core.Scenes;
+using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;

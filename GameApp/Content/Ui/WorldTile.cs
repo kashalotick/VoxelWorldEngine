@@ -1,9 +1,11 @@
 ﻿using LearningOpenTK.Content.Ui.DynamicDraw;
 using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
 using LearningOpenTK.Content.Ui.StaticDraw;
+using LearningOpenTK.Core;
 using LearningOpenTK.Core.Components;
 using LearningOpenTK.Engine.Meshes;
 using LearningOpenTK.Engine.Resources.Fonts;
+using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Mathematics;
@@ -17,13 +19,13 @@ public class WorldTile : StaticElement
 
     private const int TileWidth = 220;
     private const int TileHeight = 20;
+    
+    
 
     public WorldTile(
-        IShader shader,
-        ITexture texture,
-        IFont font,
+        GameContext gameContext,
         WorldMeta meta
-    ) : base(shader, texture)
+    ) : base(gameContext.ShaderRepository.Get("plain"), gameContext.TextureRepository.Get("Plain"))
     {
         Transform = new RectTransform
         {
@@ -33,10 +35,11 @@ public class WorldTile : StaticElement
         };
         Color = ColorStyle.Transparent;
 
+        var font = gameContext.FontRepository.Get("Pixel");
         AddWorldName(font, meta.Name);
         AddSubInfo(font, meta.Seed, meta.PlayTime);
-        AddPlayButton(shader, texture);
-        AddDeleteButton(shader, texture);
+        AddPlayButton(Shader, gameContext.UiAtlas.Get("Play"));
+        AddDeleteButton(Shader, gameContext.UiAtlas.Get("Cross"));
     }
 
     private void AddWorldName(IFont font, string name)

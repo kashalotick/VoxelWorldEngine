@@ -9,6 +9,7 @@ using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Input;
 using LearningOpenTK.Core.Scenes;
 using LearningOpenTK.Engine.Resources.Fonts;
+using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources;
 using OpenTK.Graphics.OpenGL4;
@@ -18,7 +19,7 @@ namespace GameApp.Content.Scenes;
 public class CreateNewWorld : Scene
 {
     private Shader _plainShader;
-    private Texture _emptyTexture;
+    private GLTexture _emptyGlTexture;
     private Font _pixelFont;
 
     private WorldRepository _repository;
@@ -53,7 +54,7 @@ public class CreateNewWorld : Scene
     protected override void Load()
     {
         _plainShader = GameContext.ShaderRepository.Get("plain");
-        _emptyTexture = GameContext.TextureRepository.Get("empty");
+        _emptyGlTexture = GameContext.TextureRepository.Get("empty");
         _pixelFont = GameContext.FontRepository.Get("Pixel");
 
         var ui = SOR.Register(new UiLayout(GameContext.ScreenWidth, GameContext.ScreenHeight));
@@ -77,14 +78,14 @@ public class CreateNewWorld : Scene
 
     private UiElement CreateBackground()
     {
-        var bg = new Background(_plainShader, _emptyTexture);
+        var bg = new Background(_plainShader, _emptyGlTexture);
         bg.Color = ColorStyle.Background;
         return bg;
     }
 
     private UiElement CreateForm()
     {
-        var list = new ListElement(_plainShader, _emptyTexture);
+        var list = new ListElement(_plainShader, _emptyGlTexture);
         list.Transform = new RectTransform
         {
             Anchor = (0.5f, 0.5f),
@@ -104,7 +105,7 @@ public class CreateNewWorld : Scene
 
     private UiElement CreateSpacingElement(int width, int height)
     {
-        var rect = new StaticElement(_plainShader, _emptyTexture);
+        var rect = new StaticElement(_plainShader, _emptyGlTexture);
         rect.Transform = new RectTransform
         {
             Width = width,
@@ -116,7 +117,7 @@ public class CreateNewWorld : Scene
 
     private TextField CreateField(Reactive<string> reactive)
     {
-        var field = new TextField(_plainShader, _emptyTexture, _pixelFont, reactive)
+        var field = new TextField(_plainShader, _emptyGlTexture, _pixelFont, reactive)
         {
             Transform = new RectTransform
             {
@@ -166,7 +167,7 @@ public class CreateNewWorld : Scene
 
     private UiElement CreateSubmitButton()
     {
-        var button = new ButtonWithLabel(_plainShader, _emptyTexture, _pixelFont, "Create world")
+        var button = new ButtonWithLabel(_plainShader, _emptyGlTexture, _pixelFont, "Create world")
         {
             Transform = new RectTransform
             {
@@ -202,7 +203,7 @@ public class CreateNewWorld : Scene
 
     private UiElement CreateBackButton()
     {
-        var button = new Button(_plainShader, _emptyTexture);
+        var button = new Button(_plainShader, GameContext.UiAtlas.Get("ArrowLeft"));
         button.Transform = new RectTransform()
         {
             Width = 20,

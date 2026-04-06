@@ -10,6 +10,7 @@ using LearningOpenTK.Core.Components;
 using LearningOpenTK.Core.Input;
 using LearningOpenTK.Core.Scenes;
 using LearningOpenTK.Engine.Resources.Fonts;
+using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources;
 using OpenTK.Graphics.OpenGL4;
@@ -25,7 +26,7 @@ public class MainMenu : Scene
 
 
     private Shader _plainShader;
-    private Texture _emptyTexture;
+    private GLTexture _emptyGlTexture;
     private Font _pixelFont;
     private WorldRepository _repository;
 
@@ -47,7 +48,7 @@ public class MainMenu : Scene
     protected override void Load()
     {
         _plainShader = GameContext.ShaderRepository.Get("plain");
-        _emptyTexture = GameContext.TextureRepository.Get("empty");
+        _emptyGlTexture = GameContext.TextureRepository.Get("empty");
         _pixelFont = GameContext.FontRepository.Get("Pixel");
         _repository = new WorldRepository();
 
@@ -71,7 +72,7 @@ public class MainMenu : Scene
 
     private UiElement CreateBackground()
     {
-        var bg = new Background(_plainShader, _emptyTexture);
+        var bg = new Background(_plainShader, _emptyGlTexture);
         bg.Color = ColorStyle.Background;
         bg.ZIndex = -1;
         return bg;
@@ -95,7 +96,7 @@ public class MainMenu : Scene
 
     private ListElement BuildSlotList()
     {
-        var list = new ListElement(_plainShader, _emptyTexture)
+        var list = new ListElement(_plainShader, _emptyGlTexture)
         {
             Orientation = ListOrientation.Vertical,
             Gap = 16,
@@ -120,7 +121,7 @@ public class MainMenu : Scene
 
             if (slots[i] is { } info)
             {
-                var tile = new WorldTile(_plainShader, _emptyTexture, _pixelFont, info);
+                var tile = new WorldTile(GameContext, info);
                 tile.Transform = new RectTransform
                 {
                     Width = TileWidth,
@@ -143,7 +144,7 @@ public class MainMenu : Scene
 
     private UiElement CreateEmptySlotButton(int slot)
     {
-        var button = new ButtonWithLabel(_plainShader, _emptyTexture, _pixelFont, "+ Create world");
+        var button = new ButtonWithLabel(_plainShader, _emptyGlTexture, _pixelFont, "+ Create world");
         button.Transform = new RectTransform
         {
             Width = TileWidth,
@@ -159,7 +160,7 @@ public class MainMenu : Scene
 
     private UiElement CreateExitButton()
     {
-        var button = new ButtonWithLabel(_plainShader, _emptyTexture, _pixelFont, "Exit");
+        var button = new ButtonWithLabel(_plainShader, _emptyGlTexture, _pixelFont, "Exit");
         button.Transform = new RectTransform
         {
             Width = 48,
@@ -169,9 +170,10 @@ public class MainMenu : Scene
             Offset = (-32, 32),
             Scale = 4,
         };
-        button.Color = ColorStyle.RedLight;
+        button.Color = ColorStyle.Transparent;
         button.TextColor = ColorStyle.White;
-        button.HoverColor = ColorStyle.Red;
+        button.TextHoverColor = ColorStyle.Black;
+        button.HoverColor = ColorStyle.RedLight;
         button.Click += OnExit;
         return button;
     }

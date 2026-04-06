@@ -1,5 +1,6 @@
 ﻿using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Primitives;
+using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Entities.World;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
