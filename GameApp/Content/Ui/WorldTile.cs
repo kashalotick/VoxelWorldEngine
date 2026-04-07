@@ -12,6 +12,14 @@ using OpenTK.Mathematics;
 
 namespace GameApp.Content.Ui;
 
+public record WorldTileMaterial(
+    IShader Shader,
+    ITexture Background,
+    ITexture PlayButton,
+    ITexture DeleteButton,
+    IFont TextFont
+);
+
 public class WorldTile : StaticElement
 {
     public event Action Play;
@@ -19,14 +27,18 @@ public class WorldTile : StaticElement
 
     private const int TileWidth = 220;
     private const int TileHeight = 20;
-    
-    
+
+    private readonly WorldTileMaterial _material;
+    private readonly WorldMeta _meta;
 
     public WorldTile(
-        MyGameContext gameContext,
+        WorldTileMaterial material,
         WorldMeta meta
-    ) : base(gameContext.ShaderRepository.Get("plain"), gameContext.TextureRepository.Get("Plain"))
+    ) : base(material.Shader, material.Background)
     {
+        _material = material;
+        _meta = meta;
+
         Transform = new RectTransform
         {
             Width = TileWidth,
@@ -35,16 +47,15 @@ public class WorldTile : StaticElement
         };
         Color = ColorStyle.Transparent;
 
-        var font = gameContext.FontRepository.Get("Pixel");
-        AddWorldName(font, meta.Name);
-        AddSubInfo(font, meta.Seed, meta.PlayTime);
-        AddPlayButton(Shader, gameContext.UiAtlas.Get("Play"));
-        AddDeleteButton(Shader, gameContext.UiAtlas.Get("Cross"));
+        AddWorldName();
+        AddSubInfo();
+        AddPlayButton();
+        AddDeleteButton();
     }
 
-    private void AddWorldName(IFont font, string name)
+    private void AddWorldName()
     {
-        var label = new DynamicText(Shader, font, name);
+        var label = new DynamicText(Shader, _material.TextFont, _meta.Name);
         label.Color = new(1);
         label.Transform = new RectTransform
         {
@@ -55,14 +66,14 @@ public class WorldTile : StaticElement
         };
         AddChild(label);
     }
-    
-    private void AddSubInfo(IFont font, int seed, double playtime)
+
+    private void AddSubInfo()
     {
-        var elapsed = (int)playtime;
+        var elapsed = (int)_meta.PlayTime;
         var hours = elapsed / 3600;
         var minutes = elapsed % 3600 / 60;
         var seconds = elapsed % 60;
-        var label = new StaticText(Shader, font, $"{hours:00}:{minutes:00}:{seconds:00} | {seed}");
+        var label = new StaticText(Shader, _material.TextFont, $"{hours:00}:{minutes:00}:{seconds:00} | {_meta.Seed}");
         label.Color = ColorStyle.Gray;
         label.Transform = new RectTransform
         {
@@ -73,9 +84,9 @@ public class WorldTile : StaticElement
         AddChild(label);
     }
 
-    private void AddPlayButton(IShader shader, ITexture texture)
+    private void AddPlayButton()
     {
-        var button = new Button(shader, texture);
+        var button = new Button(Shader, _material.PlayButton);
         button.Transform = new RectTransform
         {
             Width = TileHeight,
@@ -89,9 +100,9 @@ public class WorldTile : StaticElement
         AddChild(button);
     }
 
-    private void AddDeleteButton(IShader shader, ITexture texture)
+    private void AddDeleteButton()
     {
-        var button = new Button(shader, texture);
+        var button = new Button(Shader, _material.DeleteButton);
         button.Transform = new RectTransform
         {
             Width = TileHeight,

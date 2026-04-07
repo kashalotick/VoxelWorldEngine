@@ -19,7 +19,7 @@ namespace GameApp.Content.Scenes;
 public class CreateNewWorld : BaseScene
 {
     private Shader _plainShader;
-    private GLTexture _emptyGlTexture;
+    private Texture _plainTexture;
     private Font _pixelFont;
 
     private WorldRepository _repository;
@@ -54,7 +54,7 @@ public class CreateNewWorld : BaseScene
     protected override void Load()
     {
         _plainShader = GameContext.ShaderRepository.Get("plain");
-        _emptyGlTexture = GameContext.TextureRepository.Get("empty");
+        _plainTexture = GameContext.UiAtlas.Get("Plain");
         _pixelFont = GameContext.FontRepository.Get("Pixel");
 
         var ui = SOR.Register(new UiLayout(GameContext.ScreenWidth, GameContext.ScreenHeight));
@@ -78,14 +78,14 @@ public class CreateNewWorld : BaseScene
 
     private UiElement CreateBackground()
     {
-        var bg = new Background(_plainShader, _emptyGlTexture);
+        var bg = new Background(_plainShader, _plainTexture);
         bg.Color = ColorStyle.Background;
         return bg;
     }
 
     private UiElement CreateForm()
     {
-        var list = new ListElement(_plainShader, _emptyGlTexture);
+        var list = new ListElement(_plainShader, _plainTexture);
         list.Transform = new RectTransform
         {
             Anchor = (0.5f, 0.5f),
@@ -105,7 +105,7 @@ public class CreateNewWorld : BaseScene
 
     private UiElement CreateSpacingElement(int width, int height)
     {
-        var rect = new StaticElement(_plainShader, _emptyGlTexture);
+        var rect = new StaticElement(_plainShader, _plainTexture);
         rect.Transform = new RectTransform
         {
             Width = width,
@@ -117,7 +117,7 @@ public class CreateNewWorld : BaseScene
 
     private TextField CreateField(Reactive<string> reactive)
     {
-        var field = new TextField(_plainShader, _emptyGlTexture, _pixelFont, reactive)
+        var field = new TextField(_plainShader, _plainTexture, _pixelFont, reactive)
         {
             Transform = new RectTransform
             {
@@ -167,7 +167,7 @@ public class CreateNewWorld : BaseScene
 
     private UiElement CreateSubmitButton()
     {
-        var button = new ButtonWithLabel(_plainShader, _emptyGlTexture, _pixelFont, "Create world")
+        var button = new ButtonWithLabel(_plainShader, _plainTexture, _pixelFont, "Create world")
         {
             Transform = new RectTransform
             {

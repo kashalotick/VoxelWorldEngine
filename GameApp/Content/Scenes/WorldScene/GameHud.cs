@@ -2,7 +2,10 @@
 using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.Primitives;
+using LearningOpenTK.Engine.Resources.Fonts;
+using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
+using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
@@ -10,9 +13,15 @@ using VoxelWorldEngine.Utils;
 
 namespace GameApp.Content.Scenes.WorldScene;
 
+public record GameHudMaterial(
+    IShader Shader,
+    ITexture Background,
+    ITexture Crosshair,
+    IFont TextFont
+);
 public class GameHud : UiLayout
 {
-    private readonly GameContext _gameContext;
+    private readonly GameHudMaterial _material;
 
     private DynamicText _playerPositionText;
     private DynamicText _chunkPositionText;
@@ -21,9 +30,9 @@ public class GameHud : UiLayout
     private DynamicText _fpsText;
 
 
-    public GameHud(GameContext gameContext) : base(gameContext.ScreenWidth, gameContext.ScreenHeight)
+    public GameHud(float width, float height, GameHudMaterial material) : base(width, height)
     {
-        _gameContext = gameContext;
+        _material = material;
     }
 
     protected override void Load()
@@ -53,10 +62,8 @@ public class GameHud : UiLayout
 
     private void InitBackground()
     {
-        var shader = _gameContext.ShaderRepository.Get("plain");
-        var empty = _gameContext.TextureRepository.Get("Empty");
 
-        Add(new StaticElement(shader, empty)
+        Add(new StaticElement(_material.Shader, _material.Background)
         {
             Transform =
             {
@@ -84,10 +91,7 @@ public class GameHud : UiLayout
 
     private void InitCrosshair()
     {
-        var shader = _gameContext.ShaderRepository.Get("plain");
-        var crosshairTexture = _gameContext.TextureRepository.Get("Crosshair");
-
-        var crosshair = new Crosshair(shader, crosshairTexture, 16)
+        var crosshair = new Crosshair(_material.Shader, _material.Crosshair, 16)
         {
             Color = ColorStyle.White
         };
@@ -96,10 +100,7 @@ public class GameHud : UiLayout
 
     private DynamicText FastText(Vector2 position)
     {
-        var shader = _gameContext.ShaderRepository.Get("plain");
-        var font = _gameContext.FontRepository.Get("Pixel");
-
-        var text = new DynamicText(shader, font, " ");
+        var text = new DynamicText(_material.Shader, _material.TextFont, " ");
         text.Transform.Anchor = new Vector2(0, 1);
         text.Transform.Offset = position with { Y = -position.Y - 16 };
         text.Transform.Scale = 2;

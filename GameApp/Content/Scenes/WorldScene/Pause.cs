@@ -2,9 +2,19 @@
 using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.Components;
+using LearningOpenTK.Engine.Resources.Fonts;
+using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
+using LearningOpenTK.Resources.Interfaces;
 
 namespace GameApp.Content.Scenes.WorldScene;
+
+
+public record PauseMaterial(
+    IShader Shader,
+    ITexture Background,
+    IFont TextFont
+);
 
 public class Pause : UiLayout
 {
@@ -12,12 +22,13 @@ public class Pause : UiLayout
     public event Action Save;
     public event Action SaveAndExit;
 
-    private readonly GameContext _gameContext;
-
-    public Pause(GameContext gameContext) : base(gameContext.ScreenWidth, gameContext.ScreenHeight)
+    private readonly PauseMaterial _material;
+    
+    public Pause(float width, float height, PauseMaterial material) : base(width, height)
     {
-        _gameContext = gameContext;
+        _material = material;
     }
+
 
     protected override void Load()
     {
@@ -29,10 +40,7 @@ public class Pause : UiLayout
 
     private UiElement CreateButtonList()
     {
-        var shader = _gameContext.ShaderRepository.Get("plain");
-        var empty = _gameContext.TextureRepository.Get("Empty");
-
-        var list = new ListElement(shader, empty)
+        var list = new ListElement(_material.Shader, _material.Background)
         {
             Transform = new RectTransform
             {
@@ -55,10 +63,7 @@ public class Pause : UiLayout
 
     private UiElement CreateBackground()
     {
-        var shader = _gameContext.ShaderRepository.Get("plain");
-        var empty = _gameContext.TextureRepository.Get("Empty");
-
-        var bg = new Background(shader, empty);
+        var bg = new Background(_material.Shader, _material.Background);
         bg.ZIndex = -1;
         bg.Color = ColorStyle.PauseBackground;
 
@@ -88,11 +93,8 @@ public class Pause : UiLayout
 
     private Button CreateButton(string label)
     {
-        var shader = _gameContext.ShaderRepository.Get("plain");
-        var empty = _gameContext.TextureRepository.Get("Empty");
-        var font = _gameContext.FontRepository.Get("Pixel");
 
-        var button = new ButtonWithLabel(shader, empty, font, label);
+        var button = new ButtonWithLabel(_material.Shader, _material.Background, _material.TextFont, label);
         button.Transform = new RectTransform
         {
             Width = 120,

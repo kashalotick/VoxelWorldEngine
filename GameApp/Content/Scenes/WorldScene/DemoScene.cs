@@ -69,7 +69,9 @@ public class DemoScene : BaseScene
         LoadHud();
 
         Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
-        var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero ? Vector3.UnitX : _worldState.Player.ViewDirection;
+        var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero
+            ? Vector3.UnitX
+            : _worldState.Player.ViewDirection;
         Camera.LookAt(_worldState.Player.Position + viewDirection);
 
         _playerController = new PlayerController(Camera, _rayShooter);
@@ -116,7 +118,13 @@ public class DemoScene : BaseScene
 
     private void LoadHud()
     {
-        _hud = SOR.Register(new GameHud(GameContext));
+        var hudMaterial = new GameHudMaterial(
+            GameContext.ShaderRepository.Get("plain"),
+            GameContext.UiAtlas.Get("Plain"),
+            GameContext.UiAtlas.Get("Crosshair"),
+            GameContext.FontRepository.Get("Pixel")
+        );
+        _hud = SOR.Register(new GameHud(GameContext.ScreenWidth, GameContext.ScreenHeight, hudMaterial));
         _hud.Enable();
         _fpsCounter = new FpsCounter(1.0, 0.25);
         _fpsCounter.OnFpsChanged += fps => _hud.UpdateFps(fps);
@@ -125,7 +133,12 @@ public class DemoScene : BaseScene
 
     private void LoadPause()
     {
-        _pause = SOR.Register(new Pause(GameContext));
+        var pauseMaterial = new PauseMaterial(
+            GameContext.ShaderRepository.Get("plain"),
+            GameContext.UiAtlas.Get("Plain"),
+            GameContext.FontRepository.Get("Pixel")
+        );
+        _pause = SOR.Register(new Pause(GameContext.ScreenWidth, GameContext.ScreenHeight, pauseMaterial));
         _pause.Resume += OnResume;
         _pause.Save += OnSave;
         _pause.SaveAndExit += OnSaveAndExit;

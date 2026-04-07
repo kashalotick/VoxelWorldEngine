@@ -26,7 +26,7 @@ public class MainMenu : BaseScene
 
 
     private Shader _plainShader;
-    private GLTexture _emptyGlTexture;
+    private Texture _plainTexture;
     private Font _pixelFont;
     private WorldRepository _repository;
 
@@ -48,7 +48,7 @@ public class MainMenu : BaseScene
     protected override void Load()
     {
         _plainShader = GameContext.ShaderRepository.Get("plain");
-        _emptyGlTexture = GameContext.TextureRepository.Get("empty");
+        _plainTexture = GameContext.UiAtlas.Get("Plain");
         _pixelFont = GameContext.FontRepository.Get("Pixel");
         _repository = new WorldRepository();
 
@@ -72,7 +72,7 @@ public class MainMenu : BaseScene
 
     private UiElement CreateBackground()
     {
-        var bg = new Background(_plainShader, _emptyGlTexture);
+        var bg = new Background(_plainShader, _plainTexture);
         bg.Color = ColorStyle.Background;
         bg.ZIndex = -1;
         return bg;
@@ -96,7 +96,13 @@ public class MainMenu : BaseScene
 
     private ListElement BuildSlotList()
     {
-        var list = new ListElement(_plainShader, _emptyGlTexture)
+        var worldTileMaterial = new WorldTileMaterial(
+            _plainShader, 
+            _plainTexture, 
+            GameContext.UiAtlas.Get("Play"), 
+            GameContext.UiAtlas.Get("Cross"), 
+            _pixelFont);
+        var list = new ListElement(_plainShader, _plainTexture)
         {
             Orientation = ListOrientation.Vertical,
             Gap = 16,
@@ -119,9 +125,9 @@ public class MainMenu : BaseScene
             int slot = i;
             UiElement item;
 
-            if (slots[i] is { } info)
+            if (slots[i] is { } meta)
             {
-                var tile = new WorldTile(GameContext, info);
+                var tile = new WorldTile(worldTileMaterial, meta);
                 tile.Transform = new RectTransform
                 {
                     Width = TileWidth,
@@ -144,7 +150,7 @@ public class MainMenu : BaseScene
 
     private UiElement CreateEmptySlotButton(int slot)
     {
-        var button = new ButtonWithLabel(_plainShader, _emptyGlTexture, _pixelFont, "+ Create world");
+        var button = new ButtonWithLabel(_plainShader, _plainTexture, _pixelFont, "+ Create world");
         button.Transform = new RectTransform
         {
             Width = TileWidth,
@@ -160,7 +166,7 @@ public class MainMenu : BaseScene
 
     private UiElement CreateExitButton()
     {
-        var button = new ButtonWithLabel(_plainShader, _emptyGlTexture, _pixelFont, "Exit");
+        var button = new ButtonWithLabel(_plainShader, _plainTexture, _pixelFont, "Exit");
         button.Transform = new RectTransform
         {
             Width = 48,
