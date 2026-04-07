@@ -82,9 +82,9 @@ public class Benchmark
         Console.WriteLine("\n--- RESULTS ---");
         Console.WriteLine($"Total Time: {totalTimeMs:F4} ms");
         Console.WriteLine($"Average Time per call: {avgTime:F6} ms");
-        Console.WriteLine($"Average Error (Min): {avgErrorMin:F6}");
-        Console.WriteLine($"Average Error (Max): {avgErrorMax:F6}");
-        Console.WriteLine($"Max Single Error found: {maxSingleError:F6}");
+        Console.WriteLine($"Average Error (MinIndex): {avgErrorMin:F6}");
+        Console.WriteLine($"Average Error (MaxIndex): {avgErrorMax:F6}");
+        Console.WriteLine($"MaxIndex Single Error found: {maxSingleError:F6}");
 
         if (maxSingleError < 0.00001f)
             Console.WriteLine("Accuracy: Perfect (or very high)");

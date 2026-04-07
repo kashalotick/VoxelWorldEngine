@@ -5,6 +5,7 @@ namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
 public partial class Octree<T> : IOctree<T>
 {
+
     public int MaxDepth { get; private set; }
     public int Size => _linearOctree.Size;
     private LinearOctree<T> _linearOctree;
@@ -23,13 +24,23 @@ public partial class Octree<T> : IOctree<T>
         _linearOctree = new LinearOctree<T>(MaxDepth);
     }
 
+    public IEnumerable<T> Query(Vector3Int min, Vector3Int max)
+    {
+        return Root().Query(min, max);
+    }
+
+    public void Accept(IOctreeVisitor<T> visitor)
+    {
+        Root().AcceptRecursive(visitor);
+    }
+
 
     internal OctreeNode Root()
     {
         var root = new OctreeNode(_linearOctree, _linearOctree.RootIndex)
         {
             Depth = 0,
-            Min = Vector3Int.Zero,
+            MinIndex = Vector3Int.Zero,
         };
         return root;
     }

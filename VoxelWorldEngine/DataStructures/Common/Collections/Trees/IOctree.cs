@@ -7,29 +7,34 @@ public interface IOctree<T>
     bool IsEmpty { get; }
     
     void Clear();
-    
-    // IEnumerable<T> Query(Vector3Int min,  Vector3Int max);
-    // void Traverse(IOctreeVisitor<T> visitor);
+
+    IEnumerable<T> Query(Vector3Int min, Vector3Int max);
+    void Accept(IOctreeVisitor<T> visitor);
+
     // IOctreeNode<T> Root(); // TODO: remove?
-    
-    
+
+
     // void Insert(T data, Vector3Int min, Vector3Int max);
     // bool Remove(Vector3Int position);
-    
+
 }
 
-public interface IOctreeNodeReadonly<T>
+public interface IOctreeNode<T> : IOctreeNodeReadonly<T>
 {
-    public int Depth { get; }
-    public int Size { get; }
+    
+}
+public interface IOctreeNodeReadonly<out T>
+{
+    int Depth { get; }
+    int Size { get; }
 
-    public Vector3Int Min { get; }
-    public Vector3Int Max { get; }
+    Vector3Int MinIndex { get; }
+    Vector3Int MaxIndex { get; }
     
     T Data { get; }
     bool IsLeaf { get; }
     
-    public IOctreeNodeReadonly<T> GetNeighbor(Vector3Int direction);
+    IOctreeNodeReadonly<T>? GetNeighbor(Vector3Int direction);
 }
 
 public interface IOctreeVisitor<T>

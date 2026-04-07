@@ -6,47 +6,36 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
 
-public class VoxelOctree : Octree<Voxel>, IRaycastable
+public class VoxelOctree : Octree<Voxel>, IVoxelOctree
 {
-    private static readonly ThreadLocal<Stack<OctreeNode>> _stackPool =
-        new(() => new Stack<OctreeNode>());
-
-
     public void Build(IGenerator generator)
     {
-        var stack = _stackPool.Value;
-        stack.Clear();
-        var root = Root();
-        stack.Push(root);
+        BuildRecursive(generator, Root());
+    }
 
-        while (stack.Count > 0)
+    internal void BuildRecursive(IGenerator generator, OctreeNode node)
+    {
+        if (generator.IsUniform(node.MinIndex, node.MaxIndex) || node.Depth == MaxDepth)
         {
-            var node = stack.Pop();
+            node.Data = generator.Approximate(node.MinIndex, node.MaxIndex);
+            return;
+        }
 
-            if (generator.IsUniform(node.Min, node.Max) || node.Depth == MaxDepth)
-            {
-                node.Data = generator.Approximate(node.Min, node.Max);
-            }
-            else
-            {
-                node.Split();
-                for (int i = 0; i < 8; i++)
-                {
-                    var child = node.GetChild(i);
-                    stack.Push(child);
-                }
-            }
+        node.Split();
+        for (int i = 0; i < 8; i++)
+        {
+            BuildRecursive(generator, node.GetChild(i));
         }
     }
-    
+
     public RayHit Raycast(Ray ray)
     {
         var root = Root();
-    
+
         // Межі кореневого вузла в float
-        var minF = new Vector3(root.Min.X, root.Min.Y, root.Min.Z);
-        var maxF = new Vector3(root.Max.X + 1, root.Max.Y + 1, root.Max.Z + 1);
-    
+        var minF = new Vector3(root.MinIndex.X, root.MinIndex.Y, root.MinIndex.Z);
+        var maxF = new Vector3(root.MaxIndex.X + 1, root.MaxIndex.Y + 1, root.MaxIndex.Z + 1);
+
         // Знаходимо точку входу/виходу променя в AABB кореня
         if (!Raycaster.IntersectAABB(ray, minF, maxF, out float tMin, out float tMax))
             return new RayHit { Voxel = Voxel.Empty };
@@ -57,6 +46,7 @@ public class VoxelOctree : Octree<Voxel>, IRaycastable
 
         return RaycastNode(root, ray, tMin, tMax);
     }
+
     private RayHit RaycastNode(OctreeNode node, Ray ray, float tMin, float tMax)
     {
         if (tMin > ray.Length)
@@ -71,9 +61,9 @@ public class VoxelOctree : Octree<Voxel>, IRaycastable
 
             return new RayHit
             {
-                HitIn  = ray.Origin + ray.Direction * tMin,
+                HitIn = ray.Origin + ray.Direction * tMin,
                 HitOut = ray.Origin + ray.Direction * MathF.Min(tMax, ray.Length),
-                Voxel  = voxel
+                Voxel = voxel
             };
         }
 
@@ -84,8 +74,8 @@ public class VoxelOctree : Octree<Voxel>, IRaycastable
         for (int octant = 0; octant < 8; octant++)
         {
             var child = node.GetChild(octant);
-            var cMin = new Vector3(child.Min.X, child.Min.Y, child.Min.Z);
-            var cMax = new Vector3(child.Max.X + 1, child.Max.Y + 1, child.Max.Z + 1);
+            var cMin = new Vector3(child.MinIndex.X, child.MinIndex.Y, child.MinIndex.Z);
+            var cMax = new Vector3(child.MaxIndex.X + 1, child.MaxIndex.Y + 1, child.MaxIndex.Z + 1);
 
             if (!Raycaster.IntersectAABB(ray, cMin, cMax, out float ct0, out float ct1))
                 continue;
@@ -107,6 +97,7 @@ public class VoxelOctree : Octree<Voxel>, IRaycastable
                 hits[j + 1] = hits[j];
                 j--;
             }
+
             hits[j + 1] = cur;
         }
 

@@ -76,10 +76,10 @@ public class MeshBuilder
     {
         if (normal.X != 0)
         {
-            int x = normal.X > 0 ? node.Max.X + 1 : node.Min.X - 1;
+            int x = normal.X > 0 ? node.MaxIndex.X + 1 : node.MinIndex.X - 1;
 
-            for (int y = node.Min.Y; y <= node.Max.Y; y++)
-            for (int z = node.Min.Z; z <= node.Max.Z; z++)
+            for (int y = node.MinIndex.Y; y <= node.MaxIndex.Y; y++)
+            for (int z = node.MinIndex.Z; z <= node.MaxIndex.Z; z++)
             {
                 var pos = new Vector3Int(x, y, z);
 
@@ -91,10 +91,10 @@ public class MeshBuilder
 
         if (normal.Y != 0)
         {
-            int y = normal.Y > 0 ? node.Max.Y + 1 : node.Min.Y - 1;
+            int y = normal.Y > 0 ? node.MaxIndex.Y + 1 : node.MinIndex.Y - 1;
 
-            for (int x = node.Min.X; x <= node.Max.X; x++)
-            for (int z = node.Min.Z; z <= node.Max.Z; z++)
+            for (int x = node.MinIndex.X; x <= node.MaxIndex.X; x++)
+            for (int z = node.MinIndex.Z; z <= node.MaxIndex.Z; z++)
             {
                 var pos = new Vector3Int(x, y, z);
 
@@ -105,10 +105,10 @@ public class MeshBuilder
         }
 
         // Z
-        int zFixed = normal.Z > 0 ? node.Max.Z + 1 : node.Min.Z - 1;
+        int zFixed = normal.Z > 0 ? node.MaxIndex.Z + 1 : node.MinIndex.Z - 1;
 
-        for (int x = node.Min.X; x <= node.Max.X; x++)
-        for (int y = node.Min.Y; y <= node.Max.Y; y++)
+        for (int x = node.MinIndex.X; x <= node.MaxIndex.X; x++)
+        for (int y = node.MinIndex.Y; y <= node.MaxIndex.Y; y++)
         {
             var pos = new Vector3Int(x, y, zFixed);
 
@@ -138,7 +138,7 @@ public class MeshBuilder
 
     private void AddFace(VoxelOctree.OctreeNode node, Vector3Int normal)
     {
-        var facePosition = (Vector3)node.Min;
+        var facePosition = (Vector3)node.MinIndex;
         var faceNormal = (Vector3)normal;
         var vCount = (uint)_vertices.Count;
         var normalIndex = GetFaceIndex(normal);

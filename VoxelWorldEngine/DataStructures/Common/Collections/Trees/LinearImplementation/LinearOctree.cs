@@ -6,6 +6,7 @@ namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImpleme
 public class LinearOctree<T>
 {
     public int MaxDepth { get; set; }
+    public int Count => _nodes.Count;
     private readonly List<LinearOctreeNode<T>> _nodes; // TODO: make stack with free cells indices (after merge)
 
     public LinearOctree(int maxDepth)

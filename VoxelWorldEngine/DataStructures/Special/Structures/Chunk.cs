@@ -24,8 +24,8 @@ public class Chunk
 
     public Vector3Int GlobalPosition {get; private set;}
     
-    // public Vector3Int Min => GlobalPosition;
-    // public Vector3Int Max => GlobalPosition + Vector3Int.One * ChunkSize;
+    // public Vector3Int MinIndex => GlobalPosition;
+    // public Vector3Int MaxIndex => GlobalPosition + Vector3Int.One * ChunkSize;
 
 
     public Chunk(Vector3Int position)
