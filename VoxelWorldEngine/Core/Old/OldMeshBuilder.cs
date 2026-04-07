@@ -1,43 +1,66 @@
 ﻿using System.Numerics;
 using VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Collections;
 using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
-using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.Core.Builders;
 
-public class MeshBuilder : IMeshBuilder, IOctreeVisitor<Voxel>
+public class OldMeshBuilder
 {
-    private List<uint> _indices = new(4096);
-    private List<ChunkVertex> _vertices = new(4096);
+    private VoxelOctree _octree;
 
-    private IVoxelOctree _octree;
-    
-    public MeshData Build(IVoxelOctree octree)
+    private bool?[,,] _isEmptyCache = new bool?[Chunk.ChunkSize, Chunk.ChunkSize, Chunk.ChunkSize];
+
+    private Stack<VoxelOctree.OctreeNode> _stack = new();
+
+    private List<uint> _indices = new (4096);
+    private List<ChunkVertex> _vertices = new (4096);
+
+
+    public MeshData Build(VoxelOctree octree)
     {
         _octree = octree;
-        _isEmptyCache = new bool?[Chunk.ChunkSize, Chunk.ChunkSize, Chunk.ChunkSize]; // або пул
-        octree.Accept(this);
+
+        
+        _stack.Clear();
+        var stack = _stack;
+
+        var counter = 0;
+        stack.Push(_octree.Root());
+
+        while (stack.Count > 0)
+        {
+            var node = stack.Pop();
+
+            if (node.IsLeaf)
+            {
+                if (node.Data.IsEmpty) continue;
+
+                AddFaces(node);
+            }
+            else
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    stack.Push(node.GetChild(i));
+                    counter++;
+                }
+            }
+        }
 
         var mesh = new MeshData(_indices.ToArray(), _vertices.ToArray());
         _indices.Clear();
         _vertices.Clear();
+        Array.Clear(_isEmptyCache, 0, _isEmptyCache.Length);
+
         return mesh;
     }
 
-    public void Visit(IOctreeNodeReadonly<Voxel> node)
-    {
-        if (node.IsLeaf && !node.Data.IsEmpty)
-        {
-            AddFaces(node);
-        }
-    }
-    
-    private void AddFaces(IOctreeNodeReadonly<Voxel> node)
+
+    private void AddFaces(VoxelOctree.OctreeNode node)
     {
         for (int i = 0; i < 6; i++)
         {
@@ -49,9 +72,7 @@ public class MeshBuilder : IMeshBuilder, IOctreeVisitor<Voxel>
         }
     }
 
-    private bool?[,,] _isEmptyCache = new bool?[Chunk.ChunkSize, Chunk.ChunkSize, Chunk.ChunkSize];
-    
-    private bool FaceCulling(IOctreeNodeReadonly<Voxel> node, Vector3Int normal)
+    private bool FaceCulling(VoxelOctree.OctreeNode node, Vector3Int normal)
     {
         if (normal.X != 0)
         {
@@ -99,7 +120,7 @@ public class MeshBuilder : IMeshBuilder, IOctreeVisitor<Voxel>
 
     private bool IsEmpty(Vector3Int pos)
     {
-        if (!pos.IsInBounds(_octree.Size))
+        if (!pos.IsInBounds(_octree.Root().Size))
         {
             return true;
         }
@@ -114,53 +135,8 @@ public class MeshBuilder : IMeshBuilder, IOctreeVisitor<Voxel>
 
     }
 
-    //
-    // private bool FaceCulling(IOctreeNodeReadonly<Voxel> node, Vector3Int normal)
-    // {
-    //     var neighbor =  node.GetNeighbor(normal);
-    //     if (neighbor == null) return false;
-    //     // return !neighbor.Data.IsEmpty;
-    //
-    //     var neighborFace = GetNeighborFaceIndices(node, normal);
-    //     var queryResult = neighbor.Query(neighborFace.min, neighborFace.max);
-    //     return queryResult.All(v => !v.IsEmpty);
-    // }
-    //
-    //
-    public (Vector3Int min, Vector3Int max) GetNeighborFaceIndices(IOctreeNodeReadonly<Voxel> node, Vector3Int normal)
-    {
-        Vector3Int neighborMin;
-        Vector3Int neighborMax;
-    
-        Vector3Int startFaceMin = new Vector3Int(
-            normal.X > 0 ? node.MaxIndex.X : node.MinIndex.X,
-            normal.Y > 0 ? node.MaxIndex.Y : node.MinIndex.Y,
-            normal.Z > 0 ? node.MaxIndex.Z : node.MinIndex.Z
-        );
 
-        Vector3Int startFaceMax = new Vector3Int(
-            normal.X < 0 ? node.MinIndex.X : node.MaxIndex.X,
-            normal.Y < 0 ? node.MinIndex.Y : node.MaxIndex.Y,
-            normal.Z < 0 ? node.MinIndex.Z : node.MaxIndex.Z
-        );
-
-        neighborMin = startFaceMin + normal;
-        neighborMax = startFaceMax + normal;
-        
-        if (normal.X != 0) {
-            neighborMin.X = neighborMax.X = (normal.X > 0) ? node.MaxIndex.X + 1 : node.MinIndex.X - 1;
-        }
-        else if (normal.Y != 0) {
-            neighborMin.Y = neighborMax.Y = (normal.Y > 0) ? node.MaxIndex.Y + 1 : node.MinIndex.Y - 1;
-        }
-        else if (normal.Z != 0) {
-            neighborMin.Z = neighborMax.Z = (normal.Z > 0) ? node.MaxIndex.Z + 1 : node.MinIndex.Z - 1;
-        }
-
-        return (neighborMin, neighborMax);
-    }
-    
-    private void AddFace(IOctreeNodeReadonly<Voxel> node, Vector3Int normal)
+    private void AddFace(VoxelOctree.OctreeNode node, Vector3Int normal)
     {
         var facePosition = (Vector3)node.MinIndex;
         var faceNormal = (Vector3)normal;
@@ -187,9 +163,7 @@ public class MeshBuilder : IMeshBuilder, IOctreeVisitor<Voxel>
         _indices.Add(vCount + 3);
         _indices.Add(vCount + 0);
     }
-    
-    
-    
+
     private static readonly Vector2[] FaceUVs =
     [
         new(0, 0), // Нижній лівий

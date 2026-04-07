@@ -13,23 +13,21 @@ class Program
     static void Main(string[] args)
     {
         var seed = 151234;
-        var iterations = 100;
-        // Console.WriteLine("\n-- Top surface chunk");
-        // ProfileBuildMethod(seed, new Vector3Int(0, 0, 0), iterations);
-        // Console.WriteLine("\n-- Down surface chunk");
-        // ProfileBuildMethod(seed, new Vector3Int(0, -1, 0), iterations);
+        
+        // Можна вибрати один або обидва методи тестування
+        // ProfileBuildMethod(seed, new Vector3Int(0, 0, 0), 100);
         
         ProfileBuildAreaMethod(seed, new Vector3Int(-5, 0, -5), new Vector3Int(5, 1, 5));
+        
         Counter.Display();
     }
-    
 
-    private static void ProfileBuildMethod(int seed, Vector3Int position, int iterations = 100)
+    private static void ProfileBuildMethod(int seed, Vector3Int position, int iterations = 200)
     {
-        // Накопичувачі часу для кожного етапу (в мілісекундах)
         double totalGenTime = 0;
         double totalOctreeTime = 0;
-        double totalMeshTime = 0;
+        double totalOldMeshTime = 0;
+        double totalNewMeshTime = 0;
         double totalChunkTime = 0;
 
         Stopwatch sw = new Stopwatch();
@@ -42,7 +40,6 @@ class Program
 
             // 1. Етап Генератора
             sw.Restart();
-
             IGenerator generator = new ProceduralGenerator(seed, Chunk.ChunkToGlobal(position));
             sw.Stop();
             totalGenTime += sw.Elapsed.TotalMilliseconds;
@@ -54,41 +51,38 @@ class Program
             sw.Stop();
             totalOctreeTime += sw.Elapsed.TotalMilliseconds;
 
-            // 3. Етап Генерації Mesh
+            // 3a. Етап Генерації Mesh (Старий)
             sw.Restart();
-            var meshBuilder = new MeshBuilder();
-            var mesh = meshBuilder.Build(octree);
+            var oldMeshBuilder = new OldMeshBuilder();
+            var oldMesh = oldMeshBuilder.Build(octree);
             sw.Stop();
-            totalMeshTime += sw.Elapsed.TotalMilliseconds;
+            totalOldMeshTime += sw.Elapsed.TotalMilliseconds;
+
+            // 3b. Етап Генерації Mesh (Новий)
+            sw.Restart();
+            var newMeshBuilder = new MeshBuilder();
+            var newMesh = newMeshBuilder.Build(octree);
+            sw.Stop();
+            totalNewMeshTime += sw.Elapsed.TotalMilliseconds;
 
             // 4. Етап Створення об'єкта Chunk
             sw.Restart();
             var chunk = new Chunk(position);
             chunk.Octree = octree;
-            chunk.Mesh = mesh;
+            chunk.Mesh = newMesh; // Використовуємо новий меш
             sw.Stop();
             totalChunkTime += sw.Elapsed.TotalMilliseconds;
         }
 
-        // Вивід результатів
-        Console.WriteLine("--- Результати (Середній час на етап) ---");
-        PrintResult("Generator Setup", totalGenTime, iterations);
-        PrintResult("Octree Build   ", totalOctreeTime, iterations);
-        PrintResult("Mesh Building  ", totalMeshTime, iterations);
-        PrintResult("Chunk Instance ", totalChunkTime, iterations);
-
-        double grandTotal = totalGenTime + totalOctreeTime + totalMeshTime + totalChunkTime;
-        double grandAverage = grandTotal / iterations;
-        Console.WriteLine($"Загальний час: {grandTotal:N2} ms");
-        Console.WriteLine($"Загальний середній час: {grandAverage:F4} ms");
+        PrintFinalResults(iterations, totalGenTime, totalOctreeTime, totalOldMeshTime, totalNewMeshTime, totalChunkTime);
     }
 
     private static void ProfileBuildAreaMethod(int seed, Vector3Int min, Vector3Int max)
     {
-        // Накопичувачі часу для кожного етапу (в мілісекундах)
         double totalGenTime = 0;
         double totalOctreeTime = 0;
-        double totalMeshTime = 0;
+        double totalOldMeshTime = 0;
+        double totalNewMeshTime = 0;
         double totalChunkTime = 0;
 
         Stopwatch sw = new Stopwatch();
@@ -99,58 +93,67 @@ class Program
         for (int x = 0; x < max.X - min.X; x++)
         for (int y = 0; y < max.Y - min.Y; y++)
         for (int z = 0; z < max.Z - min.Z; z++)
-
         {
             var position = new Vector3Int(min.X + x, min.Y + y, min.Z + z);
             Counter.Increment(CounterType.VoxelOctreeBuild);
 
-            // 1. Етап Генератора
             sw.Restart();
-
             IGenerator generator = new ProceduralGenerator(seed, Chunk.ChunkToGlobal(position));
             sw.Stop();
             totalGenTime += sw.Elapsed.TotalMilliseconds;
 
-            // 2. Етап Побудови Octree
             sw.Restart();
             var octree = new VoxelOctree();
             octree.Build(generator);
             sw.Stop();
             totalOctreeTime += sw.Elapsed.TotalMilliseconds;
 
-            // 3. Етап Генерації Mesh
+            // Old Mesh Builder
             sw.Restart();
-            var meshBuilder = new MeshBuilder();
-            var mesh = meshBuilder.Build(octree);
+            var oldMeshBuilder = new OldMeshBuilder();
+            oldMeshBuilder.Build(octree);
             sw.Stop();
-            totalMeshTime += sw.Elapsed.TotalMilliseconds;
+            totalOldMeshTime += sw.Elapsed.TotalMilliseconds;
 
-            // 4. Етап Створення об'єкта Chunk
+            // New Mesh Builder
+            sw.Restart();
+            var newMeshBuilder = new MeshBuilder();
+            var newMesh = newMeshBuilder.Build(octree);
+            sw.Stop();
+            totalNewMeshTime += sw.Elapsed.TotalMilliseconds;
+
             sw.Restart();
             var chunk = new Chunk(position);
             chunk.Octree = octree;
-            chunk.Mesh = mesh;
+            chunk.Mesh = newMesh;
             sw.Stop();
             totalChunkTime += sw.Elapsed.TotalMilliseconds;
         }
 
-        // Вивід результатів
-        Console.WriteLine("--- Результати (Середній час на етап) ---");
-        PrintResult("Generator Setup", totalGenTime, iterations);
-        PrintResult("Octree Build   ", totalOctreeTime, iterations);
-        PrintResult("Mesh Building  ", totalMeshTime, iterations);
-        PrintResult("Chunk Instance ", totalChunkTime, iterations);
+        PrintFinalResults(iterations, totalGenTime, totalOctreeTime, totalOldMeshTime, totalNewMeshTime, totalChunkTime);
+    }
 
-        double grandTotal = totalGenTime + totalOctreeTime + totalMeshTime + totalChunkTime;
-        double grandAverage = grandTotal / iterations;
-        Console.WriteLine($"Загальний час: {grandTotal:N2} ms");
-        Console.WriteLine($"Загальний середній час: {grandAverage:F4} ms");
+    private static void PrintFinalResults(int iterations, double totalGen, double totalOct, double totalOldM, double totalNewM, double totalChunk)
+    {
+        Console.WriteLine("\n--- Результати (Середній час на етап) ---");
+        PrintResult("Generator Setup ", totalGen, iterations);
+        PrintResult("Octree Build    ", totalOct, iterations);
+        PrintResult("Old Mesh Builder", totalOldM, iterations);
+        PrintResult("New Mesh Builder", totalNewM, iterations);
+        PrintResult("Chunk Instance  ", totalChunk, iterations);
+
+        Console.WriteLine("-----------------------------------------");
+        double diff = totalOldM - totalNewM;
+        string comparison = diff > 0 ? "швидше" : "повільніше";
+        double percent = (Math.Abs(diff) / totalOldM) * 100;
+        
+        Console.WriteLine($"Новий білдер {comparison} за старий на {Math.Abs(diff/iterations):F4} ms ({percent:F1}%)");
+        Console.WriteLine($"Загальний середній час (з новим): {(totalGen + totalOct + totalNewM + totalChunk) / iterations:F4} ms");
     }
 
     private static void PrintResult(string label, double totalMs, int count)
     {
         double average = totalMs / count;
-        // Використовуємо F4 для точності до 4 знаків після коми
-        Console.WriteLine($"{label}: {average:F3} ms");
+        Console.WriteLine($"{label}: {average:F4} ms");
     }
 }

@@ -4,13 +4,15 @@ namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
 public interface IOctree<T>
 {
+    int MaxDepth { get; }
+    int Size { get; }
+    int Count { get; }
     bool IsEmpty { get; }
-    
     void Clear();
 
     IEnumerable<T> Query(Vector3Int min, Vector3Int max);
     void Accept(IOctreeVisitor<T> visitor);
-
+    T GetData(Vector3Int position);
     // IOctreeNode<T> Root(); // TODO: remove?
 
 
@@ -35,6 +37,8 @@ public interface IOctreeNodeReadonly<out T>
     bool IsLeaf { get; }
     
     IOctreeNodeReadonly<T>? GetNeighbor(Vector3Int direction);
+    IEnumerable<T> Query(Vector3Int min, Vector3Int max);
+
 }
 
 public interface IOctreeVisitor<T>

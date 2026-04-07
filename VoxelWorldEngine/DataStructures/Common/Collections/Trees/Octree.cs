@@ -16,6 +16,7 @@ public partial class Octree<T> : IOctree<T>
         _linearOctree = new LinearOctree<T>(MaxDepth);
     }
 
+    public int Count => _linearOctree.Count;
     public bool IsEmpty => _linearOctree.Root.IsLeaf;
 
 
@@ -45,7 +46,7 @@ public partial class Octree<T> : IOctree<T>
         return root;
     }
 
-    internal T GetData(Vector3Int position)
+    public T GetData(Vector3Int position)
     {
         Counter.Increment(CounterType.VoxelOctreeGetData);
 

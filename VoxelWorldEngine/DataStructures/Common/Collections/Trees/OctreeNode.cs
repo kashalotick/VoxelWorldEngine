@@ -1,5 +1,6 @@
 ﻿using VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
@@ -97,7 +98,6 @@ public partial class Octree<T>
             };
         }
 
-
         public IEnumerable<T> Query(Vector3Int min, Vector3Int max)
         {
             if (!Intersects(min, max))
@@ -126,10 +126,7 @@ public partial class Octree<T>
 
         internal void QueryRecursive(List<T> queryResult, Vector3Int min, Vector3Int max)
         {
-            if (!Intersects(min, max))
-            {
-                return;
-            }
+            if (!Intersects(min, max)) return;
 
             if (IsLeaf)
             {
