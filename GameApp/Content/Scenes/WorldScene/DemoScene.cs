@@ -22,7 +22,7 @@ using VoxelWorldEngine.Utils;
 
 namespace GameApp.Content.Scenes.WorldScene;
 
-public class DemoScene : Scene
+public class DemoScene : BaseScene
 {
     private ChunkLoadingSystem _chunkLoadingSystem;
 
@@ -47,7 +47,7 @@ public class DemoScene : Scene
 
     private double _elapsedTime;
 
-    public DemoScene(GameContext gameContext, WorldRepository repository, WorldMeta worldMeta) : base(gameContext)
+    public DemoScene(MyGameContext gameContext, WorldRepository repository, WorldMeta worldMeta) : base(gameContext)
     {
         _worldRepository = repository;
         _worldMeta = worldMeta;

@@ -23,7 +23,7 @@ public class WorldTile : StaticElement
     
 
     public WorldTile(
-        GameContext gameContext,
+        MyGameContext gameContext,
         WorldMeta meta
     ) : base(gameContext.ShaderRepository.Get("plain"), gameContext.TextureRepository.Get("Plain"))
     {

@@ -18,7 +18,7 @@ using OpenTK.Mathematics;
 
 namespace GameApp.Content.Scenes;
 
-public class MainMenu : Scene
+public class MainMenu : BaseScene
 {
     private const int SlotCount = 3;
     private const int TileWidth = 170;
@@ -30,7 +30,7 @@ public class MainMenu : Scene
     private Font _pixelFont;
     private WorldRepository _repository;
 
-    public MainMenu(GameContext gameContext) : base(gameContext)
+    public MainMenu(MyGameContext gameContext) : base(gameContext)
     {
     }
 

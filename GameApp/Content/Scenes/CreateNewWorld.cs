@@ -16,7 +16,7 @@ using OpenTK.Graphics.OpenGL4;
 
 namespace GameApp.Content.Scenes;
 
-public class CreateNewWorld : Scene
+public class CreateNewWorld : BaseScene
 {
     private Shader _plainShader;
     private GLTexture _emptyGlTexture;
@@ -31,7 +31,7 @@ public class CreateNewWorld : Scene
     private const int FormWidth = 180;
 
 
-    public CreateNewWorld(GameContext gameContext, WorldRepository repository, int slot) : base(gameContext)
+    public CreateNewWorld(MyGameContext gameContext, WorldRepository repository, int slot) : base(gameContext)
     {
         _repository = repository;
         _slot = slot;
