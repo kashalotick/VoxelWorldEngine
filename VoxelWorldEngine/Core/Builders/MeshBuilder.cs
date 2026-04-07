@@ -14,13 +14,9 @@ public class MeshBuilder : IMeshBuilder, IOctreeVisitor<Voxel>
 {
     private List<uint> _indices = new(4096);
     private List<ChunkVertex> _vertices = new(4096);
-
-    private IVoxelOctree _octree;
     
     public MeshData Build(IVoxelOctree octree)
     {
-        _octree = octree;
-        _isEmptyCache = new bool?[Chunk.ChunkSize, Chunk.ChunkSize, Chunk.ChunkSize]; // або пул
         octree.Accept(this);
 
         var mesh = new MeshData(_indices.ToArray(), _vertices.ToArray());
@@ -48,85 +44,19 @@ public class MeshBuilder : IMeshBuilder, IOctreeVisitor<Voxel>
             AddFace(node, normal);
         }
     }
-
-    private bool?[,,] _isEmptyCache = new bool?[Chunk.ChunkSize, Chunk.ChunkSize, Chunk.ChunkSize];
     
     private bool FaceCulling(IOctreeNodeReadonly<Voxel> node, Vector3Int normal)
     {
-        if (normal.X != 0)
-        {
-            int x = normal.X > 0 ? node.MaxIndex.X + 1 : node.MinIndex.X - 1;
-
-            for (int y = node.MinIndex.Y; y <= node.MaxIndex.Y; y++)
-            for (int z = node.MinIndex.Z; z <= node.MaxIndex.Z; z++)
-            {
-                var pos = new Vector3Int(x, y, z);
-
-                if (IsEmpty(pos)) return false;
-            }
-
-            return true;
-        }
-
-        if (normal.Y != 0)
-        {
-            int y = normal.Y > 0 ? node.MaxIndex.Y + 1 : node.MinIndex.Y - 1;
-
-            for (int x = node.MinIndex.X; x <= node.MaxIndex.X; x++)
-            for (int z = node.MinIndex.Z; z <= node.MaxIndex.Z; z++)
-            {
-                var pos = new Vector3Int(x, y, z);
-
-                if (IsEmpty(pos)) return false;
-            }
-
-            return true;
-        }
-
-        // Z
-        int zFixed = normal.Z > 0 ? node.MaxIndex.Z + 1 : node.MinIndex.Z - 1;
-
-        for (int x = node.MinIndex.X; x <= node.MaxIndex.X; x++)
-        for (int y = node.MinIndex.Y; y <= node.MaxIndex.Y; y++)
-        {
-            var pos = new Vector3Int(x, y, zFixed);
-
-            if (IsEmpty(pos)) return false;
-        }
-
-        return true;
-    }
-
-    private bool IsEmpty(Vector3Int pos)
-    {
-        if (!pos.IsInBounds(_octree.Size))
-        {
-            return true;
-        }
-
-        var cached = _isEmptyCache[pos.X, pos.Y, pos.Z];
-        if (cached.HasValue)
-            return cached.Value;
+        var neighbor =  node.GetNeighbor(normal);
+        if (neighbor == null) return false;
+        // return !neighbor.Data.IsEmpty;
     
-        var isEmpty = _octree.GetData(pos).IsEmpty;
-        _isEmptyCache[pos.X, pos.Y, pos.Z] = isEmpty;
-        return isEmpty;
-
+        var neighborFace = GetNeighborFaceIndices(node, normal);
+        var queryResult = neighbor.Query(neighborFace.min, neighborFace.max);
+        return queryResult.All(v => !v.IsEmpty);
     }
-
-    //
-    // private bool FaceCulling(IOctreeNodeReadonly<Voxel> node, Vector3Int normal)
-    // {
-    //     var neighbor =  node.GetNeighbor(normal);
-    //     if (neighbor == null) return false;
-    //     // return !neighbor.Data.IsEmpty;
-    //
-    //     var neighborFace = GetNeighborFaceIndices(node, normal);
-    //     var queryResult = neighbor.Query(neighborFace.min, neighborFace.max);
-    //     return queryResult.All(v => !v.IsEmpty);
-    // }
-    //
-    //
+    
+    
     public (Vector3Int min, Vector3Int max) GetNeighborFaceIndices(IOctreeNodeReadonly<Voxel> node, Vector3Int normal)
     {
         Vector3Int neighborMin;
