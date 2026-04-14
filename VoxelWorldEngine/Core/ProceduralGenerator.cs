@@ -12,8 +12,8 @@ public class ProceduralGenerator : IGenerator
     private FastNoise _noise;
     private FastNoise _noise2;
 
-    private const int DirtDepth = 4;
-    private const int GrassDepth = 1; // Тепер використовується
+    private const int MaxDirtDepth = 4;     // максимальна глибина землі
+    private const int MaxGrassDepth = 1;
 
     private (Vector2Int min, Vector2Int max) _cacheVector;
     private (float min, float max) _cacheValue;
@@ -37,31 +37,33 @@ public class ProceduralGenerator : IGenerator
 
         var height = Evaluate(min, max);
 
-        // 1. Повністю під dirt-зоною — гарантовано камінь
-        if (max.Y <= height.min - DirtDepth)
+        // 1. Повністю під землею — камінь
+        if (max.Y <= height.min - GetDirtDepth(height.min))
             return new Voxel(BlockId.Stone);
 
-        // 2. Повністю над поверхнею — гарантовано повітря
+        // 2. Повністю над поверхнею — повітря
         if (min.Y > height.max)
             return new Voxel(BlockId.Air);
 
-        // Визначаємо тип блоку для змішаних зон (або листкових нод 1x1x1)
         var centerY = (min.Y + max.Y) / 2f;
         var centerHeight = (height.min + height.max) / 2f;
 
-        // Повітря над поверхнею
+        // Повітря
         if (centerY > centerHeight)
             return new Voxel(BlockId.Air);
 
-        // Трава — самий верхній шар (товщиною GrassDepth)
-        if (centerY > centerHeight - GrassDepth)
+        float surfaceHeight = centerHeight;
+        int dirtDepth = GetDirtDepth(surfaceHeight);
+
+        // Трава — самий верх (товщиною 1)
+        if (centerY > surfaceHeight - MaxGrassDepth)
             return new Voxel(BlockId.Grass);
 
-        // Земля — під травою до певної глибини
-        if (centerY > centerHeight - DirtDepth)
+        // Земля
+        if (centerY > surfaceHeight - dirtDepth)
             return new Voxel(BlockId.Dirt);
 
-        // Камінь — все, що глибше за DirtDepth (виправляє баг з землею внизу)
+        // Все нижче — камінь (в горах камінь виходить майже на поверхню)
         return new Voxel(BlockId.Stone);
     }
 
@@ -72,14 +74,36 @@ public class ProceduralGenerator : IGenerator
 
         var height = Evaluate(min, max);
 
-        // Регіон однорідний, якщо він повністю в зоні каменю або повністю в повітрі
-        if (max.Y <= height.min - DirtDepth)
+        int dirtDepth = GetDirtDepth((height.min + height.max) / 2f);
+
+        if (max.Y <= height.min - dirtDepth)
             return true;
 
         if (min.Y > height.max)
             return true;
 
         return false;
+    }
+
+    // НОВА ФУНКЦІЯ — глибина землі залежить від висоти поверхні
+    private int GetDirtDepth(float surfaceHeight)
+    {
+        // Чим вище гора — тим тонший шар землі
+        // На висоті ~40+ майже немає землі (камінь проглядається)
+        const float minHeightForThinDirt = 20f;
+        const float maxHeightForStone = 45f;
+
+        if (surfaceHeight <= minHeightForThinDirt)
+            return MaxDirtDepth;                    // рівнина — нормальна земля 4 блоки
+
+        if (surfaceHeight >= maxHeightForStone)
+            return 0;                               // дуже високі гори — чисто камінь зверху
+
+        // Плавне зменшення глибини землі на середніх висотах
+        float t = (surfaceHeight - minHeightForThinDirt) / 
+                  (maxHeightForStone - minHeightForThinDirt);
+        
+        return (int)MathF.Max(0, MaxDirtDepth * (1f - t * 1.1f)); // 1.1f щоб трохи швидше сходило до 0
     }
 
     private (float min, float max) Evaluate(Vector3Int min, Vector3Int max)
@@ -90,11 +114,8 @@ public class ProceduralGenerator : IGenerator
         const int absoluteMin = -32;
         const int absoluteMax = 156;
 
-        if (max.Y <= absoluteMin)
-            return (absoluteMin, absoluteMin);
-
-        if (min.Y >= absoluteMax)
-            return (absoluteMax, absoluteMax);
+        if (max.Y <= absoluteMin) return (absoluteMin, absoluteMin);
+        if (min.Y >= absoluteMax) return (absoluteMax, absoluteMax);
 
         if (_cacheVector == (min2, max2))
             return _cacheValue;
