@@ -18,6 +18,7 @@ using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
+using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 using VoxelWorldEngine.Utils;
 
 namespace GameApp.Content.Scenes.WorldScene;
@@ -62,6 +63,7 @@ public class DemoScene : BaseScene
         GL.Enable(EnableCap.CullFace);
         GL.Enable(EnableCap.Blend);
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+        // GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);        
 
         LoadWorld();
         LoadRaycasting();
@@ -85,23 +87,27 @@ public class DemoScene : BaseScene
 
     private void LoadWorld()
     {
-        var chunkShader = GameContext.ShaderRepository.Get("chunk");
-        var cubeShader = GameContext.ShaderRepository.Get("shader");
-        var stoneTexture = GameContext.TextureRepository.Get("Stone");
+        var (array, map) = new BlockMapper().Build(GameContext.TextureArrayRepository);
+
+        var material = new GameWorldMaterial(
+            GameContext.ShaderRepository.Get("chunk"),
+            GameContext.TextureArrayRepository.Get("Blocks"),
+            16
+        );
+        Console.WriteLine(material);
 
         _voxelWorld = _worldRepository.LoadWorld(_worldMeta);
         var worldState = _worldRepository.LoadState(_worldMeta.Slot);
         _worldState = worldState ?? new WorldState();
 
-        _gameWorld = new GameWorld(_voxelWorld, chunkShader, stoneTexture);
+        _gameWorld = new GameWorld(_voxelWorld, material);
         _voxelWorld.ChunkAdded += _gameWorld.AddChunk;
         _voxelWorld.ChunkRemoved += _gameWorld.RemoveChunk;
         _gameWorld.Load();
 
         _chunkLoadingSystem = SOR.Register(new ChunkLoadingSystem(_voxelWorld));
 
-        LightComposition(chunkShader, stoneTexture);
-        LightComposition(cubeShader, stoneTexture);
+        LightComposition(material.Shader);
     }
 
     private void LoadRaycasting()
@@ -203,7 +209,7 @@ public class DemoScene : BaseScene
         _rayHit.Update(deltaTime);
     }
 
-    private static void LightComposition(IShader shader, ITexture texture)
+    private static void LightComposition(IShader shader)
     {
         shader.Use();
         shader.SetVector3("lightColor", new Vector3(1.0f, 1.0f, 0.95f));

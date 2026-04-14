@@ -3,6 +3,7 @@ using LearningOpenTK.Core;
 using LearningOpenTK.Core.Scenes;
 using LearningOpenTK.Engine.Resources.Fonts;
 using LearningOpenTK.Engine.Resources.Textures;
+using LearningOpenTK.Engine.Resources.Textures.Array;
 using LearningOpenTK.Resources.Repositories;
 
 
@@ -20,6 +21,7 @@ public class Program
             (w, h) =>
             {
                 var textureRepository = new GLTextureRepository();
+                var textureArrayRepository = new TextureArrayRepository();
                 return new MyGameContext
                 {
                     ScreenWidth = w,
@@ -28,7 +30,9 @@ public class Program
                     ShaderRepository = new ShaderRepository(),
                     FontRepository = new FontRepository(),
                     UiAtlas = new AtlasTextureRepository(textureRepository, "Ui"),
-                    BlockAtlas = new AtlasTextureRepository(textureRepository, "Blocks"),
+                    TextureArrayRepository = textureArrayRepository,
+                    // BlockArray = new BlockMapper().Build(textureArrayRepository);
+                    // BlockAtlas = new AtlasTextureRepository(textureRepository, "Blocks"),
                 };
             });
 

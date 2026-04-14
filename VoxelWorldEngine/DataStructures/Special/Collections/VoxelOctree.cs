@@ -22,9 +22,33 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
         }
 
         node.Split();
+        var shouldMerge = true;
+        Voxel? childVoxel = null;
         for (int i = 0; i < 8; i++)
         {
-            BuildRecursive(generator, node.GetChild(i));
+            var child = node.GetChild(i);
+            BuildRecursive(generator, child);
+            
+            if (!child.IsLeaf)
+            {
+                shouldMerge = false;
+            }
+            else
+            {
+                if (childVoxel == null)
+                {
+                    childVoxel = child.Data;
+                } else if (!Equals(childVoxel, child.Data))
+                {
+                    shouldMerge = false;
+                }
+            }
+
+        }
+        if (shouldMerge)
+        {
+            node.Data = childVoxel ??  new Voxel();
+            node.Merge();
         }
     }
 

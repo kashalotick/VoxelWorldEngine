@@ -3,6 +3,8 @@
 public enum BlockId : byte
 {
     Air,
+    Stone,
+    Dirt,
+    Grass,
     Mixed,
-    Stone
 }

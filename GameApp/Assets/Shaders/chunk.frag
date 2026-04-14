@@ -7,7 +7,8 @@ flat in uint blockId;
 
 out vec4 FragColor;
 
-uniform sampler2D texture0;
+uniform sampler2DArray uTextureArray;
+
 uniform vec3 lightColor;
 uniform vec3 lightDirection;
 uniform vec4 ambientColor;
@@ -16,6 +17,7 @@ uniform float shininess;
 
 uniform vec3 fogColor = vec3(0.5, 0.6, 0.7);
 uniform float fogDensity = 0.002;
+
 
 vec3 applyFog(vec3 lightingResult) {
     float dist = length(viewPos - fragPos);
@@ -36,7 +38,7 @@ void main()
 
     float diff = max(dot(N, L), 0.0);
 
-    vec3 tex = texture(texture0, texCoord).rgb;
+    vec3 tex = texture(uTextureArray, vec3(texCoord, blockId)).rgb;
 
     float spec = pow(max(dot(V, R), 0.0), shininess);
     

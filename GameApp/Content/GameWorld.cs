@@ -1,6 +1,8 @@
-﻿using LearningOpenTK.Core.DTO;
+﻿using System.Runtime.InteropServices;
+using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Engine.Resources.Textures;
+using LearningOpenTK.Engine.Resources.Textures.Array;
 using LearningOpenTK.Entities.World;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
@@ -12,20 +14,24 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 namespace GameApp.Content;
 
 // TODO: inherit some scene collection class idk (common for scene)
+public record GameWorldMaterial(
+    IShader Shader,
+    ITextureArray TextureArray,
+    float TileScale
+);
 
 public class GameWorld : ILoadable, IRenderable
 {
-    private IShader _worldShader;
-    private ITexture _worldTexture;
+    private GameWorldMaterial _material;
+    private float[] _tileOffsets;
     private VoxelWorld _voxelWorld;
 
     private Dictionary<Vector3Int, WorldObject> _chunks = new();
 
-    public GameWorld(VoxelWorld voxelWorld, IShader shader, ITexture texture)
+    public GameWorld(VoxelWorld voxelWorld, GameWorldMaterial material)
     {
         _voxelWorld = voxelWorld;
-        _worldShader = shader;
-        _worldTexture = texture;
+        _material = material;
     }
 
     public void AddChunk(Chunk chunk)
@@ -40,7 +46,6 @@ public class GameWorld : ILoadable, IRenderable
         if (wo.Mesh != null)
         {
             wo.Load();
-
         }
     }
 
@@ -65,7 +70,7 @@ public class GameWorld : ILoadable, IRenderable
         }
         // var mesh = new ChunkMesh(chunk.Mesh.Vertices, chunk.Mesh.Indices);
 
-        var obj = new WorldObject(mesh, _worldShader, _worldTexture);
+        var obj = new WorldObject(mesh, _material.Shader, _material.TextureArray);
 
         obj.Transform3D.Position = (Vector3)(System.Numerics.Vector3)chunk.GlobalPosition;
         return obj;
@@ -84,19 +89,19 @@ public class GameWorld : ILoadable, IRenderable
         GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.CullFace);
 
-        _worldTexture.Use(TextureUnit.Texture0);
-        _worldShader.Use();
-
-        _worldShader.SetMatrix4("view", context.ViewMatrix);
-        _worldShader.SetMatrix4("projection", context.ProjectionMatrix3D);
-        _worldShader.SetVector3("viewPos", context.CameraPosition);
+        _material.TextureArray.Use(TextureUnit.Texture0);
+        _material.Shader.Use();
+        _material.Shader.SetMatrix4("view", context.ViewMatrix);
+        _material.Shader.SetMatrix4("projection", context.ProjectionMatrix3D);
+        _material.Shader.SetVector3("viewPos", context.CameraPosition);
+        _material.Shader.SetFloat("tileScale", _material.TileScale);
 
         var chunks = _chunks.Count;
 
         foreach (var chunk in _chunks)
         {
             if (chunk.Value.Mesh == null) continue;
-            
+
             if (_voxelWorld.Chunks.TryGetValue(chunk.Key, out var chunkData))
             {
                 var globalPos = (Vector3)(System.Numerics.Vector3)chunkData.GlobalPosition; // TODO
@@ -105,10 +110,10 @@ public class GameWorld : ILoadable, IRenderable
             }
 
             var model = chunk.Value.Transform3D.GetModelMatrix();
-            _worldShader.SetMatrix4("model", model);
-            
+            _material.Shader.SetMatrix4("model", model);
+
             var normalMatrix = chunk.Value.Transform3D.GetCubeNormalMatrix(); // TODO: make caching
-            _worldShader.SetMatrix3("normalMatrix", normalMatrix);
+            _material.Shader.SetMatrix3("normalMatrix", normalMatrix);
 
 
             chunk.Value.Mesh.Render();
@@ -117,6 +122,9 @@ public class GameWorld : ILoadable, IRenderable
 
     public void Load()
     {
+        
+        _material.Shader.Use();
+
         foreach (var chunk in _chunks.Values)
         {
             chunk.Load();
