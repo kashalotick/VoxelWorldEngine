@@ -34,7 +34,9 @@ public class Program
                     // BlockArray = new BlockMapper().Build(textureArrayRepository);
                     // BlockAtlas = new AtlasTextureRepository(textureRepository, "Blocks"),
                 };
-            });
+            },
+            "Assets/IconDark.png"
+            );
 
         game.Run();
     }
