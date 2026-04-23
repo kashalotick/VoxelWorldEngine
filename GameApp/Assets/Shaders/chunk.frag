@@ -16,7 +16,7 @@ uniform vec3 viewPos;
 uniform float shininess;
 
 uniform vec3 fogColor = vec3(0.5, 0.6, 0.7);
-uniform float fogDensity = 0.002;
+uniform float fogDensity = 0.003;
 
 
 vec3 applyFog(vec3 lightingResult) {
