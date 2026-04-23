@@ -42,6 +42,8 @@ public class DemoScene : BaseScene
     private VoxelWorld _voxelWorld;
     private GameWorld _gameWorld;
 
+    private Sky _sky;
+
     private WorldRepository _worldRepository;
     private WorldMeta _worldMeta;
     private WorldState _worldState;
@@ -65,6 +67,7 @@ public class DemoScene : BaseScene
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
         // GL.PolygonMode(MaterialFace.FrontAndBack, PolygonMode.Line);        
 
+        LoadSky();
         LoadWorld();
         LoadRaycasting();
         LoadPause();
@@ -84,6 +87,14 @@ public class DemoScene : BaseScene
         SceneContext.RequestWindowAction(new GrabCursor());
     }
 
+    private void LoadSky()
+    {
+        var skyTop = new Vector3(0.35f, 0.65f, 0.95f);
+        var skyBottom = new Vector3(0.85f, 0.95f, 1.0f);
+        
+        _sky = new Sky(GameContext.ShaderRepository.Get("sky"), skyTop, skyBottom);
+        SOR.Register(_sky);
+    }
 
     private void LoadWorld()
     {
@@ -163,6 +174,9 @@ public class DemoScene : BaseScene
 
     protected override void Render(RenderContext renderContext)
     {
+        GL.Enable(EnableCap.DepthTest);
+        _sky.Render(renderContext);
+        
         _fpsCounter.Update(renderContext.DeltaTime);
         _gameWorld.Render(renderContext);
 
