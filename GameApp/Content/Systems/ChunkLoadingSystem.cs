@@ -83,7 +83,7 @@ public class ChunkLoadingSystem : ILoadable
         var shouldBeLoaded = new HashSet<Vector3Int>();
 
         for (int x = -player.ChunkViewRadius; x <= player.ChunkViewRadius; x++)
-        for (int y = -player.ChunkViewRadius; y <= player.ChunkViewRadius; y++)
+        for (int y = -player.ChunkViewHeightRadius; y <= player.ChunkViewHeightRadius; y++)
         for (int z = -player.ChunkViewRadius; z <= player.ChunkViewRadius; z++)
         {
             var chunkPosition = playerChunkPosition + new Vector3Int(x, y, z);
