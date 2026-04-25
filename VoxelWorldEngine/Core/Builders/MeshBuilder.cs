@@ -24,6 +24,7 @@ public class MeshBuilder : IMeshBuilder, IOctreeVisitor<Voxel>
         _vertices.Clear();
         return mesh;
     }
+    
 
     public void Visit(IOctreeNodeReadonly<Voxel> node)
     {

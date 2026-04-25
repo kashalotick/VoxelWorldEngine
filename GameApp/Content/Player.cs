@@ -16,7 +16,8 @@ public class Player
         {
             Position = (System.Numerics.Vector3)obj.Position,
             ViewDirection = (System.Numerics.Vector3)obj.ViewDirection,
-            ChunkViewRadius = obj.ChunkViewRadius
+            ChunkViewRadius = obj.ChunkViewRadius,
+            ChunkViewHeightRadius = obj.ChunkViewHeightRadius
         };
     }
 }

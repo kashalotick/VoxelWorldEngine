@@ -9,6 +9,8 @@ public partial class Octree<T> : IOctree<T>
     public int MaxDepth { get; private set; }
     public int Size => _linearOctree.Size;
     private LinearOctree<T> _linearOctree;
+    
+    // private bool isModified = false;
 
     public Octree()
     {
@@ -54,5 +56,15 @@ public partial class Octree<T> : IOctree<T>
         var node = _linearOctree.GetNode(nodeIndex);
         return node.Data;
 
+    }
+
+    public bool SetData(Vector3Int index, T data)
+    {
+        return _linearOctree.SetData(data, index);
+    }
+
+    public void ModifyArea(Vector3Int minIndex, Vector3Int maxIndex, T data)
+    {
+        _linearOctree.ModifyArea(data, minIndex, maxIndex);
     }
 }

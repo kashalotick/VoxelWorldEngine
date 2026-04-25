@@ -25,12 +25,13 @@ public class LinearOctree<T>
         return _nodes;
     }
 
-    public int GetNodeIndex(Vector3Int position)
+    public int GetNodeIndex(Vector3Int posIndex)
     {
-        if (!position.IsInBounds(Size)) throw new ArgumentOutOfRangeException(nameof(position));
+        // if (!posIndex.IsInBounds(Size)) throw new ArgumentOutOfRangeException(nameof(posIndex));
+        if (!posIndex.IsInBounds(Size)) return -1;
 
-        Span<int> way = stackalloc int[6];
-        OctreeMath.FindWayTo(position, Size, way);
+        Span<int> way = stackalloc int[MaxDepth];
+        OctreeMath.FindWayTo(posIndex, Size, way);
 
         var nodeIndex = RootIndex;
         for (var i = 0; i < way.Length; i++)
@@ -38,8 +39,7 @@ public class LinearOctree<T>
             var node = _nodes[nodeIndex];
             if (node.IsLeaf) return nodeIndex;
 
-            var nexChildOctant = way[i];
-            nodeIndex = node.GetChildIndex(nexChildOctant);
+            nodeIndex = node.GetChildIndex(way[i]);
         }
 
         return nodeIndex;
@@ -48,6 +48,54 @@ public class LinearOctree<T>
     public LinearOctreeNode<T> GetNode(int index)
     {
         return _nodes[index];
+    }
+
+    public bool SetData(T data, Vector3Int posIndex)
+    {
+        if (!posIndex.IsInBounds(Size)) return false;
+
+        Span<int> way = stackalloc int[MaxDepth];
+        Span<int> parentIndices = stackalloc int[MaxDepth];
+
+        OctreeMath.FindWayTo(posIndex, Size, way);
+
+        var nodeIndex = RootIndex;
+        for (var i = 0; i < way.Length; i++)
+        {
+            parentIndices[i] = nodeIndex;
+            var node = _nodes[nodeIndex];
+            if (node.IsLeaf)
+            {
+                Split(nodeIndex);
+            }
+            nodeIndex = _nodes[nodeIndex].GetChildIndex(way[i]);
+        }
+
+        var targetNode = _nodes[nodeIndex];
+        if (targetNode.Data != null && targetNode.Data.Equals(data))
+        {
+            return false;
+        }
+
+        targetNode.Data = data;
+        _nodes[nodeIndex] = targetNode;
+
+        for (var i = way.Length - 1; i >= 0; i--)
+        {
+            var parentIndex = parentIndices[i];
+            if (!TryMerge(parentIndex))
+            {
+                break;
+            }
+        }
+
+        return true;
+    }
+    public void ModifyArea(T data, Vector3Int minIndex, Vector3Int maxIndex)
+    {
+        // split
+        // try merge
+        throw new NotImplementedException();
     }
     
     public void SetNodeData(int index, T data)
@@ -82,26 +130,27 @@ public class LinearOctree<T>
         var parent = _nodes[index];
         if (parent.IsLeaf) return false;
 
-        LinearOctreeNode<T> previous = _nodes[parent.GetChildIndex(0)];
-        var isNodeSame = true;
+        int firstChildIdx = parent.ChildrenStartIndex;
+        var firstChild = _nodes[firstChildIdx];
+
+        if (!firstChild.IsLeaf) return false;
+
         for (int i = 1; i < 8; i++)
         {
-            var nextIndex = parent.GetChildIndex(i);
-            var next = _nodes[nextIndex];
-            if (!next.Data.Equals(previous.Data))
+            var child = _nodes[firstChildIdx + i];
+
+            if (!child.IsLeaf || !EqualityComparer<T>.Default.Equals(child.Data, firstChild.Data))
             {
-                isNodeSame = false;
-                break;
+                return false;
             }
-            previous = next;
         }
 
-        if (isNodeSame)
-        {
-            Merge(index); //TODO: may write native 
-            return true;
-        }
-        return false;
+        parent.Data = firstChild.Data;
+        parent.MarkAsLeaf();
+        _nodes[index] = parent;
+
+        // TODO: Додати індекси дітей у список вільних комірок для повторного використання
+        return true;
     }
 
     public bool Merge(int index)
@@ -118,7 +167,7 @@ public class LinearOctree<T>
     //     if (_nodes[index].IsLeaf) return;
     //     _nodes[index].MarkAsLeaf();
     // }
-    
+
     public void Clear()
     {
         _nodes.Clear();

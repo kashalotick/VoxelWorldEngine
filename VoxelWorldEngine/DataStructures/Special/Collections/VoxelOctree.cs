@@ -13,7 +13,7 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
         BuildRecursive(generator, Root());
     }
 
-    internal void BuildRecursive(IGenerator generator, OctreeNode node)
+    private void BuildRecursive(IGenerator generator, OctreeNode node)
     {
         if (generator.IsUniform(node.MinIndex, node.MaxIndex) || node.Depth == MaxDepth)
         {
@@ -30,6 +30,9 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
             BuildRecursive(generator, child);
             
             if (!child.IsLeaf)
+            {
+                shouldMerge = false;
+            } else if (child.Data.BlockId == BlockId.Mixed)
             {
                 shouldMerge = false;
             }
@@ -61,22 +64,21 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
         var maxF = new Vector3(root.MaxIndex.X + 1, root.MaxIndex.Y + 1, root.MaxIndex.Z + 1);
 
         // Знаходимо точку входу/виходу променя в AABB кореня
-        if (!Raycaster.IntersectAABB(ray, minF, maxF, out float tMin, out float tMax))
+        if (!Raycaster.IntersectAABB(ray, minF, maxF, out float tMin, out float tMax, out Vector3 normal))
             return new RayHit { Voxel = Voxel.Empty };
 
         tMin = MathF.Max(tMin, 0f);
         if (tMin > tMax)
             return new RayHit { Voxel = Voxel.Empty };
 
-        return RaycastNode(root, ray, tMin, tMax);
+        return RaycastNode(root, ray, tMin, tMax, normal);
     }
 
-    private RayHit RaycastNode(OctreeNode node, Ray ray, float tMin, float tMax)
+    private RayHit RaycastNode(OctreeNode node, Ray ray, float tMin, float tMax, Vector3 normal)
     {
         if (tMin > ray.Length)
             return new RayHit { Voxel = Voxel.Empty };
 
-        // Листовий вузол — повертаємо результат
         if (node.IsLeaf)
         {
             var voxel = node.Data;
@@ -85,14 +87,15 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
 
             return new RayHit
             {
-                HitIn = ray.Origin + ray.Direction * tMin,
+                HitIn  = ray.Origin + ray.Direction * tMin,
                 HitOut = ray.Origin + ray.Direction * MathF.Min(tMax, ray.Length),
-                Voxel = voxel
+                Voxel  = voxel,
+                HitFaceNormal = normal   // <-- нормаль грані входу
             };
         }
 
-        // Сортуємо дочірні вузли за відстанню входу
-        Span<(int octant, float t0, float t1)> hits = stackalloc (int, float, float)[8];
+        Span<(int octant, float t0, float t1, Vector3 n)> hits =
+            stackalloc (int, float, float, Vector3)[8];
         int hitCount = 0;
 
         for (int octant = 0; octant < 8; octant++)
@@ -101,17 +104,17 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
             var cMin = new Vector3(child.MinIndex.X, child.MinIndex.Y, child.MinIndex.Z);
             var cMax = new Vector3(child.MaxIndex.X + 1, child.MaxIndex.Y + 1, child.MaxIndex.Z + 1);
 
-            if (!Raycaster.IntersectAABB(ray, cMin, cMax, out float ct0, out float ct1))
+            if (!Raycaster.IntersectAABB(ray, cMin, cMax, out float ct0, out float ct1, out Vector3 childNormal))
                 continue;
 
             ct0 = MathF.Max(ct0, tMin);
             ct1 = MathF.Min(ct1, tMax);
 
             if (ct0 <= ct1 && ct0 <= ray.Length)
-                hits[hitCount++] = (octant, ct0, ct1);
+                hits[hitCount++] = (octant, ct0, ct1, childNormal);
         }
 
-        // Сортування по t0 (insertion sort, бо масив малий — max 8)
+        // insertion sort
         for (int i = 1; i < hitCount; i++)
         {
             var cur = hits[i];
@@ -121,16 +124,14 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
                 hits[j + 1] = hits[j];
                 j--;
             }
-
             hits[j + 1] = cur;
         }
 
-        // Рекурсивно перевіряємо в порядку зростання відстані
         for (int i = 0; i < hitCount; i++)
         {
-            var (octant, ct0, ct1) = hits[i];
+            var (octant, ct0, ct1, childNormal) = hits[i];
             var child = node.GetChild(octant);
-            var result = RaycastNode(child, ray, ct0, ct1);
+            var result = RaycastNode(child, ray, ct0, ct1, childNormal);  // <-- передаємо нормаль
             if (result.IsHit)
                 return result;
         }

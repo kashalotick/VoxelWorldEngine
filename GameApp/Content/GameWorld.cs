@@ -26,7 +26,7 @@ public class GameWorld : ILoadable, IRenderable
     private float[] _tileOffsets;
     private VoxelWorld _voxelWorld;
 
-    private Dictionary<Vector3Int, WorldObject> _chunks = new();
+    private Dictionary<Vector3Int, WorldObject<ChunkMesh>> _chunks = new();
 
     public GameWorld(VoxelWorld voxelWorld, GameWorldMaterial material)
     {
@@ -51,7 +51,22 @@ public class GameWorld : ILoadable, IRenderable
 
     public void UpdateChunk(Chunk chunk)
     {
-        throw new NotImplementedException();
+        if (!_chunks.ContainsKey(chunk.Position))
+        {
+            AddChunk(chunk);
+        }
+        
+        var wo = _chunks[chunk.Position];
+        if (wo.Mesh != null)
+        {
+            wo.Mesh.UpdateVertices(chunk.Mesh.Vertices);
+            wo.Mesh.UpdateIndices(chunk.Mesh.Indices);
+        }
+        else
+        {
+            AddChunk(chunk);
+        }
+
     }
 
     public void RemoveChunk(Vector3Int chunkPosition)
@@ -61,7 +76,7 @@ public class GameWorld : ILoadable, IRenderable
     }
 
     // TODO: temporary?????
-    private WorldObject ConvertToWorldObject(Chunk chunk)
+    private WorldObject<ChunkMesh> ConvertToWorldObject(Chunk chunk)
     {
         ChunkMesh? mesh = null;
         if (chunk.Mesh.Vertices.Length > 0)
@@ -70,7 +85,7 @@ public class GameWorld : ILoadable, IRenderable
         }
         // var mesh = new ChunkMesh(chunk.Mesh.Vertices, chunk.Mesh.Indices);
 
-        var obj = new WorldObject(mesh, _material.Shader, _material.TextureArray);
+        var obj = new WorldObject<ChunkMesh>(mesh, _material.Shader, _material.TextureArray);
 
         obj.Transform3D.Position = (Vector3)(System.Numerics.Vector3)chunk.GlobalPosition;
         return obj;

@@ -11,6 +11,10 @@ public class PlayerController : FreeCameraController
 {
     public event Action Pause;
     public event Action ToggleHud;
+    
+    public event Action PlaceBlock;
+    public event Action BreakBlock;
+
 
     private RayShooter _rayShooter;
 
@@ -32,8 +36,68 @@ public class PlayerController : FreeCameraController
                 ToggleHud?.Invoke();
                 break;
             case Keys.F11:
-                RequestWindowAction(new ToggleFullscreenWindow()); // TODO: replace with event
+                RequestWindowAction(new ToggleFullscreenWindow()); // TODO: replace with event???
                 break;
+        }
+    }
+
+    private enum ClickState { Idle, WaitingForFirstRepeat, Repeating }
+    private ClickState _currentClickState = ClickState.Idle;
+    
+    private double _timer = 0;    private const double InitialDelay = 0.25;
+    private const double RepeatInterval = 0.025; 
+    public override void OnMousePressed(double deltaTime, MouseState mouse)
+    {
+        if (mouse.IsAnyButtonDown)
+        {
+            switch (_currentClickState)
+            {
+                case ClickState.Idle:
+                    // DoAction(); 
+                
+                    _timer = InitialDelay;
+                    _currentClickState = ClickState.WaitingForFirstRepeat;
+                    break;
+
+                case ClickState.WaitingForFirstRepeat:
+                    _timer -= deltaTime;
+                    if (_timer <= 0)
+                    {
+                        // DoAction();
+                    
+                        _timer = RepeatInterval;
+                        _currentClickState = ClickState.Repeating;
+                    }
+                    break;
+
+                case ClickState.Repeating:
+                    _timer -= deltaTime;
+                    if (_timer <= 0)
+                    {
+                        OnMouseButtonPressed(mouse);
+                        // DoAction();
+                        _timer = RepeatInterval;
+                    }
+                    break;
+            }
+        }
+        else
+        {
+            _currentClickState = ClickState.Idle;
+            _timer = 0;
+        }
+    }
+
+    private void OnMouseButtonPressed(MouseState mouse)
+    {
+        if (mouse.IsButtonDown(MouseButton.Left))
+        {
+            _rayShooter.Trace();
+            BreakBlock?.Invoke();
+        }
+        if (mouse.IsButtonDown(MouseButton.Right))
+        {
+            PlaceBlock?.Invoke();
         }
     }
 
@@ -42,6 +106,11 @@ public class PlayerController : FreeCameraController
         if (e.Button == MouseButton.Left)
         {
             _rayShooter.Trace();
+            BreakBlock?.Invoke();
+        }
+        if (e.Button == MouseButton.Right)
+        {
+            PlaceBlock?.Invoke();
         }
     }
 }

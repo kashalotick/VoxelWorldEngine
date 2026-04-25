@@ -7,11 +7,13 @@ using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.Core;
 
+// TODO: mb make composite with IWorldStructure for world, chunk, voxel octree
 public class VoxelWorld : IRaycastable
 {
     public event Action<Chunk> ChunkAdded;
     public event Action<Chunk> ChunkUpdated;
     public event Action<Vector3Int> ChunkRemoved;
+    
     
     public VoxelWorld(int seed)
     {
@@ -21,6 +23,9 @@ public class VoxelWorld : IRaycastable
     public int Seed { get; }
     private Dictionary<Vector3Int, Chunk> _chunks = new();
     public IReadOnlyDictionary<Vector3Int, Chunk>  Chunks => _chunks;
+
+    private readonly HashSet<Vector3Int> _dirtyChunks = new();
+    public IReadOnlySet<Vector3Int> DirtyChunks => _dirtyChunks;
 
 
     public void AddChunk(Chunk chunk)
@@ -41,7 +46,38 @@ public class VoxelWorld : IRaycastable
         ChunkRemoved?.Invoke(chunkPosition);
     }
 
-    private readonly Stack<Chunk> _rayStack = new Stack<Chunk>();
+    public void ClearDirty()
+    {
+        _dirtyChunks.Clear();
+    }
+    public void MarkChunkClean(Vector3Int chunkPos)
+    {
+        _dirtyChunks.Remove(chunkPos);
+    }
+    
+    public void PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
+    {
+        var chunkPos = Chunk.GlobalToChunk(voxelPositionIndex);
+        var localVoxelIndex = Chunk.GlobalToLocal(voxelPositionIndex);
+        
+        var chunk = _chunks[chunkPos];
+ 
+    
+        var isDataChanged = chunk.Octree.SetData(localVoxelIndex, new Voxel(blockId));
+        if (isDataChanged)
+        {
+            _dirtyChunks.Add(chunkPos);
+        }
+        Console.WriteLine($"set {blockId} on chunk={chunkPos} voxel={localVoxelIndex}: {isDataChanged}");
+
+        
+        
+        // mark as dirty
+        
+        // TODO: make chunk dirty flags (for serialization), mesh rebuild queue etc (mb event call, or some additional flags)
+        // put into queue
+        
+    }
 
     public RayHit Raycast(Ray ray)
     {

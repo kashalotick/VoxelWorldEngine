@@ -15,8 +15,9 @@ public interface IOctree<T>
     T GetData(Vector3Int position);
     // IOctreeNode<T> Root(); // TODO: remove?
 
-
-    // void Insert(T data, Vector3Int min, Vector3Int max);
+    
+    bool SetData(Vector3Int index, T data);
+    void ModifyArea(Vector3Int minIndex, Vector3Int maxIndex, T data);
     // bool Remove(Vector3Int position);
 
 }

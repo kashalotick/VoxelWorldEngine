@@ -11,8 +11,8 @@ public class RayShooter : ILoadable, IRenderable
 {
     private IShader _shader;
 
-    public Ray PrevRay { get; private set; }
-    public RayHit PrevHit {get; private set;}
+    public Ray LastRay { get; private set; }
+    public RayHit LastHit {get; private set;}
     private (Ray ray, RayHit hit) _traced = new();
     private LineMesh _rayMesh;
     private RayHitPointsMesh _rayHitPointsMesh;
@@ -45,18 +45,18 @@ public class RayShooter : ILoadable, IRenderable
     public RayHit Shoot(Ray ray, IRaycastable target)
     {
         var rayHit = target.Raycast(ray);
-        PrevRay = ray;
-        PrevHit =  rayHit;
+        LastRay = ray;
+        LastHit =  rayHit;
         return rayHit;
     }
 
     public void Trace()
     {
-        _traced = (PrevRay, PrevHit);
+        _traced = (LastRay, LastHit);
         _rayMesh.UpdateRay(_traced.ray, _traced.hit);
-        var hitline = (bool)PrevHit.IsHit ? $"{PrevHit.HitIn.FancyString()} -> {PrevHit.HitOut.FancyString()}" : "";
-        // Console.WriteLine($"\nRay: {PrevRay.Origin.FancyString()} -> {PrevRay.Direction.FancyString()}"
-        //                   + $"\nHit: {PrevHit.IsHit}  {hitline}");
+        var hitline = (bool)LastHit.IsHit ? $"{LastHit.HitIn.FancyString()} -> {LastHit.HitOut.FancyString()}" : "";
+        // Console.WriteLine($"\nRay: {LastRay.Origin.FancyString()} -> {LastRay.Direction.FancyString()}"
+        //                   + $"\nHit: {LastHit.IsHit}  {hitline}");
 
         _rayHitPointsMesh.UpdateHitPoints(_traced.ray, _traced.hit);
     }

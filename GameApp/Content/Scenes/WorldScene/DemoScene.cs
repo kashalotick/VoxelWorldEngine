@@ -8,13 +8,13 @@ using LearningOpenTK.Core;
 using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Input;
 using LearningOpenTK.Core.Scenes;
-using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using VoxelWorldEngine.Core;
+using VoxelWorldEngine.Core.Commands;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
@@ -26,6 +26,9 @@ namespace GameApp.Content.Scenes.WorldScene;
 public class DemoScene : BaseScene
 {
     private ChunkLoadingSystem _chunkLoadingSystem;
+    private ChunkUpdateSystem _chunkUpdateSystem;
+
+    
 
     private FpsCounter _fpsCounter;
     private PlayerController _playerController;
@@ -82,6 +85,8 @@ public class DemoScene : BaseScene
         _playerController = new PlayerController(Camera, _rayShooter);
         _playerController.Pause += OnPause;
         _playerController.ToggleHud += OnToggleHud;
+        _playerController.PlaceBlock += OnPlaceBlock;
+        _playerController.BreakBlock += OnBreakBlock;
 
         ControllerContext.SetState(_playerController);
         SceneContext.RequestWindowAction(new GrabCursor());
@@ -113,10 +118,12 @@ public class DemoScene : BaseScene
 
         _gameWorld = new GameWorld(_voxelWorld, material);
         _voxelWorld.ChunkAdded += _gameWorld.AddChunk;
+        _voxelWorld.ChunkUpdated += _gameWorld.UpdateChunk;
         _voxelWorld.ChunkRemoved += _gameWorld.RemoveChunk;
         _gameWorld.Load();
 
         _chunkLoadingSystem = SOR.Register(new ChunkLoadingSystem(_voxelWorld));
+        _chunkUpdateSystem = new ChunkUpdateSystem(_voxelWorld);
 
         LightComposition(material.Shader);
     }
@@ -202,6 +209,9 @@ public class DemoScene : BaseScene
         _hud.UpdateChunkPosition(Chunk.GlobalToChunk(_worldState.Player.Position.ToVector3Int()));
 
         _chunkLoadingSystem.Update(deltaTime, _worldState.Player);
+        _chunkUpdateSystem.Update(deltaTime);
+        
+        
     }
 
     private void ProcessRaycast(double deltaTime)
@@ -216,7 +226,7 @@ public class DemoScene : BaseScene
         var rayHit = _rayShooter.Shoot(ray, _voxelWorld);
 
         _hitVoxelPosition.Value = rayHit.IsHit
-            ? (rayHit.HitIn + _rayShooter.PrevRay.Direction * 0.001f).FloorToVector3Int()
+            ? (rayHit.HitIn + _rayShooter.LastRay.Direction * 0.001f).FloorToVector3Int()
             : null;
 
         _rayHit.Value = rayHit;
@@ -271,5 +281,31 @@ public class DemoScene : BaseScene
     {
         SaveWorld();
         SceneContext.SetState(new MainMenu(GameContext));
+    }
+
+    private void OnPlaceBlock()
+    {
+        const BlockId blockToPlace = BlockId.Stone;
+        
+        var lastHit = _rayShooter.LastHit;
+        if (!lastHit.IsHit) return;
+        
+        var hitVoxel = (lastHit.HitIn + _rayShooter.LastRay.Direction * 0.001f);
+        var voxelPlaceIndex = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
+        
+        Console.WriteLine($"Place block at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
+        var command = new PlaceBlockCommand(_voxelWorld, voxelPlaceIndex, blockToPlace);
+        command.Execute();
+    }
+    private void OnBreakBlock()
+    {
+        var lastHit = _rayShooter.LastHit;
+        if (!lastHit.IsHit) return;
+
+        var hitVoxel = (lastHit.HitIn + _rayShooter.LastRay.Direction * 0.001f).FloorToVector3Int();
+
+        Console.WriteLine($"Breaking block at {hitVoxel}");
+        var command = new BreakBlockCommand(_voxelWorld, hitVoxel);
+        command.Execute();
     }
 }
