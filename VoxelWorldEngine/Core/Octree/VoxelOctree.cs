@@ -8,9 +8,12 @@ namespace VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
 
 public class VoxelOctree : Octree<Voxel>, IVoxelOctree
 {
+    private int _splitCount;
+    public int _mergeCount;
     public void Build(IGenerator generator)
     {
         BuildRecursive(generator, Root());
+        // Console.WriteLine($"Split: {_splitCount}, Merge: {_mergeCount}");
     }
 
     private void BuildRecursive(IGenerator generator, OctreeNode node)
@@ -21,6 +24,7 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
             return;
         }
 
+        _splitCount++;
         node.Split();
         var shouldMerge = true;
         Voxel? childVoxel = null;
@@ -51,6 +55,7 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
         if (shouldMerge)
         {
             node.Data = childVoxel ??  new Voxel();
+            _mergeCount++;
             node.Merge();
         }
     }

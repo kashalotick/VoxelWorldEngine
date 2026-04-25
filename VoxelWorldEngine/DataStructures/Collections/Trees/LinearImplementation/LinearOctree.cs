@@ -1,4 +1,5 @@
-﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+﻿using VoxelWorldEngine.Core.Serialization;
+using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
@@ -6,7 +7,8 @@ namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImpleme
 public class LinearOctree<T>
 {
     public int MaxDepth { get; set; }
-    public int Count => _nodes.Count;
+    public int Count => _nodes.Count - _freeClusters.Count * 8;
+    private readonly Stack<int> _freeClusters = new();
     private readonly List<LinearOctreeNode<T>> _nodes; // TODO: make stack with free cells indices (after merge)
 
     public LinearOctree(int maxDepth)
@@ -68,6 +70,7 @@ public class LinearOctree<T>
             {
                 Split(nodeIndex);
             }
+
             nodeIndex = _nodes[nodeIndex].GetChildIndex(way[i]);
         }
 
@@ -91,13 +94,14 @@ public class LinearOctree<T>
 
         return true;
     }
+
     public void ModifyArea(T data, Vector3Int minIndex, Vector3Int maxIndex)
     {
         // split
         // try merge
         throw new NotImplementedException();
     }
-    
+
     public void SetNodeData(int index, T data)
     {
         var linearOctreeNode = _nodes[index];
@@ -111,12 +115,25 @@ public class LinearOctree<T>
         var parent = _nodes[index];
         if (!parent.IsLeaf) throw new ArgumentException("Node is already splitted", nameof(index));
 
-        var startChildIndex = _nodes.Count;
-
-        for (var i = 0; i < 8; i++)
+        int startChildIndex;
+        if (_freeClusters.TryPop(out int recycledIndex))
         {
-            var child = new LinearOctreeNode<T>(parent.Data);
-            _nodes.Add(child);
+            startChildIndex = recycledIndex;
+            for (var i = 0; i < 8; i++)
+            {
+                // ПЕРЕЗАПИСУЄМО старі дані за існуючими індексами
+                _nodes[startChildIndex + i] = new LinearOctreeNode<T>(parent.Data);
+            }
+        }
+        else
+        {
+            // Якщо вільних немає, виділяємо нове місце в кінці
+            startChildIndex = _nodes.Count;
+            for (var i = 0; i < 8; i++)
+            {
+                // Додаємо нові елементи
+                _nodes.Add(new LinearOctreeNode<T>(parent.Data));
+            }
         }
 
         parent.ChildrenStartIndex = startChildIndex;
@@ -149,6 +166,7 @@ public class LinearOctree<T>
         parent.MarkAsLeaf();
         _nodes[index] = parent;
 
+        _freeClusters.Push(firstChildIdx);
         // TODO: Додати індекси дітей у список вільних комірок для повторного використання
         return true;
     }
@@ -158,6 +176,7 @@ public class LinearOctree<T>
         var parent = _nodes[index];
         if (parent.IsLeaf) return false;
 
+        _freeClusters.Push(parent.ChildrenStartIndex);
         parent.MarkAsLeaf();
         _nodes[index] = parent;
         return true;
@@ -171,5 +190,70 @@ public class LinearOctree<T>
     public void Clear()
     {
         _nodes.Clear();
+    }
+    public void Pack()
+    {
+        // Якщо сміття немає, нічого не робимо
+        if (_freeClusters.Count == 0) return; 
+
+        // Виділяємо пам'ять тільки під реальну кількість живих нодів
+        var packedNodes = new List<LinearOctreeNode<T>>(_nodes.Count - _freeClusters.Count * 8);
+        var queue = new Queue<(int oldIndex, int newIndex)>();
+
+        // 1. Переносимо корінь
+        packedNodes.Add(_nodes[RootIndex]);
+        queue.Enqueue((RootIndex, 0)); // (Індекс у старому масиві, Індекс у новому масиві)
+
+        // 2. Обходимо всі живі ноди
+        while (queue.Count > 0)
+        {
+            var (oldIdx, newIdx) = queue.Dequeue();
+            var oldNode = _nodes[oldIdx];
+
+            if (!oldNode.IsLeaf)
+            {
+                // Отримуємо індекс, куди зараз будуть записані діти
+                int newChildrenStart = packedNodes.Count;
+
+                // Оновлюємо вказівник на дітей у батька (в НОВОМУ масиві)
+                var packedNode = packedNodes[newIdx];
+                packedNode.ChildrenStartIndex = newChildrenStart;
+                packedNodes[newIdx] = packedNode;
+
+                // Копіюємо всіх 8 дітей
+                for (int i = 0; i < 8; i++)
+                {
+                    int oldChildIdx = oldNode.ChildrenStartIndex + i;
+                    int newChildIdx = packedNodes.Count;
+
+                    packedNodes.Add(_nodes[oldChildIdx]);
+                
+                    // Якщо дитина теж має своїх дітей, додаємо в чергу для обробки
+                    if (!_nodes[oldChildIdx].IsLeaf)
+                    {
+                        queue.Enqueue((oldChildIdx, newChildIdx));
+                    }
+                }
+            }
+        }
+
+        // 3. Замінюємо старі дані на чисті
+        _nodes.Clear();
+        _nodes.AddRange(packedNodes);
+        _freeClusters.Clear(); // Тепер сміття немає, стек пустий
+    }
+    public OctreeMemento<T> Save()
+    {
+        Pack();
+        // Зберігаємо масив як є. Тобі доведеться додати збереження _freeClusters у Memento!
+        return new OctreeMemento<T>(_nodes.ToArray());
+    }
+
+    public void Restore(OctreeMemento<T> memento)
+    {
+        _nodes.Clear();
+        _nodes.AddRange(memento.Nodes);
+        
+        _freeClusters.Clear();
     }
 }

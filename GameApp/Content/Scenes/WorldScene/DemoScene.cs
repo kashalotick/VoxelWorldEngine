@@ -110,19 +110,18 @@ public class DemoScene : BaseScene
             GameContext.TextureArrayRepository.Get("Blocks"),
             16
         );
-        Console.WriteLine(material);
 
         _voxelWorld = _worldRepository.LoadWorld(_worldMeta);
         var worldState = _worldRepository.LoadState(_worldMeta.Slot);
         _worldState = worldState ?? new WorldState();
 
-        _gameWorld = new GameWorld(_voxelWorld, material);
+        _gameWorld = new GameWorld(_voxelWorld, material, _worldRepository.GetChunkRepository(_worldMeta.Slot));
         _voxelWorld.ChunkAdded += _gameWorld.AddChunk;
         _voxelWorld.ChunkUpdated += _gameWorld.UpdateChunk;
         _voxelWorld.ChunkRemoved += _gameWorld.RemoveChunk;
         _gameWorld.Load();
 
-        _chunkLoadingSystem = SOR.Register(new ChunkLoadingSystem(_voxelWorld));
+        _chunkLoadingSystem = SOR.Register(new ChunkLoadingSystem(_voxelWorld, _worldRepository.GetChunkRepository(_worldMeta.Slot)));
         _chunkUpdateSystem = new ChunkUpdateSystem(_voxelWorld);
 
         LightComposition(material.Shader);
@@ -244,6 +243,7 @@ public class DemoScene : BaseScene
 
     private void SaveWorld()
     {
+        Console.WriteLine("Save world");
         _worldRepository.SaveState(_worldMeta.Slot, _worldState);
         _worldRepository.AddPlayTime(_worldMeta, _elapsedTime);
         _elapsedTime = 0;
@@ -307,5 +307,13 @@ public class DemoScene : BaseScene
         Console.WriteLine($"Breaking block at {hitVoxel}");
         var command = new BreakBlockCommand(_voxelWorld, hitVoxel);
         command.Execute();
+    }
+
+    protected override void ReleaseManagedResources()
+    {
+        _gameWorld.Dispose();
+        Console.WriteLine("Releasing managed resources");
+
+        // save world here
     }
 }

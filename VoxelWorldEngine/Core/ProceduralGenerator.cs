@@ -97,16 +97,56 @@ public class ProceduralGenerator : IGenerator
 
         var height = Evaluate(min, max);
 
-        int dirtDepth = GetDirtDepth((height.min + height.max) / 2f);
-        // int dirtDepth = MaxDirtDepth; // worst case — не скорочуй тут
-
-        if (max.Y <= height.min - dirtDepth + MaxCaveDepth)
-            return true;
-
+        // 1. Повністю над поверхнею (суцільне Повітря)
         if (min.Y > height.max)
             return true;
 
+        // 2. Повністю під землею
+        // Використовуємо MaxDirtDepth, щоб гарантовано бути нижче шару землі і трави
+        if (max.Y <= height.min - MaxDirtDepth)
+        {
+            // Якщо куб глибше зони печер (нижче -64) — це 100% суцільний камінь
+            if (max.Y <= height.min - MaxDirtDepth + MaxCaveDepth)
+                return true;
+
+            // Якщо куб у зоні печер, перевіряємо, чи є печера ПОРУЧ з цим кубом
+            if (!MightContainCave(min, max))
+                return true; // Печери поруч немає, це 100% суцільний камінь!
+        }
+
+        // В усіх інших випадках (куб перетинає поверхню з травою або містить печеру) — дробимо
         return false;
+    }
+    private bool MightContainCave(Vector3Int worldMin, Vector3Int worldMax)
+    {
+        // 1. Знаходимо центр ноди
+        float cx = (worldMin.X + worldMax.X) * 0.5f;
+        float cy = (worldMin.Y + worldMax.Y) * 0.5f;
+        float cz = (worldMin.Z + worldMax.Z) * 0.5f;
+
+        // 2. Радіус ноди (максимальна відстань від центру до кута)
+        float dx = worldMax.X - cx;
+        float dy = worldMax.Y - cy;
+        float dz = worldMax.Z - cz;
+        float radius = MathF.Sqrt(dx * dx + dy * dy + dz * dz);
+
+        // 3. Оцінка швидкості зміни шуму (Interval Arithmetic / SDF trick).
+        // Для FastNoise з частотою 0.009 шум змінюється максимум на ~0.05 одиниць за 1 блок.
+        float maxVariation = radius * 0.05f;
+
+        // 4. Перевіряємо першу "трубку" печери
+        float n1 = _caveNoise.GetNoise(cx, cy, cz);
+        if (MathF.Abs(n1) - maxVariation > CaveThreshold) 
+            return false; // Шум занадто далеко від 0, печери ТУТ ТОЧНО НЕМАЄ
+
+        // 5. Перевіряємо другу "трубку" печери
+        float n2 = _caveNoise.GetNoise(cx + 1000, cy + 500, cz + 1000);
+        if (MathF.Abs(n2) - maxVariation > CaveThreshold) 
+            return false; // Точно немає печери
+
+        // Якщо ми дійшли сюди, центр куба близько до порожнини печери.
+        // Печера МОЖЕ зачепити наш куб, тому дозволяємо розділення (Split).
+        return true; 
     }
     private bool IsCave(Vector3Int worldPos)
     {

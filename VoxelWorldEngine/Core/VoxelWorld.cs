@@ -12,9 +12,9 @@ public class VoxelWorld : IRaycastable
 {
     public event Action<Chunk> ChunkAdded;
     public event Action<Chunk> ChunkUpdated;
-    public event Action<Vector3Int> ChunkRemoved;
-    
-    
+    public event Action<Chunk> ChunkRemoved;
+
+
     public VoxelWorld(int seed)
     {
         Seed = seed;
@@ -22,18 +22,18 @@ public class VoxelWorld : IRaycastable
 
     public int Seed { get; }
     private Dictionary<Vector3Int, Chunk> _chunks = new();
-    public IReadOnlyDictionary<Vector3Int, Chunk>  Chunks => _chunks;
+    public IReadOnlyDictionary<Vector3Int, Chunk> Chunks => _chunks;
 
-    private readonly HashSet<Vector3Int> _dirtyChunks = new();
-    public IReadOnlySet<Vector3Int> DirtyChunks => _dirtyChunks;
+    private readonly HashSet<Vector3Int> _meshDirtyChunks = new();
+    public IReadOnlySet<Vector3Int> MeshDirtyChunks => _meshDirtyChunks;
 
 
     public void AddChunk(Chunk chunk)
     {
         _chunks[chunk.Position] = chunk;
         ChunkAdded?.Invoke(chunk);
-
     }
+
     public void UpdateChunk(Chunk chunk)
     {
         _chunks[chunk.Position] = chunk;
@@ -42,41 +42,39 @@ public class VoxelWorld : IRaycastable
 
     public void RemoveChunk(Vector3Int chunkPosition)
     {
-        _chunks.Remove(chunkPosition);
-        ChunkRemoved?.Invoke(chunkPosition);
+        if (_chunks.TryGetValue(chunkPosition, out var chunk))
+        {
+            ChunkRemoved?.Invoke(chunk); // ???????? ????? ? chunk ?? ? ????????
+            _chunks.Remove(chunkPosition);
+        }
     }
 
-    public void ClearDirty()
+    public void ClearMeshDirty()
     {
-        _dirtyChunks.Clear();
+        _meshDirtyChunks.Clear();
     }
-    public void MarkChunkClean(Vector3Int chunkPos)
+
+    public void MarkChunkMeshClean(Vector3Int chunkPos)
     {
-        _dirtyChunks.Remove(chunkPos);
+        _meshDirtyChunks.Remove(chunkPos);
     }
-    
+
     public void PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
     {
         var chunkPos = Chunk.GlobalToChunk(voxelPositionIndex);
         var localVoxelIndex = Chunk.GlobalToLocal(voxelPositionIndex);
-        
+
         var chunk = _chunks[chunkPos];
- 
-    
+
+
         var isDataChanged = chunk.Octree.SetData(localVoxelIndex, new Voxel(blockId));
         if (isDataChanged)
         {
-            _dirtyChunks.Add(chunkPos);
+            chunk.MarkDirty();
+            _meshDirtyChunks.Add(chunkPos);
         }
-        Console.WriteLine($"set {blockId} on chunk={chunkPos} voxel={localVoxelIndex}: {isDataChanged}");
 
-        
-        
-        // mark as dirty
-        
-        // TODO: make chunk dirty flags (for serialization), mesh rebuild queue etc (mb event call, or some additional flags)
-        // put into queue
-        
+        Console.WriteLine($"set {blockId} on chunk={chunkPos} voxel={localVoxelIndex}: {isDataChanged}");
     }
 
     public RayHit Raycast(Ray ray)
@@ -146,6 +144,5 @@ public class VoxelWorld : IRaycastable
         }
 
         return new RayHit { Voxel = Voxel.Empty };
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+﻿using VoxelWorldEngine.Core.Serialization;
+using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
 namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
@@ -15,17 +16,20 @@ public interface IOctree<T>
     T GetData(Vector3Int position);
     // IOctreeNode<T> Root(); // TODO: remove?
 
-    
+
     bool SetData(Vector3Int index, T data);
     void ModifyArea(Vector3Int minIndex, Vector3Int maxIndex, T data);
     // bool Remove(Vector3Int position);
 
+
+    OctreeMemento<T> Save();
+    void Restore(OctreeMemento<T> memento);
 }
 
 public interface IOctreeNode<T> : IOctreeNodeReadonly<T>
 {
-    
 }
+
 public interface IOctreeNodeReadonly<out T>
 {
     int Depth { get; }
@@ -33,13 +37,12 @@ public interface IOctreeNodeReadonly<out T>
 
     Vector3Int MinIndex { get; }
     Vector3Int MaxIndex { get; }
-    
+
     T Data { get; }
     bool IsLeaf { get; }
-    
+
     IOctreeNodeReadonly<T>? GetNeighbor(Vector3Int direction);
     IEnumerable<T> Query(Vector3Int min, Vector3Int max);
-
 }
 
 public interface IOctreeVisitor<T>

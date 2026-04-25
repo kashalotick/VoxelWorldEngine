@@ -10,6 +10,20 @@ public interface ICommand
     void Execute();
 }
 
+
+// public record ChunkCommand : ICommand
+// {
+//     ChunkCommand(Vector3Int chunkPosition, Vector3Int localVoxelIndex)
+//     {
+//         
+//     }
+//     
+//     public void Execute()
+//     {
+//         
+//     }
+// }
+
 public record BreakBlockCommand : PlaceBlockCommand
 {
     public BreakBlockCommand(VoxelWorld world, Vector3Int voxelPositionIndex) : base(world,
@@ -17,6 +31,7 @@ public record BreakBlockCommand : PlaceBlockCommand
     {
     }
 }
+
 
 
 public record PlaceBlockCommand : ICommand
@@ -41,21 +56,21 @@ public record PlaceBlockCommand : ICommand
 
 
 // internal ??
-public record ChunkLocalPlaceBlockCommand : ICommand
-{
-    public Chunk Chunk;
-    public Vector3Int LocalVoxelPositionIndex;
-    public BlockId BlockId;
-
-    public ChunkLocalPlaceBlockCommand(Chunk chunk, Vector3Int localVoxelPositionIndex, BlockId blockId)
-    {
-        Chunk = chunk;
-        LocalVoxelPositionIndex = localVoxelPositionIndex;
-        BlockId = blockId;
-    }
-
-    public virtual void Execute()
-    {
-        // Chunk.PlaceBlock(VoxelPositionIndex, BlockId);
-    }
-}
+// public record ChunkLocalPlaceBlockCommand : ICommand
+// {
+//     public Chunk Chunk;
+//     public Vector3Int LocalVoxelPositionIndex;
+//     public BlockId BlockId;
+//
+//     public ChunkLocalPlaceBlockCommand(Chunk chunk, Vector3Int localVoxelPositionIndex, BlockId blockId)
+//     {
+//         Chunk = chunk;
+//         LocalVoxelPositionIndex = localVoxelPositionIndex;
+//         BlockId = blockId;
+//     }
+//
+//     public virtual void Execute()
+//     {
+//         // Chunk.PlaceBlock(VoxelPositionIndex, BlockId);
+//     }
+// }

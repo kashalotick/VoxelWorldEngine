@@ -8,6 +8,7 @@ using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core;
+using VoxelWorldEngine.Core.Serialization;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
@@ -25,18 +26,21 @@ public class GameWorld : ILoadable, IRenderable
     private GameWorldMaterial _material;
     private float[] _tileOffsets;
     private VoxelWorld _voxelWorld;
+    private IChunkMementoRepository _chunkRepository;
 
     private Dictionary<Vector3Int, WorldObject<ChunkMesh>> _chunks = new();
 
-    public GameWorld(VoxelWorld voxelWorld, GameWorldMaterial material)
+    // TODO: temp repository usage here
+    public GameWorld(VoxelWorld voxelWorld, GameWorldMaterial material, IChunkMementoRepository chunkRepository)
     {
         _voxelWorld = voxelWorld;
         _material = material;
+        _chunkRepository = chunkRepository;
     }
 
     public void AddChunk(Chunk chunk)
     {
-        if (chunk.Mesh.Vertices.Length == 0)
+        if (chunk.ChunkMesh.Vertices.Length == 0)
         {
         }
 
@@ -59,8 +63,8 @@ public class GameWorld : ILoadable, IRenderable
         var wo = _chunks[chunk.Position];
         if (wo.Mesh != null)
         {
-            wo.Mesh.UpdateVertices(chunk.Mesh.Vertices);
-            wo.Mesh.UpdateIndices(chunk.Mesh.Indices);
+            wo.Mesh.UpdateVertices(chunk.ChunkMesh.Vertices);
+            wo.Mesh.UpdateIndices(chunk.ChunkMesh.Indices);
         }
         else
         {
@@ -69,21 +73,25 @@ public class GameWorld : ILoadable, IRenderable
 
     }
 
-    public void RemoveChunk(Vector3Int chunkPosition)
+    public void RemoveChunk(Chunk chunk)
     {
-        _chunks[chunkPosition].Dispose();
-        _chunks.Remove(chunkPosition);
+        if (chunk.IsDirty)
+        {
+            _chunkRepository.Save(chunk.Save());
+        }
+        _chunks[chunk.Position].Dispose();
+        _chunks.Remove(chunk.Position);
     }
 
     // TODO: temporary?????
     private WorldObject<ChunkMesh> ConvertToWorldObject(Chunk chunk)
     {
         ChunkMesh? mesh = null;
-        if (chunk.Mesh.Vertices.Length > 0)
+        if (chunk.ChunkMesh.Vertices.Length > 0)
         {
-            mesh = new ChunkMesh(chunk.Mesh.Vertices, chunk.Mesh.Indices);
+            mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
         }
-        // var mesh = new ChunkMesh(chunk.Mesh.Vertices, chunk.Mesh.Indices);
+        // var mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
 
         var obj = new WorldObject<ChunkMesh>(mesh, _material.Shader, _material.TextureArray);
 
@@ -148,9 +156,17 @@ public class GameWorld : ILoadable, IRenderable
 
     public void Dispose()
     {
-        foreach (var chunk in _chunks.Values)
+        foreach (var pair in _chunks)
         {
-            chunk.Dispose();
+            var chunk = _voxelWorld.Chunks[pair.Key];
+
+            if (chunk.IsDirty)
+            {
+                _chunkRepository.Save(chunk.Save());
+            }
+            
+
+            pair.Value.Dispose();
         }
     }
 }

@@ -10,16 +10,16 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.Core.Builders;
 
-public class MeshBuilder : IMeshBuilder, IOctreeVisitor<Voxel>
+public class MeshBuilder : IMeshBuilder
 {
     private List<uint> _indices = new(4096);
     private List<ChunkVertex> _vertices = new(4096);
     
-    public MeshData Build(IVoxelOctree octree)
+    public ChunkMeshData Build(IVoxelOctree octree)
     {
         octree.Accept(this);
 
-        var mesh = new MeshData(_indices.ToArray(), _vertices.ToArray());
+        var mesh = new ChunkMeshData(_indices.ToArray(), _vertices.ToArray());
         _indices.Clear();
         _vertices.Clear();
         return mesh;

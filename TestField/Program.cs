@@ -51,14 +51,14 @@ class Program
             sw.Stop();
             totalOctreeTime += sw.Elapsed.TotalMilliseconds;
 
-            // 3a. Етап Генерації Mesh (Старий)
+            // 3a. Етап Генерації ChunkMesh (Старий)
             sw.Restart();
             var oldMeshBuilder = new OldMeshBuilder();
             var oldMesh = oldMeshBuilder.Build(octree);
             sw.Stop();
             totalOldMeshTime += sw.Elapsed.TotalMilliseconds;
 
-            // 3b. Етап Генерації Mesh (Новий)
+            // 3b. Етап Генерації ChunkMesh (Новий)
             sw.Restart();
             var newMeshBuilder = new MeshBuilder();
             var newMesh = newMeshBuilder.Build(octree);
@@ -69,7 +69,7 @@ class Program
             sw.Restart();
             var chunk = new Chunk(position);
             chunk.Octree = octree;
-            chunk.Mesh = newMesh; // Використовуємо новий меш
+            chunk.ChunkMesh = newMesh; // Використовуємо новий меш
             sw.Stop();
             totalChunkTime += sw.Elapsed.TotalMilliseconds;
         }
@@ -108,14 +108,14 @@ class Program
             sw.Stop();
             totalOctreeTime += sw.Elapsed.TotalMilliseconds;
 
-            // Old Mesh Builder
+            // Old ChunkMesh Builder
             sw.Restart();
             var oldMeshBuilder = new OldMeshBuilder();
             oldMeshBuilder.Build(octree);
             sw.Stop();
             totalOldMeshTime += sw.Elapsed.TotalMilliseconds;
 
-            // New Mesh Builder
+            // New ChunkMesh Builder
             sw.Restart();
             var newMeshBuilder = new MeshBuilder();
             var newMesh = newMeshBuilder.Build(octree);
@@ -125,7 +125,7 @@ class Program
             sw.Restart();
             var chunk = new Chunk(position);
             chunk.Octree = octree;
-            chunk.Mesh = newMesh;
+            chunk.ChunkMesh = newMesh;
             sw.Stop();
             totalChunkTime += sw.Elapsed.TotalMilliseconds;
         }
@@ -138,8 +138,8 @@ class Program
         Console.WriteLine("\n--- Результати (Середній час на етап) ---");
         PrintResult("Generator Setup ", totalGen, iterations);
         PrintResult("Octree Build    ", totalOct, iterations);
-        PrintResult("Old Mesh Builder", totalOldM, iterations);
-        PrintResult("New Mesh Builder", totalNewM, iterations);
+        PrintResult("Old ChunkMesh Builder", totalOldM, iterations);
+        PrintResult("New ChunkMesh Builder", totalNewM, iterations);
         PrintResult("Chunk Instance  ", totalChunk, iterations);
 
         Console.WriteLine("-----------------------------------------");

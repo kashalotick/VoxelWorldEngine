@@ -20,7 +20,7 @@ public class OldMeshBuilder
     private List<ChunkVertex> _vertices = new (4096);
 
 
-    public MeshData Build(VoxelOctree octree)
+    public ChunkMeshData Build(VoxelOctree octree)
     {
         _octree = octree;
 
@@ -51,7 +51,7 @@ public class OldMeshBuilder
             }
         }
 
-        var mesh = new MeshData(_indices.ToArray(), _vertices.ToArray());
+        var mesh = new ChunkMeshData(_indices.ToArray(), _vertices.ToArray());
         _indices.Clear();
         _vertices.Clear();
         Array.Clear(_isEmptyCache, 0, _isEmptyCache.Length);

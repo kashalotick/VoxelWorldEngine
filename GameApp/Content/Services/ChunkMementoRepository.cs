@@ -1,0 +1,66 @@
+﻿using System.Collections.Concurrent;
+using VoxelWorldEngine.Core.Serialization;
+using VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
+using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
+
+namespace GameApp.Content.Services;
+
+public class ChunkMementoRepository : IChunkMementoRepository
+{
+    private readonly string _directory;
+    private readonly ConcurrentDictionary<Vector3Int, object> _chunkLocks = new();
+    
+    public ChunkMementoRepository(string directory)
+    {
+        _directory = directory;
+        Directory.CreateDirectory(directory);
+    }
+
+    public void Save(ChunkMemento memento)
+    {
+        Console.WriteLine($"Saving chunk {memento.Position}");
+        Console.WriteLine(memento.Nodes.Length);
+        var lockObj = _chunkLocks.GetOrAdd(memento.Position, _ => new object());
+        lock (lockObj)
+        {
+            var path = GetPath(memento.Position);
+            var tmp = path + ".tmp";
+
+            using (var writer = new BinaryWriter(File.Open(tmp, FileMode.Create)))
+            {
+                writer.Write(memento.Nodes.Length);
+                foreach (var node in memento.Nodes)
+                {
+                    writer.Write((byte)node.Data.BlockId);
+                    writer.Write(node.ChildrenStartIndex);
+                }
+            }
+
+            File.Move(tmp, path, overwrite: true); // atomic
+        }
+    }
+
+    public ChunkMemento? Load(Vector3Int position)
+    {
+        var path = GetPath(position);
+        if (!File.Exists(path)) return null;
+
+        using var reader = new BinaryReader(File.OpenRead(path));
+        var count = reader.ReadInt32();
+        var nodes = new LinearOctreeNode<Voxel>[count];
+        for (int i = 0; i < count; i++)
+        {
+            var blockId = (BlockId)reader.ReadByte();
+            var childrenStart = reader.ReadInt32();
+            nodes[i] = new LinearOctreeNode<Voxel>(new Voxel(blockId), childrenStart);
+        }
+
+        return new ChunkMemento(position, nodes);
+    }
+
+    public bool Exists(Vector3Int position) => File.Exists(GetPath(position));
+
+    private string GetPath(Vector3Int pos) =>
+        Path.Combine(_directory, $"chunk_{pos.X}_{pos.Y}_{pos.Z}.bin");
+}

@@ -2,6 +2,8 @@
 using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Core.Threading;
 using VoxelWorldEngine.Core;
+using VoxelWorldEngine.Core.ChunkLoading;
+using VoxelWorldEngine.Core.Serialization;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
@@ -16,7 +18,7 @@ public class ChunkLoadingSystem : ILoadable
     private readonly DynamicWorkerPool<ChunkLoadTask> _workerPool;
     
     // Використовуємо ThreadLocal замість звичайного поля
-    private readonly ThreadLocal<ChunkLoader> _threadLocalChunkLoader; 
+    private readonly ThreadLocal<ChunkFactory> _threadLocalChunkLoader; 
     
     private Vector3Int? _activeChunkPosition;
     private double _cooldown = 0f;
@@ -25,13 +27,13 @@ public class ChunkLoadingSystem : ILoadable
     private HashSet<Vector3Int> _requestedNewChunks = new();
     private ConcurrentQueue<Chunk> _readyChunks = new();
 
-    public ChunkLoadingSystem(VoxelWorld voxelWorld)
+    public ChunkLoadingSystem(VoxelWorld voxelWorld, IChunkMementoRepository chunkRepository)
     {
         _voxelWorld = voxelWorld;
         
         // Ініціалізуємо ThreadLocal. Він викличе лямбду ТІЛЬКИ тоді, 
         // коли новий потік вперше звернеться до Value.
-        _threadLocalChunkLoader = new ThreadLocal<ChunkLoader>(() => new ChunkLoader(_voxelWorld));
+        _threadLocalChunkLoader = new ThreadLocal<ChunkFactory>(() => new ChunkFactory(chunkRepository, _voxelWorld.Seed));
         
         _workerPool = new DynamicWorkerPool<ChunkLoadTask>(
             minWorkers: 2, 
@@ -64,9 +66,9 @@ public class ChunkLoadingSystem : ILoadable
 
     private void BuildChunkInBackground(ChunkLoadTask task)
     {
-        // Беремо екземпляр ChunkLoader, який належить КОНКРЕТНО ЦЬОМУ потоку
+        // Беремо екземпляр ChunkGenerateStrategy, який належить КОНКРЕТНО ЦЬОМУ потоку
         var chunkLoader = _threadLocalChunkLoader.Value;
-        var chunk = chunkLoader.BuildChunk(task.Position);
+        var chunk = chunkLoader.GetChunk(task.Position);
         
         _readyChunks.Enqueue(chunk);
     }

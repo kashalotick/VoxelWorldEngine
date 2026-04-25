@@ -10,8 +10,4 @@
         <PackageReference Include="DotnetNoise" Version="1.0.0"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="DataStructures\Common\Structures\"/>
-    </ItemGroup>
-
 </Project>

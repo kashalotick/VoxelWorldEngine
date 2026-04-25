@@ -1,15 +1,15 @@
-﻿using VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
+﻿using VoxelWorldEngine.Core.Serialization;
+using VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
 namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
 public partial class Octree<T> : IOctree<T>
 {
-
     public int MaxDepth { get; private set; }
     public int Size => _linearOctree.Size;
     private LinearOctree<T> _linearOctree;
-    
+
     // private bool isModified = false;
 
     public Octree()
@@ -55,7 +55,6 @@ public partial class Octree<T> : IOctree<T>
         var nodeIndex = _linearOctree.GetNodeIndex(position);
         var node = _linearOctree.GetNode(nodeIndex);
         return node.Data;
-
     }
 
     public bool SetData(Vector3Int index, T data)
@@ -66,5 +65,15 @@ public partial class Octree<T> : IOctree<T>
     public void ModifyArea(Vector3Int minIndex, Vector3Int maxIndex, T data)
     {
         _linearOctree.ModifyArea(data, minIndex, maxIndex);
+    }
+
+    public OctreeMemento<T> Save()
+    {
+        return _linearOctree.Save();
+    }
+
+    public void Restore(OctreeMemento<T> memento)
+    {
+        _linearOctree.Restore(memento);
     }
 }

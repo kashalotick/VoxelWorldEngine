@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using VoxelWorldEngine.Core;
+using VoxelWorldEngine.Core.Serialization;
 
 namespace GameApp.Content.Services;
 
@@ -105,6 +106,7 @@ public class WorldRepository
     }
 
     private string SlotPath(int slot) => Path.Combine(_savesPath, $"slot_{slot}");
+    private string ChunksPath(int slot) => Path.Combine(SlotPath(slot), "chunks");
     private string MetaPath(int slot) => Path.Combine(SlotPath(slot), "meta.json");
     private string StatePath(int slot) => Path.Combine(SlotPath(slot), "state.json");
 
@@ -112,5 +114,10 @@ public class WorldRepository
     {
         if (slot < 0 || slot >= SlotCount)
             throw new ArgumentOutOfRangeException(nameof(slot), $"Slot must be 0–{SlotCount - 1}");
+    }
+
+    public IChunkMementoRepository GetChunkRepository(int slot)
+    {
+        return new ChunkMementoRepository(ChunksPath(slot));
     }
 }

@@ -36,8 +36,8 @@ public class ChunkUpdateSystem : IDisposable
             _voxelWorld.UpdateChunk(task.Chunk);
         }
 
-        var dirty = _voxelWorld.DirtyChunks.ToList();
-        _voxelWorld.ClearDirty();
+        var dirty = _voxelWorld.MeshDirtyChunks.ToList();
+        _voxelWorld.ClearMeshDirty();
 
         foreach (var chunkPos in dirty)
         {
@@ -55,7 +55,7 @@ public class ChunkUpdateSystem : IDisposable
         try
         {
             var mesh = new MeshBuilder().Build(task.Chunk.Octree);
-            task.Chunk.Mesh = mesh;
+            task.Chunk.ChunkMesh = mesh;
             _readyMeshes.Enqueue(task); // кладемо для main thread
         }
         finally
