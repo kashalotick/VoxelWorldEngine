@@ -226,7 +226,7 @@ public class DemoScene : BaseScene
         var rayHit = _rayShooter.Shoot(ray, _voxelWorld);
 
         _hitVoxelPosition.Value = rayHit.IsHit
-            ? (rayHit.HitIn + _rayShooter.LastRay.Direction * 0.001f).FloorToVector3Int()
+            ? (rayHit.HitIn - rayHit.HitFaceNormal * 0.001f).FloorToVector3Int()
             : null;
 
         _rayHit.Value = rayHit;
@@ -290,7 +290,7 @@ public class DemoScene : BaseScene
         var lastHit = _rayShooter.LastHit;
         if (!lastHit.IsHit) return;
         
-        var hitVoxel = (lastHit.HitIn + _rayShooter.LastRay.Direction * 0.001f);
+        var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f);
         var voxelPlaceIndex = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
         
         Console.WriteLine($"Place block at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
@@ -302,7 +302,7 @@ public class DemoScene : BaseScene
         var lastHit = _rayShooter.LastHit;
         if (!lastHit.IsHit) return;
 
-        var hitVoxel = (lastHit.HitIn + _rayShooter.LastRay.Direction * 0.001f).FloorToVector3Int();
+        var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f).FloorToVector3Int();
 
         Console.WriteLine($"Breaking block at {hitVoxel}");
         var command = new BreakBlockCommand(_voxelWorld, hitVoxel);
