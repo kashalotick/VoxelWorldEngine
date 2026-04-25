@@ -15,6 +15,9 @@ public class PlayerController : FreeCameraController
     public event Action PlaceBlock;
     public event Action BreakBlock;
 
+    public event Action InventoryNext;
+    public event Action InventoryPrevious;
+
 
     private RayShooter _rayShooter;
 
@@ -105,12 +108,24 @@ public class PlayerController : FreeCameraController
     {
         if (e.Button == MouseButton.Left)
         {
-            _rayShooter.Trace();
+            // _rayShooter.Trace();
             BreakBlock?.Invoke();
         }
         if (e.Button == MouseButton.Right)
         {
             PlaceBlock?.Invoke();
+        }
+    }
+
+    public override void OnMouseWheel(MouseWheelEventArgs e, MouseState mouse)
+    {
+        if (e.OffsetY > 0)
+        {
+            InventoryPrevious?.Invoke();
+        }
+        else if (e.OffsetY < 0)
+        {
+            InventoryNext?.Invoke();
         }
     }
 }

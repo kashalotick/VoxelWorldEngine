@@ -31,6 +31,7 @@ public class Program
                     ShaderRepository = new ShaderRepository(),
                     FontRepository = new FontRepository(),
                     UiAtlas = new AtlasTextureRepository(textureRepository, "Ui"),
+                    BlockAtlas = new AtlasTextureRepository(textureRepository, "Blocks"),
                     TextureArrayRepository = textureArrayRepository,
                     // BlockArray = new BlockMapper().Build(textureArrayRepository);
                     // BlockAtlas = new AtlasTextureRepository(textureRepository, "Blocks"),

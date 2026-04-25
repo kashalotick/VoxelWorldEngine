@@ -6,5 +6,8 @@ public enum BlockId : byte
     Stone,
     Dirt,
     Grass,
+    Bricks,
+    Wood,
+    Leaves,
     Mixed,
 }

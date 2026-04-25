@@ -8,6 +8,7 @@ using LearningOpenTK.Core;
 using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Input;
 using LearningOpenTK.Core.Scenes;
+using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -28,11 +29,11 @@ public class DemoScene : BaseScene
     private ChunkLoadingSystem _chunkLoadingSystem;
     private ChunkUpdateSystem _chunkUpdateSystem;
 
-    
 
     private FpsCounter _fpsCounter;
     private PlayerController _playerController;
     private UiController _uiController;
+    private Inventory _inventory;
     private GameHud _hud;
     private Pause _pause;
 
@@ -75,6 +76,7 @@ public class DemoScene : BaseScene
         LoadRaycasting();
         LoadPause();
         LoadHud();
+        LoadInventory();
 
         Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
         var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero
@@ -87,6 +89,8 @@ public class DemoScene : BaseScene
         _playerController.ToggleHud += OnToggleHud;
         _playerController.PlaceBlock += OnPlaceBlock;
         _playerController.BreakBlock += OnBreakBlock;
+        _playerController.InventoryNext += _inventory.NextSlot;
+        _playerController.InventoryPrevious += _inventory.PreviousSlot;
 
         ControllerContext.SetState(_playerController);
         SceneContext.RequestWindowAction(new GrabCursor());
@@ -96,7 +100,7 @@ public class DemoScene : BaseScene
     {
         var skyTop = new Vector3(0.35f, 0.65f, 0.95f);
         var skyBottom = new Vector3(0.85f, 0.95f, 1.0f);
-        
+
         _sky = new Sky(GameContext.ShaderRepository.Get("sky"), skyTop, skyBottom);
         SOR.Register(_sky);
     }
@@ -121,7 +125,8 @@ public class DemoScene : BaseScene
         _voxelWorld.ChunkRemoved += _gameWorld.RemoveChunk;
         _gameWorld.Load();
 
-        _chunkLoadingSystem = SOR.Register(new ChunkLoadingSystem(_voxelWorld, _worldRepository.GetChunkRepository(_worldMeta.Slot)));
+        _chunkLoadingSystem
+            = SOR.Register(new ChunkLoadingSystem(_voxelWorld, _worldRepository.GetChunkRepository(_worldMeta.Slot)));
         _chunkUpdateSystem = new ChunkUpdateSystem(_voxelWorld);
 
         LightComposition(material.Shader);
@@ -154,6 +159,40 @@ public class DemoScene : BaseScene
         _rayHit.OnChanged += hit => _hud.UpdateRayHit(hit);
     }
 
+    private void LoadInventory()
+    {
+        BlockId[] inventoryBlocks =
+        [
+            BlockId.Stone,
+            BlockId.Dirt,
+            BlockId.Grass,
+            BlockId.Bricks,
+            BlockId.Wood,
+            BlockId.Leaves
+        ];
+        _inventory = new Inventory(inventoryBlocks);
+
+        var inventoryHudMaterial = new InventoryHudMaterial(
+            GameContext.ShaderRepository.Get("plain"),
+            GameContext.UiAtlas.Get("Plain"),
+            
+                GameContext.UiAtlas.Get("Selection"),
+                inventoryBlocks.Select(block => (ITexture)GameContext.BlockAtlas.Get(block.ToString())).ToArray(),
+            GameContext.UiAtlas.Get("Empty")
+        );
+        var inventoryHud = new InventoryHud(_inventory, inventoryHudMaterial)
+        {
+            Transform =
+            {
+                Pivot = new Vector2(0.5f, 0),
+                Anchor = new Vector2(0.5f, 0),
+                Offset = new Vector2(0, 16),
+                Scale = 4
+            }
+        };
+        _hud.Add(inventoryHud);
+    }
+
     private void LoadPause()
     {
         var pauseMaterial = new PauseMaterial(
@@ -182,7 +221,7 @@ public class DemoScene : BaseScene
     {
         GL.Enable(EnableCap.DepthTest);
         _sky.Render(renderContext);
-        
+
         _fpsCounter.Update(renderContext.DeltaTime);
         _gameWorld.Render(renderContext);
 
@@ -209,8 +248,6 @@ public class DemoScene : BaseScene
 
         _chunkLoadingSystem.Update(deltaTime, _worldState.Player);
         _chunkUpdateSystem.Update(deltaTime);
-        
-        
     }
 
     private void ProcessRaycast(double deltaTime)
@@ -285,18 +322,20 @@ public class DemoScene : BaseScene
 
     private void OnPlaceBlock()
     {
-        const BlockId blockToPlace = BlockId.Stone;
-        
+        var blockToPlace = _inventory.SelectedBlock;
+
         var lastHit = _rayShooter.LastHit;
         if (!lastHit.IsHit) return;
-        
+
         var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f);
         var voxelPlaceIndex = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
-        
-        Console.WriteLine($"Place block at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
+
+        Console.WriteLine(
+            $"Place block at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
         var command = new PlaceBlockCommand(_voxelWorld, voxelPlaceIndex, blockToPlace);
         command.Execute();
     }
+
     private void OnBreakBlock()
     {
         var lastHit = _rayShooter.LastHit;

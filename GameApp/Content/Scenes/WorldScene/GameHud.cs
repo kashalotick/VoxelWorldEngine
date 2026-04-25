@@ -37,7 +37,7 @@ public class GameHud : UiLayout
 
     protected override void Load()
     {
-        InitBackground();
+        // InitBackground();
         InitFpsText();
         InitDebugTexts();
         InitCrosshair();

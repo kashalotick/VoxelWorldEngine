@@ -7,8 +7,9 @@ namespace GameApp;
 public class MyGameContext : GameContext
 {
     public required AtlasTextureRepository UiAtlas { get; init; }
+    public required AtlasTextureRepository BlockAtlas { get; init; }
+    
     public required TextureArrayRepository TextureArrayRepository { get; init; }
     // public required TextureArray BlockArray { get; init; }
-    // public required AtlasTextureRepository BlockAtlas { get; init; }
     
 }
