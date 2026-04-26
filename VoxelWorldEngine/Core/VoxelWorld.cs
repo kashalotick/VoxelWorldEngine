@@ -98,6 +98,27 @@ public class VoxelWorld : IWorldRegion
         }
     }
 
+    public bool TryGetVoxel(Vector3Int voxelPosition, out Voxel voxel)
+    {
+        var chunkPos = Chunk.GlobalToChunk(voxelPosition);
+        if (!_chunks.TryGetValue(chunkPos, out var chunk))
+        {
+            voxel = Voxel.Void;
+            return false;
+        }
+
+        var localVoxelIndex = Chunk.GlobalToLocal(voxelPosition);
+        voxel = chunk.Octree.GetData(localVoxelIndex);
+        return true;
+    }
+
+    public bool IsSolid(Vector3Int voxelPosition)
+    {
+        return TryGetVoxel(voxelPosition, out var voxel)
+            ? !voxel.IsAir && !voxel.IsVoid
+            : true;
+    }
+
 
     public RayHit Raycast(Ray ray)
     {

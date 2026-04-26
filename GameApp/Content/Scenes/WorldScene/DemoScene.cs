@@ -33,6 +33,7 @@ public class DemoScene : BaseScene
 
     private FpsCounter _fpsCounter;
     private PlayerController _playerController;
+    private CharacterPhysics _characterPhysics;
     private UiController _uiController;
     private Inventory _inventory;
     private GameHud _hud;
@@ -87,7 +88,8 @@ public class DemoScene : BaseScene
             : _worldState.Player.ViewDirection;
         Camera.LookAt(_worldState.Player.Position + viewDirection);
 
-        _playerController = new PlayerController(Camera, _raycaster);
+        _characterPhysics = new CharacterPhysics(_worldState.Player.Position, voxelPosition => _voxelWorld.IsSolid(voxelPosition));
+        _playerController = new PlayerController(Camera, _raycaster, _characterPhysics);
         _playerController.Pause += OnPause;
         _playerController.ToggleHud += OnToggleHud;
         _playerController.ToggleDebug += OnToggleDebug;
