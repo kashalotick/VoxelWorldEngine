@@ -9,6 +9,8 @@ public enum BlockId : byte
     Bricks = 4,
     Wood = 5,
     Leaves = 6,
+    Glass = 7,
+    Planks = 8,
     Void = 254,
     Mixed = 255,
 }

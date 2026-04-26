@@ -172,8 +172,10 @@ public class DemoScene : BaseScene
             BlockId.Dirt,
             BlockId.Grass,
             BlockId.Bricks,
+            BlockId.Glass,
+            BlockId.Planks,
             BlockId.Wood,
-            BlockId.Leaves
+            BlockId.Leaves,
         ];
         _inventory = new Inventory(inventoryBlocks);
 

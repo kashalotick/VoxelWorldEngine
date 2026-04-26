@@ -15,6 +15,8 @@ public class BlockMapper
             .Set(BlockId.Bricks, "Bricks")
             .Set(BlockId.Wood, "Wood")
             .Set(BlockId.Leaves, "Leaves")
+            .Set(BlockId.Glass, "Glass")
+            .Set(BlockId.Planks, "Planks")
             .Set(BlockId.Mixed, "Mixed") 
             .Build();
     }
