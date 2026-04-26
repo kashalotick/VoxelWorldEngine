@@ -39,7 +39,7 @@ public class DemoScene : BaseScene
 
     private const float TextUpdateInterval = 1 / 60f;
     private ThrottleReactive<RayHit> _rayHit = new(TextUpdateInterval);
-    private RayShooter _rayShooter;
+    private Raycaster _raycaster;
     private Reactive<Vector3Int?> _hitVoxelPosition = new();
     private VoxelSelection _voxelSelection;
 
@@ -84,7 +84,7 @@ public class DemoScene : BaseScene
             : _worldState.Player.ViewDirection;
         Camera.LookAt(_worldState.Player.Position + viewDirection);
 
-        _playerController = new PlayerController(Camera, _rayShooter);
+        _playerController = new PlayerController(Camera, _raycaster);
         _playerController.Pause += OnPause;
         _playerController.ToggleHud += OnToggleHud;
         _playerController.ToggleDebug += OnToggleDebug;
@@ -137,8 +137,8 @@ public class DemoScene : BaseScene
     {
         var debugLinesShader = GameContext.ShaderRepository.Get("line");
 
-        _rayShooter = new RayShooter(debugLinesShader);
-        _rayShooter.Load();
+        _raycaster = new Raycaster(debugLinesShader);
+        _raycaster.Load();
 
         _voxelSelection = SOR.Register(new VoxelSelection(debugLinesShader));
         _hitVoxelPosition.OnChanged += pos => _voxelSelection.SetVoxelPosition(pos);
@@ -227,7 +227,7 @@ public class DemoScene : BaseScene
         _gameWorld.Render(renderContext);
 
         GL.Disable(EnableCap.DepthTest);
-        _rayShooter.Render(renderContext);
+        _raycaster.Render(renderContext);
     }
 
     public override void Update(double deltaTime)
@@ -260,7 +260,7 @@ public class DemoScene : BaseScene
             Direction = (System.Numerics.Vector3)Camera.Front
         };
 
-        var rayHit = _rayShooter.Shoot(ray, _voxelWorld);
+        var rayHit = _raycaster.Shoot(ray, _voxelWorld);
 
         _hitVoxelPosition.Value = rayHit.IsHit
             ? (rayHit.HitIn - rayHit.HitFaceNormal * 0.001f).FloorToVector3Int()
@@ -330,7 +330,7 @@ public class DemoScene : BaseScene
     {
         var blockToPlace = _inventory.SelectedBlock;
 
-        var lastHit = _rayShooter.LastHit;
+        var lastHit = _raycaster.LastHit;
         if (!lastHit.IsHit) return;
 
         var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f);
@@ -344,7 +344,7 @@ public class DemoScene : BaseScene
 
     private void OnBreakBlock()
     {
-        var lastHit = _rayShooter.LastHit;
+        var lastHit = _raycaster.LastHit;
         if (!lastHit.IsHit) return;
 
         var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f).FloorToVector3Int();

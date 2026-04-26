@@ -20,11 +20,11 @@ public class PlayerController : FreeCameraController
     public event Action InventoryPrevious;
 
 
-    private RayShooter _rayShooter;
+    private Raycaster _raycaster;
 
-    public PlayerController(Camera camera, RayShooter rayShooter) : base(camera)
+    public PlayerController(Camera camera, Raycaster raycaster) : base(camera)
     {
-        _rayShooter = rayShooter;
+        _raycaster = raycaster;
     }
 
     public override void OnKeyDown(KeyboardKeyEventArgs e, KeyboardState keyboard)
@@ -99,7 +99,7 @@ public class PlayerController : FreeCameraController
     {
         if (mouse.IsButtonDown(MouseButton.Left))
         {
-            _rayShooter.Trace();
+            _raycaster.Trace();
             BreakBlock?.Invoke();
         }
         if (mouse.IsButtonDown(MouseButton.Right))
@@ -112,7 +112,7 @@ public class PlayerController : FreeCameraController
     {
         if (e.Button == MouseButton.Left)
         {
-            // _rayShooter.Trace();
+            _raycaster.Trace();
             BreakBlock?.Invoke();
         }
         if (e.Button == MouseButton.Right)

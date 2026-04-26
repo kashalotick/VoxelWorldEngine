@@ -5,7 +5,7 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.Core.Raycasting;
 
-public static class Raycaster
+public static class RaycastUtils
 {
     public static bool IntersectAABB(
         Ray ray,

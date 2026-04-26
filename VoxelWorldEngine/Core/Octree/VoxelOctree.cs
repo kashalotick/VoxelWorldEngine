@@ -69,7 +69,7 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
         var maxF = new Vector3(root.MaxIndex.X + 1, root.MaxIndex.Y + 1, root.MaxIndex.Z + 1);
 
         // Знаходимо точку входу/виходу променя в AABB кореня
-        if (!Raycaster.IntersectAABB(ray, minF, maxF, out float tMin, out float tMax, out Vector3 normal))
+        if (!RaycastUtils.IntersectAABB(ray, minF, maxF, out float tMin, out float tMax, out Vector3 normal))
             return new RayHit { Voxel = Voxel.Empty };
 
         tMin = MathF.Max(tMin, 0f);
@@ -109,7 +109,7 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
             var cMin = new Vector3(child.MinIndex.X, child.MinIndex.Y, child.MinIndex.Z);
             var cMax = new Vector3(child.MaxIndex.X + 1, child.MaxIndex.Y + 1, child.MaxIndex.Z + 1);
 
-            if (!Raycaster.IntersectAABB(ray, cMin, cMax, out float ct0, out float ct1, out Vector3 childNormal))
+            if (!RaycastUtils.IntersectAABB(ray, cMin, cMax, out float ct0, out float ct1, out Vector3 childNormal))
                 continue;
 
             ct0 = MathF.Max(ct0, tMin);

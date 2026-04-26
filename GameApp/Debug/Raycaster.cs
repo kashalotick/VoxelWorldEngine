@@ -7,23 +7,31 @@ using VoxelWorldEngine.Utils;
 
 namespace GameApp.Debug;
 
-public class RayShooter : ILoadable, IRenderable
+public class Raycaster : ILoadable, IRenderable
 {
     private IShader _shader;
 
     public Ray LastRay { get; private set; }
-    public RayHit LastHit {get; private set;}
+    public RayHit LastHit { get; private set; }
     private (Ray ray, RayHit hit) _traced = new();
+    
+    private bool _meshInitialized = false;
     private LineMesh _rayMesh;
     private RayHitPointsMesh _rayHitPointsMesh;
 
-    public RayShooter(IShader shader)
+    public Raycaster(IShader shader)
     {
         _shader = shader;
     }
 
     public void Load()
     {
+        // InitRayMesh();
+    }
+
+    private void InitRayMesh()
+    {
+        _meshInitialized = true;
         _rayMesh = new LineMesh();
         _rayMesh.Load(BufferUsageHint.DynamicDraw);
         _rayHitPointsMesh = new RayHitPointsMesh();
@@ -32,13 +40,12 @@ public class RayShooter : ILoadable, IRenderable
 
     public void Render(RenderContext renderContext)
     {
+        if (!_meshInitialized) return;
+        
         _shader.Use();
         var viewProjection = renderContext.ViewMatrix * renderContext.ProjectionMatrix3D;
         _shader.SetMatrix4("uViewProjection", viewProjection);
-
         _rayMesh.Render();
-
-
         _rayHitPointsMesh.Render();
     }
 
@@ -46,12 +53,14 @@ public class RayShooter : ILoadable, IRenderable
     {
         var rayHit = target.Raycast(ray);
         LastRay = ray;
-        LastHit =  rayHit;
+        LastHit = rayHit;
         return rayHit;
     }
 
     public void Trace()
     {
+        if (!_meshInitialized) return;
+
         _traced = (LastRay, LastHit);
         _rayMesh.UpdateRay(_traced.ray, _traced.hit);
         var hitline = (bool)LastHit.IsHit ? $"{LastHit.HitIn.FancyString()} -> {LastHit.HitOut.FancyString()}" : "";
@@ -64,6 +73,8 @@ public class RayShooter : ILoadable, IRenderable
 
     public void Dispose()
     {
+        if (!_meshInitialized) return;
+
         _rayMesh.Dispose();
         _rayHitPointsMesh.Dispose();
     }
