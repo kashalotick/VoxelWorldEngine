@@ -10,7 +10,7 @@ public enum ModifyMode
 }
 
 public record ModifyRegionCommand(
-    VoxelWorld World,
+    IWorldRegion Region,
     Vector3Int InsertPosition,
     Vector3Int AreaSize,
     Voxel[] Data,
@@ -25,11 +25,11 @@ public record ModifyRegionCommand(
         switch (Mode)
         {
             case ModifyMode.ReplaceAll:
-                World.ModifyArea(InsertPosition, AreaSize, Data, CanPlaceInAnyIfNotVoid);
+                Region.ModifyArea(InsertPosition, AreaSize, Data, CanPlaceInAnyIfNotVoid);
                 break;
 
             case ModifyMode.ReplaceAir:
-                World.ModifyArea(InsertPosition, AreaSize, Data, CanPlaceInAirIfNotVoid);
+                Region.ModifyArea(InsertPosition, AreaSize, Data, CanPlaceInAirIfNotVoid);
                 break;
 
             default:

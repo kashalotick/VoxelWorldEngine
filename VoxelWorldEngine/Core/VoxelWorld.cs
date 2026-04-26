@@ -1,4 +1,5 @@
 using System.Numerics;
+using VoxelWorldEngine.Core.Commands;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
@@ -7,8 +8,7 @@ using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.Core;
 
-// TODO: mb make composite with IWorldStructure for world, chunk, voxel octree
-public class VoxelWorld : IRaycastable
+public class VoxelWorld : IWorldRegion
 {
     public event Action<Chunk> ChunkAdded;
     public event Action<Chunk> ChunkUpdated;
@@ -59,20 +59,18 @@ public class VoxelWorld : IRaycastable
         _meshDirtyChunks.Remove(chunkPos);
     }
 
-    public void PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
+    public bool PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
     {
         var chunkPos = Chunk.GlobalToChunk(voxelPositionIndex);
-        var localVoxelIndex = Chunk.GlobalToLocal(voxelPositionIndex);
-
         var chunk = _chunks[chunkPos];
 
-
-        var isDataChanged = chunk.Octree.SetData(localVoxelIndex, new Voxel(blockId));
-        if (isDataChanged)
+        var result = chunk.PlaceBlock(voxelPositionIndex, blockId);
+        if (result)
         {
-            chunk.MarkDirty();
             _meshDirtyChunks.Add(chunkPos);
         }
+
+        return result;
     }
 
     public void ModifyArea(Vector3Int insertPosition, Vector3Int areaSize, Voxel[] data, Func<Voxel, Voxel, bool>? canReplace = null)
@@ -84,91 +82,33 @@ public class VoxelWorld : IRaycastable
         for (int x = firstChunk.X; x <= lastChunk.X; x++)
         for (int y = firstChunk.Y; y <= lastChunk.Y; y++)
         for (int z = firstChunk.Z; z <= lastChunk.Z; z++)
-            ModifyChunk(new Vector3Int(x, y, z), insertPosition, areaSize, data, canReplace);
+        {
+            var chunkPos = new Vector3Int(x, y, z);
+            var chunk = _chunks[chunkPos];
+            chunk.ModifyArea(insertPosition, areaSize, data, canReplace);
+            _meshDirtyChunks.Add(chunkPos);
+        }
     }
-
-    private void ModifyChunk(Vector3Int chunkPosition, Vector3Int insertPosition, Vector3Int areaSize, Voxel[] data, Func<Voxel, Voxel, bool>? canReplace)
-    {
-        Console.WriteLine($"[VoxelWorld] Executing ModifyRegion at chunk {chunkPosition}, insert position {insertPosition}, area size: {areaSize}");
-
-        var chunk = _chunks[chunkPosition];
-        var chunkOriginGlobal = Chunk.ChunkToGlobal(chunkPosition);
-        var relativeInsertPosition = insertPosition - chunkOriginGlobal;
-        
-        chunk.Octree.ModifyArea(relativeInsertPosition, areaSize, data, canReplace);
-        
-        chunk.MarkDirty();
-        _meshDirtyChunks.Add(chunkPosition);
-    }
-        
     
 
     public RayHit Raycast(Ray ray)
     {
-        var chunkPos = Chunk.GlobalToChunk(ray.Origin.ToVector3Int());
-        var dir = ray.Direction;
-        var chunkSize = Chunk.ChunkSize;
+        var enumerator = new RayGridEnumerator(ray, Chunk.ChunkSize);
 
-        // ???? ?? ?????? ???
-        var step = new Vector3Int(
-            dir.X >= 0 ? 1 : -1,
-            dir.Y >= 0 ? 1 : -1,
-            dir.Z >= 0 ? 1 : -1
-        );
-
-        // ??????? t ????? ?????? ??? ????????? ???? ???? ?? ?????? ???
-        var tDelta = new Vector3(
-            MathF.Abs(chunkSize / dir.X),
-            MathF.Abs(chunkSize / dir.Y),
-            MathF.Abs(chunkSize / dir.Z)
-        );
-
-        // t ?? ?????? ???? ?? ?????? ???
-        var chunkOrigin = chunkPos * chunkSize;
-        var tMax = new Vector3(
-            dir.X >= 0 ? (chunkOrigin.X + chunkSize - ray.Origin.X) / dir.X : (chunkOrigin.X - ray.Origin.X) / dir.X,
-            dir.Y >= 0 ? (chunkOrigin.Y + chunkSize - ray.Origin.Y) / dir.Y : (chunkOrigin.Y - ray.Origin.Y) / dir.Y,
-            dir.Z >= 0 ? (chunkOrigin.Z + chunkSize - ray.Origin.Z) / dir.Z : (chunkOrigin.Z - ray.Origin.Z) / dir.Z
-        );
-
-        float t = 0;
-        while (t <= ray.Length)
+        if (_chunks.TryGetValue(enumerator.CurrentPos, out var firstChunk))
         {
-            if (_chunks.TryGetValue(chunkPos, out var chunk))
-            {
-                var localRay = ray with { Origin = ray.Origin - (Vector3)chunk.GlobalPosition };
-                // var localRay = ray;
+            var hit = firstChunk.Raycast(ray);
+            if (!hit.Voxel.IsAir) return hit;
+        }
 
-                var hit = chunk.Octree.Raycast(localRay);
-                if (!hit.Voxel.IsAir)
-                {
-                    hit.HitIn += (Vector3)chunk.GlobalPosition;
-                    hit.HitOut += (Vector3)chunk.GlobalPosition;
-                    return hit;
-                }
-            }
-
-            // ?????????? ? ????????? ???? ?? ?????????? ????
-            if (tMax.X < tMax.Y && tMax.X < tMax.Z)
+        while (enumerator.MoveNext())
+        {
+            if (_chunks.TryGetValue(enumerator.CurrentPos, out var chunk))
             {
-                chunkPos.X += step.X;
-                t = tMax.X;
-                tMax.X += tDelta.X;
-            }
-            else if (tMax.Y < tMax.Z)
-            {
-                chunkPos.Y += step.Y;
-                t = tMax.Y;
-                tMax.Y += tDelta.Y;
-            }
-            else
-            {
-                chunkPos.Z += step.Z;
-                t = tMax.Z;
-                tMax.Z += tDelta.Z;
+                var hit = chunk.Raycast(ray);
+                if (!hit.Voxel.IsAir) return hit;
             }
         }
 
         return new RayHit { Voxel = Voxel.Air };
-    }
-}
+    }}

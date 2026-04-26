@@ -7,10 +7,10 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
 
-public class VoxelOctree : Octree<Voxel>, IVoxelOctree
+public class VoxelOctree : Octree<Voxel>, IVoxelOctree, IWorldRegion
 {
-    private int _splitCount;
-    public int _mergeCount;
+
+    
     public void Build(IGenerator generator)
     {
         BuildRecursive(generator, Root());
@@ -25,7 +25,6 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
             return;
         }
 
-        _splitCount++;
         node.Split();
         var shouldMerge = true;
         Voxel? childVoxel = null;
@@ -56,7 +55,6 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
         if (shouldMerge)
         {
             node.Data = childVoxel ??  new Voxel();
-            _mergeCount++;
             node.Merge();
         }
     }
@@ -71,11 +69,11 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
 
         // Знаходимо точку входу/виходу променя в AABB кореня
         if (!RaycastUtils.IntersectAABB(ray, minF, maxF, out float tMin, out float tMax, out Vector3 normal))
-            return new RayHit { Voxel = Voxel.Air };
+            return RayHit.NoHit;
 
         tMin = MathF.Max(tMin, 0f);
         if (tMin > tMax)
-            return new RayHit { Voxel = Voxel.Air };
+            return RayHit.NoHit;
 
         return RaycastNode(root, ray, tMin, tMax, normal);
     }
@@ -83,13 +81,13 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
     private RayHit RaycastNode(OctreeNode node, Ray ray, float tMin, float tMax, Vector3 normal)
     {
         if (tMin > ray.Length)
-            return new RayHit { Voxel = Voxel.Air };
+            return RayHit.NoHit;
 
         if (node.IsLeaf)
         {
             var voxel = node.Data;
             if (voxel.IsAir)
-                return new RayHit { Voxel = Voxel.Air };
+                return RayHit.NoHit;
 
             return new RayHit
             {
@@ -142,6 +140,11 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
                 return result;
         }
 
-        return new RayHit { Voxel = Voxel.Air };
+        return RayHit.NoHit;
+    }
+
+    public bool PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
+    {
+        return SetData(voxelPositionIndex, new Voxel(blockId), null);
     }
 }

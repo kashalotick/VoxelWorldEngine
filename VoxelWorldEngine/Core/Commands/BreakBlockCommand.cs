@@ -3,5 +3,5 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.Core.Commands;
 
-public record BreakBlockCommand(VoxelWorld World, Vector3Int VoxelPositionIndex) : PlaceBlockCommand(World,
+public record BreakBlockCommand(   IWorldRegion Region, Vector3Int VoxelPositionIndex) : PlaceBlockCommand(Region,
     VoxelPositionIndex, BlockId.Air);

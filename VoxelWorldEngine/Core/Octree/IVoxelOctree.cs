@@ -6,8 +6,7 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.DataStructures.Special.Collections;
 
-public interface IVoxelOctree : IOctree<Voxel>, IRaycastable
+public interface IVoxelOctree : IOctree<Voxel>
 {
     void Build(IGenerator generator);
-
 }

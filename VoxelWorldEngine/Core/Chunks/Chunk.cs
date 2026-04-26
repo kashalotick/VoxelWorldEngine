@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Commands;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.Core.Serialization;
@@ -11,7 +12,7 @@ using VoxelWorldEngine.Utils;
 namespace VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
 // TODO: implement logic
-public class Chunk
+public class Chunk : IWorldRegion
 {
     public bool IsDirty { get; private set; } = false;
     public ChunkMeshData ChunkMesh { get; set; }
@@ -72,7 +73,6 @@ public class Chunk
     }
 
 
-
     public ChunkMemento Save()
     {
         var memento = new ChunkMemento(Position, Octree.Save());
@@ -85,5 +85,48 @@ public class Chunk
         Position = memento.Position;
         Octree = new VoxelOctree();
         Octree.Restore(new OctreeMemento<Voxel>(memento.Nodes));
+    }
+
+    public RayHit Raycast(Ray ray)
+    {
+        var localRay = ray with { Origin = ray.Origin - (Vector3)GlobalPosition };
+
+        var hit = Octree.Raycast(localRay);
+
+        if (!hit.Voxel.IsAir)
+        {
+            hit.HitIn += (Vector3)GlobalPosition;
+            hit.HitOut += (Vector3)GlobalPosition;
+        }
+
+        return hit;
+    }
+
+    public bool PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
+    {
+        var localVoxelIndex = GlobalToLocal(voxelPositionIndex);
+        var isDataChanged = Octree.PlaceBlock(localVoxelIndex, blockId);
+
+        if (isDataChanged)
+        {
+            MarkDirty();
+        }
+
+        return isDataChanged;
+    }
+
+    public void ModifyArea(
+        Vector3Int insertPosition,
+        Vector3Int areaSize,
+        Voxel[] data,
+        Func<Voxel, Voxel, bool>? canReplace
+    )
+    {
+        var chunkOriginGlobal = ChunkToGlobal(Position);
+        var relativeInsertPosition = insertPosition - chunkOriginGlobal;
+
+        Octree.ModifyArea(relativeInsertPosition, areaSize, data, canReplace);
+
+        MarkDirty();
     }
 }

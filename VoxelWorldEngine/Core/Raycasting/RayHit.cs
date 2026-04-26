@@ -11,4 +11,7 @@ public struct RayHit
     public Voxel Voxel;
     public float Distance => (HitOut - HitIn).Length();
     public bool IsHit => !Voxel.IsAir;
+
+
+    public static RayHit NoHit => new RayHit { Voxel = Voxel.Air };
 }
