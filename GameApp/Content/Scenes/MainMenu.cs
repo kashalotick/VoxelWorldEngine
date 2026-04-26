@@ -1,4 +1,4 @@
-﻿using GameApp.Content.scenes;
+﻿using GameApp.Content.Controllers;
 using GameApp.Content.Scenes.WorldScene;
 using GameApp.Content.Services;
 using GameApp.Content.Ui;

@@ -1,60 +1,88 @@
-using GameApp.Debug;
+using GameApp.Content.Controllers.MovementStrategies;
 using GameApp.Content.Systems;
+using GameApp.Debug;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.Input;
-using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
-namespace GameApp.Content.Scenes.WorldScene;
+namespace GameApp.Content.Controllers;
 
 public class PlayerController : SceneController
 {
-    public event Action Pause;
-    public event Action ToggleHud;
-    public event Action ToggleDebug;
+    public event Action? Pause;
+    public event Action? ToggleHud;
+    public event Action? ToggleDebug;
 
-    public event Action PlaceBlock;
-    public event Action BreakBlock;
-    public event Action MiddleButtonClick;
+    public event Action? PlaceBlock;
+    public event Action? BreakBlock;
+    public event Action? MiddleButtonClick;
 
-    public event Action InventoryNext;
-    public event Action InventoryPrevious;
+    public event Action? InventoryNext;
+    public event Action? InventoryPrevious;
+    
+    public event Action<MovementMode>? ToggleMovementMode;
 
 
-    private Raycaster _raycaster;
-    private readonly Camera _camera;
-    private readonly CharacterPhysics _physics;
+    private readonly Raycaster _raycaster;
+    private readonly WalkBaseMovementStrategy _walkBaseStrategy;
+    private readonly FlightBaseMovementStrategy _flightBaseStrategy;
+    private readonly FreeCameraBaseMovementStrategy _freeCameraBaseStrategy;
 
-    private bool _jumpHeld;
+    private IMovementStrategy _movementStrategy;
+    private MovementMode _movementMode = MovementMode.Walk;
+
+
+    private const double DoubleTapWindow = 0.35;
 
     public float MouseSensitivity { get; set; } = 0.2f;
     public float MoveSpeed { get; set; } = 5f;
-    public float SprintMultiplier { get; set; } = 2f;
+    public float SprintMultiplier { get; set; } = 1.75f;
+    public float FlightSpeed { get; set; } = 10f;
+    public float FlightSprintMultiplier { get; set; } = 2.5f;
+
     public float JumpForce { get; set; } = 8f;
 
     public PlayerController(Camera camera, Raycaster raycaster, CharacterPhysics physics)
     {
-        _camera = camera;
         _raycaster = raycaster;
-        _physics = physics;
+
+        _walkBaseStrategy
+            = new WalkBaseMovementStrategy(camera, physics, MouseSensitivity, MoveSpeed, SprintMultiplier, JumpForce);
+        _flightBaseStrategy = new FlightBaseMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed, FlightSprintMultiplier, FlightSpeed);
+        _freeCameraBaseStrategy = new FreeCameraBaseMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed, FlightSprintMultiplier, FlightSpeed);
+        _movementStrategy = _walkBaseStrategy;
+        _movementStrategy.OnEnter();
     }
 
     public override void OnUpdate(double deltaTime, KeyboardState keyboard, MouseState mouse)
     {
         base.OnUpdate(deltaTime, keyboard, mouse);
 
-        ProcessMouseLook(mouse);
-        ProcessMovementInput(keyboard);
-        ProcessJumpInput(keyboard);
-
-        _physics.Update((float)deltaTime);
-        _camera.Position = _physics.Position;
+        _movementStrategy.Update(deltaTime, keyboard, mouse);
     }
 
     public override void OnKeyDown(KeyboardKeyEventArgs e, KeyboardState keyboard)
     {
-        if (e.Key == Keys.Escape) Pause?.Invoke();
+        if (e.IsRepeat) return;
+
+        if (e.Key == Keys.Escape)
+        {
+            Pause?.Invoke();
+            return;
+        }
+
+        if (e.Key == Keys.Tab)
+        {
+            ToggleFlightMode();
+            return;
+        }
+        if (e.Key == Keys.F)
+        {
+            ToggleFreeCam();
+            return;
+        }
+
     }
 
     public override void OnKeyUp(KeyboardKeyEventArgs e, KeyboardState keyboard)
@@ -73,47 +101,32 @@ public class PlayerController : SceneController
         }
     }
 
-    private void ProcessMouseLook(MouseState mouse)
+    private void ToggleFreeCam()
     {
-        _camera.Yaw += mouse.Delta.X * MouseSensitivity;
-        _camera.Pitch = MathHelper.Clamp(_camera.Pitch - mouse.Delta.Y * MouseSensitivity, -89f, 89f);
+        if (_movementMode == MovementMode.FreeCamera) SwitchMovementMode(MovementMode.Walk);
+        else SwitchMovementMode(MovementMode.FreeCamera);
     }
-
-    private void ProcessMovementInput(KeyboardState keyboard)
+    private void ToggleFlightMode()
     {
-        var yawRad = MathHelper.DegreesToRadians(_camera.Yaw);
-        var forward = Vector3.Normalize(new Vector3(MathF.Cos(yawRad), 0f, MathF.Sin(yawRad)));
-        var right = Vector3.Normalize(new Vector3(-forward.Z, 0f, forward.X));
-
-        var direction = Vector3.Zero;
-
-        if (keyboard.IsKeyDown(Keys.W)) direction += forward;
-        if (keyboard.IsKeyDown(Keys.S)) direction -= forward;
-        if (keyboard.IsKeyDown(Keys.D)) direction += right;
-        if (keyboard.IsKeyDown(Keys.A)) direction -= right;
-
-        if (direction.LengthSquared > 0f)
-        {
-            direction = Vector3.Normalize(direction);
-        }
-
-        var speed = keyboard.IsKeyDown(Keys.LeftControl)
-            ? MoveSpeed * SprintMultiplier
-            : MoveSpeed;
-
-        var horizontalVelocity = new Vector2(direction.X * speed, direction.Z * speed);
-        _physics.SetHorizontalVelocity(horizontalVelocity);
+        if (_movementMode == MovementMode.Flight) SwitchMovementMode(MovementMode.Walk);
+        else SwitchMovementMode(MovementMode.Flight);
     }
-
-    private void ProcessJumpInput(KeyboardState keyboard)
+    private void SwitchMovementMode(MovementMode nextMode)
     {
-        var jumpDown = keyboard.IsKeyDown(Keys.Space);
-        if (jumpDown && !_jumpHeld && _physics.IsGrounded)
-        {
-            _physics.Jump(JumpForce);
-        }
+        if (_movementMode == nextMode) return;
 
-        _jumpHeld = jumpDown;
+        ToggleMovementMode?.Invoke(nextMode);
+        
+        _movementStrategy.OnExit();
+        _movementMode = nextMode;
+        _movementStrategy = _movementMode switch
+        {
+            MovementMode.Walk => _walkBaseStrategy,
+            MovementMode.Flight => _flightBaseStrategy,
+            MovementMode.FreeCamera => _freeCameraBaseStrategy,
+            _ => _walkBaseStrategy
+        };
+        _movementStrategy.OnEnter();
     }
 
     private enum ClickState
@@ -123,9 +136,9 @@ public class PlayerController : SceneController
         Repeating
     }
 
-    private ClickState _currentClickState = ClickState.Idle;
+    private ClickState _currentClickState;
 
-    private double _timer = 0;
+    private double _timer;
     private const double InitialDelay = 0.25;
     private const double RepeatInterval = 0.2;
 

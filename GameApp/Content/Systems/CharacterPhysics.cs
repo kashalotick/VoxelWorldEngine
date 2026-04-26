@@ -7,7 +7,7 @@ public class CharacterPhysics
 {
     private readonly Func<Vector3Int, bool> _isSolidVoxel;
 
-    private const float DefaultGravity = -20f;
+    private const float DefaultGravity = -25f;
     private const float DefaultTerminalVelocity = -50f;
     private const float StepSize = 0.05f;
 
@@ -20,12 +20,24 @@ public class CharacterPhysics
 
     public float Width { get; set; } = 0.6f;
     public float Height { get; set; } = 1.8f;
-    public float EyeHeight { get; set; } = 1.62f;
+    public float EyeHeight { get; set; } = 1.65f;
 
     public CharacterPhysics(Vector3 initialPosition, Func<Vector3Int, bool> isSolidVoxel)
     {
         Position = initialPosition;
         _isSolidVoxel = isSolidVoxel;
+    }
+
+    public void Teleport(Vector3 position)
+    {
+        Position = position;
+        Velocity = Vector3.Zero;
+        IsGrounded = false;
+    }
+
+    public void SetVelocity(Vector3 velocity)
+    {
+        Velocity = velocity;
     }
 
     public void SetHorizontalVelocity(Vector2 velocityXz)
@@ -43,13 +55,27 @@ public class CharacterPhysics
 
     public void Update(float deltaTime)
     {
+        Update(deltaTime, applyGravity: true, resolveCollisions: true);
+    }
+
+    public void Update(float deltaTime, bool applyGravity, bool resolveCollisions)
+    {
         if (deltaTime <= 0f) return;
 
-        var verticalVelocity = Velocity.Y + Gravity * deltaTime;
-        verticalVelocity = MathF.Max(verticalVelocity, TerminalVelocity);
-        Velocity = new Vector3(Velocity.X, verticalVelocity, Velocity.Z);
+        if (applyGravity)
+        {
+            var verticalVelocity = Velocity.Y + Gravity * deltaTime;
+            verticalVelocity = MathF.Max(verticalVelocity, TerminalVelocity);
+            Velocity = new Vector3(Velocity.X, verticalVelocity, Velocity.Z);
+        }
 
         IsGrounded = false;
+
+        if (!resolveCollisions)
+        {
+            Position += Velocity * deltaTime;
+            return;
+        }
 
         var movement = Velocity * deltaTime;
         var nextPosition = Position;
