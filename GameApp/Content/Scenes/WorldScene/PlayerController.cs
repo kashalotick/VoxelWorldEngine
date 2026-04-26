@@ -11,7 +11,8 @@ public class PlayerController : FreeCameraController
 {
     public event Action Pause;
     public event Action ToggleHud;
-    
+    public event Action ToggleDebug;
+
     public event Action PlaceBlock;
     public event Action BreakBlock;
 
@@ -35,8 +36,11 @@ public class PlayerController : FreeCameraController
     {
         switch (e.Key)
         {
-            case Keys.F3:
+            case Keys.F1:
                 ToggleHud?.Invoke();
+                break;
+            case Keys.F3:
+                ToggleDebug?.Invoke();
                 break;
             case Keys.F11:
                 RequestWindowAction(new ToggleFullscreenWindow()); // TODO: replace with event???

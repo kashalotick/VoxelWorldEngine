@@ -73,8 +73,6 @@ public class VoxelWorld : IRaycastable
             chunk.MarkDirty();
             _meshDirtyChunks.Add(chunkPos);
         }
-
-        Console.WriteLine($"set {blockId} on chunk={chunkPos} voxel={localVoxelIndex}: {isDataChanged}");
     }
 
     public RayHit Raycast(Ray ray)

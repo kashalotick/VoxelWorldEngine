@@ -87,6 +87,7 @@ public class DemoScene : BaseScene
         _playerController = new PlayerController(Camera, _rayShooter);
         _playerController.Pause += OnPause;
         _playerController.ToggleHud += OnToggleHud;
+        _playerController.ToggleDebug += OnToggleDebug;
         _playerController.PlaceBlock += OnPlaceBlock;
         _playerController.BreakBlock += OnBreakBlock;
         _playerController.InventoryNext += _inventory.NextSlot;
@@ -286,6 +287,11 @@ public class DemoScene : BaseScene
         _elapsedTime = 0;
     }
 
+    private void OnToggleDebug()
+    {
+        _hud.ToggleDebug();
+    }
+    
     private void OnToggleHud()
     {
         if (_hud.IsDisabled) _hud.Enable();
@@ -351,8 +357,7 @@ public class DemoScene : BaseScene
     protected override void ReleaseManagedResources()
     {
         _gameWorld.Dispose();
-        Console.WriteLine("Releasing managed resources");
-
-        // save world here
+        SaveWorld();
+        
     }
 }

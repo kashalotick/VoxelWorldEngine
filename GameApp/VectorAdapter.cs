@@ -20,7 +20,4 @@ public static class VectorAdapter
 
     // Vector2Int -> Vector2
     public static Vector2 ToVector2(this Vector2Int v) => new(v.X, v.Y);
-    
-
-    public static string FancyString(this Vector3 vector) => $"{vector.X:N2}, {vector.Y:N2}, {vector.Z:N2}"; // TODO: temp
 }

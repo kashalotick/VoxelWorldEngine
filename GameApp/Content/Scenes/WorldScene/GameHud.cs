@@ -19,16 +19,12 @@ public record GameHudMaterial(
     ITexture Crosshair,
     IFont TextFont
 );
+
 public class GameHud : UiLayout
 {
     private readonly GameHudMaterial _material;
 
-    private DynamicText _playerPositionText;
-    private DynamicText _chunkPositionText;
-    private DynamicText _rayIsHitText;
-    private DynamicText _aabbText;
-    private DynamicText _fpsText;
-
+    private DebugHud _debugHud;
 
     public GameHud(float width, float height, GameHudMaterial material) : base(width, height)
     {
@@ -37,57 +33,46 @@ public class GameHud : UiLayout
 
     protected override void Load()
     {
-        // InitBackground();
-        InitFpsText();
-        InitDebugTexts();
+        InitDebugText();
         InitCrosshair();
 
         base.Load();
     }
 
-    public void UpdateFps(int fps)
-        => _fpsText.SetTextContent($"FPS: {fps}");
+    public void UpdateFps(int fps) => _debugHud.UpdateFps(fps);
 
-    public void UpdatePlayerPosition(Vector3 position)
-        => _playerPositionText.SetTextContent($"xyz: {position.FancyString()}");
+    public void UpdatePlayerPosition(Vector3 position) => _debugHud.UpdatePlayerPosition(position);
 
-    public void UpdateChunkPosition(Vector3Int chunkPos)
-        => _chunkPositionText.SetTextContent($"chunk xyz: {chunkPos}");
+    public void UpdateChunkPosition(Vector3Int chunkPos) =>  _debugHud.UpdateChunkPosition(chunkPos);
 
-    public void UpdateRayHit(RayHit hit)
+    public void UpdateRayHit(RayHit hit) => _debugHud.UpdateRayHit(hit);
+
+    public void ToggleDebug()
     {
-        _rayIsHitText.SetTextContent($"Ray hit: {hit.IsHit}");
-        _aabbText.SetTextContent($"AABB: {hit.HitIn.ToVector3Int()} / {hit.HitIn.ToVector3Int() + Vector3Int.One}");
+        _debugHud.IsVisible = !_debugHud.IsVisible;
     }
 
-    private void InitBackground()
+    public void InitDebugText()
     {
-
-        Add(new StaticElement(_material.Shader, _material.Background)
+        var debugMaterial = new DebugHudMaterial(
+            _material.Shader,
+            _material.Background,
+            _material.TextFont
+        );
+        _debugHud = new DebugHud(debugMaterial)
         {
             Transform =
             {
-                Width = 420,
-                Height = 256,
                 Anchor = (0, 1),
                 Pivot = (0, 1),
-                Scale = 1,
+                Offset = (24, -24),
+                Scale = 2,
             },
-            ZIndex = 0,
-            Color = ColorStyle.Black,
-        });
+            IsVisible = false
+        };
+        Add(_debugHud);
     }
 
-    private void InitFpsText()
-        => _fpsText = FastText(new Vector2(24, 24));
-
-    private void InitDebugTexts()
-    {
-        _playerPositionText = FastText(new Vector2(24, 24 + 2 * 32));
-        _chunkPositionText = FastText(new Vector2(24, 24 + 3 * 32));
-        _rayIsHitText = FastText(new Vector2(24, 24 + 5 * 32));
-        _aabbText = FastText(new Vector2(24, 24 + 6 * 32));
-    }
 
     private void InitCrosshair()
     {
@@ -96,17 +81,5 @@ public class GameHud : UiLayout
             Color = ColorStyle.White
         };
         Add(crosshair);
-    }
-
-    private DynamicText FastText(Vector2 position)
-    {
-        var text = new DynamicText(_material.Shader, _material.TextFont, " ");
-        text.Transform.Anchor = new Vector2(0, 1);
-        text.Transform.Offset = position with { Y = -position.Y - 16 };
-        text.Transform.Scale = 2;
-        text.Color = ColorStyle.White;
-
-        Add(text);
-        return text;
     }
 }

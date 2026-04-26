@@ -48,7 +48,6 @@ public class InventoryHud : ListElement
     {
         for (int i = 0; i < _inventory.InventorySize; i++)
         {
-            Console.WriteLine($"{i}/{_slots.Length}");
             if (i < _material.Slots.Length)
             {
                 _slots[i] = new Slot(i, _material.Shader, _material.Selection, _material.Slots[i]);
@@ -64,7 +63,6 @@ public class InventoryHud : ListElement
 
     private void UpdateSelection(int newSlot)
     {
-        Console.WriteLine($"{_inventory.SelectedBlock}, {_inventory.SelectedSlot.Value}");
         _slots[_previousSelectedSlot].IsSelected = false;
         _slots[newSlot].IsSelected = true;
         _previousSelectedSlot = newSlot;
