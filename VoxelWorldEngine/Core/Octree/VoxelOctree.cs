@@ -58,6 +58,7 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree, IWorldRegion
             node.Merge();
         }
     }
+    
 
     public RayHit Raycast(Ray ray)
     {
@@ -72,16 +73,16 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree, IWorldRegion
             return RayHit.NoHit;
 
         tMin = MathF.Max(tMin, 0f);
+        tMax = MathF.Min(tMax, ray.Length);
         if (tMin > tMax)
             return RayHit.NoHit;
+
 
         return RaycastNode(root, ray, tMin, tMax, normal);
     }
 
     private RayHit RaycastNode(OctreeNode node, Ray ray, float tMin, float tMax, Vector3 normal)
     {
-        if (tMin > ray.Length)
-            return RayHit.NoHit;
 
         if (node.IsLeaf)
         {

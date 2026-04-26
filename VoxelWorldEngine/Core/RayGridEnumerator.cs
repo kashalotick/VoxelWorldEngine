@@ -24,8 +24,8 @@ public struct RayGridEnumerator
         _dir = ray.Direction;
         _maxDistance = ray.Length;
         T = 0;
-
-        CurrentPos = Chunk.GlobalToChunk(ray.Origin.ToVector3Int());
+        
+        CurrentPos = Chunk.GlobalToChunk(ray.Origin.FloorToVector3Int());
 
         Step = new Vector3Int(
             _dir.X >= 0 ? 1 : -1,

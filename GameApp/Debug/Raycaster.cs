@@ -13,7 +13,6 @@ public class Raycaster : ILoadable, IRenderable
 
     public Ray LastRay { get; private set; }
     public RayHit LastHit { get; private set; }
-    private (Ray ray, RayHit hit) _traced = new();
     
     private bool _meshInitialized = false;
     private LineMesh _rayMesh;
@@ -59,15 +58,12 @@ public class Raycaster : ILoadable, IRenderable
 
     public void Trace()
     {
+        Console.WriteLine(LastRay);
+        Console.WriteLine(LastHit);
         if (!_meshInitialized) return;
 
-        _traced = (LastRay, LastHit);
-        _rayMesh.UpdateRay(_traced.ray, _traced.hit);
-        var hitline = (bool)LastHit.IsHit ? $"{LastHit.HitIn.FancyString()} -> {LastHit.HitOut.FancyString()}" : "";
-        // Console.WriteLine($"\nRay: {LastRay.Origin.FancyString()} -> {LastRay.Direction.FancyString()}"
-        //                   + $"\nHit: {LastHit.IsHit}  {hitline}");
-
-        _rayHitPointsMesh.UpdateHitPoints(_traced.ray, _traced.hit);
+        _rayMesh.UpdateRay(LastRay, LastHit);
+        _rayHitPointsMesh.UpdateHitPoints(LastRay, LastHit);
     }
 
 

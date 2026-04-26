@@ -16,5 +16,10 @@ public struct Ray
         }
     }
     public Vector3 InvDirection;
+    
+    public override string ToString()
+    {
+        return $"Ray | Origin: {Origin}, Dir: {Direction}, InvDir: {InvDirection}, Length: {Length}";
+    }
 }
 

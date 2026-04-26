@@ -103,21 +103,19 @@ public class VoxelWorld : IWorldRegion
     {
         var enumerator = new RayGridEnumerator(ray, Chunk.ChunkSize);
 
-        if (_chunks.TryGetValue(enumerator.CurrentPos, out var firstChunk))
-        {
-            var hit = firstChunk.Raycast(ray);
-            if (!hit.Voxel.IsAir) return hit;
-        }
-
-        while (enumerator.MoveNext())
+        do
         {
             if (_chunks.TryGetValue(enumerator.CurrentPos, out var chunk))
             {
                 var hit = chunk.Raycast(ray);
                 if (!hit.Voxel.IsAir) return hit;
             }
-        }
+            else
+            {
+                Console.WriteLine($"Chunk {enumerator.CurrentPos} not loaded");
+            }
+        } while (enumerator.MoveNext());
 
-        return new RayHit { Voxel = Voxel.Air };
+        return RayHit.NoHit;
     }
 }

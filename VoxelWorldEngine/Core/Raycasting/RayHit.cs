@@ -14,4 +14,12 @@ public struct RayHit
 
 
     public static RayHit NoHit => new RayHit { Voxel = Voxel.Air };
+    
+    
+    public override string ToString()
+    {
+        return $"RayHit | HitIn: {HitIn}, HitOut: {HitOut}, Normal: {HitFaceNormal}, " +
+               $"Voxel: {Voxel}, Distance: {Distance}, IsHit: {IsHit}";
+    }
+    
 }
