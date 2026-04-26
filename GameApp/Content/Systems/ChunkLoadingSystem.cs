@@ -11,7 +11,7 @@ namespace GameApp.Content.Systems;
 
 public class ChunkLoadingSystem : ILoadable
 {
-    private const int ChunkPerFrameLimit = 5;
+    private const int ChunkPerFrameLimit = 8;
     private const float CooldownTime = 0.5f;
 
     private readonly VoxelWorld _voxelWorld;
