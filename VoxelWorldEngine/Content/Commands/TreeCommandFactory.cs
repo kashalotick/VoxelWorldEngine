@@ -78,7 +78,7 @@ public class TreeCommandFactory
     {
         var globalPosition = position - _rootOffset;
 
-        var command = new ModifyRegionCommand(world, globalPosition, _dataSize, _voxelData, ModifyMode.ReplaceAll);
+        var command = new ModifyRegionCommand(world, globalPosition, _dataSize, _voxelData, ModifyMode.ReplaceAir);
         return command;
     }
 }

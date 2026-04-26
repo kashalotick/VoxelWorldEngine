@@ -53,8 +53,8 @@ class Program
 
             // 3a. Етап Генерації ChunkMesh (Старий)
             sw.Restart();
-            var oldMeshBuilder = new OldMeshBuilder();
-            var oldMesh = oldMeshBuilder.Build(octree);
+            // var oldMeshBuilder = new OldMeshBuilder();
+            // var oldMesh = oldMeshBuilder.Build(octree);
             sw.Stop();
             totalOldMeshTime += sw.Elapsed.TotalMilliseconds;
 
@@ -110,8 +110,8 @@ class Program
 
             // Old ChunkMesh Builder
             sw.Restart();
-            var oldMeshBuilder = new OldMeshBuilder();
-            oldMeshBuilder.Build(octree);
+            // var oldMeshBuilder = new OldMeshBuilder();
+            // oldMeshBuilder.Build(octree);
             sw.Stop();
             totalOldMeshTime += sw.Elapsed.TotalMilliseconds;
 

@@ -49,11 +49,19 @@ public class PlayerController : FreeCameraController
         }
     }
 
-    private enum ClickState { Idle, WaitingForFirstRepeat, Repeating }
+    private enum ClickState
+    {
+        Idle,
+        WaitingForFirstRepeat,
+        Repeating
+    }
+
     private ClickState _currentClickState = ClickState.Idle;
-    
-    private double _timer = 0;    private const double InitialDelay = 0.25;
-    private const double RepeatInterval = 0.025; 
+
+    private double _timer = 0;
+    private const double InitialDelay = 0.25;
+    private const double RepeatInterval = 0.2;
+
     public override void OnMousePressed(double deltaTime, MouseState mouse)
     {
         if (mouse.IsAnyButtonDown)
@@ -62,7 +70,7 @@ public class PlayerController : FreeCameraController
             {
                 case ClickState.Idle:
                     // DoAction(); 
-                
+
                     _timer = InitialDelay;
                     _currentClickState = ClickState.WaitingForFirstRepeat;
                     break;
@@ -72,10 +80,11 @@ public class PlayerController : FreeCameraController
                     if (_timer <= 0)
                     {
                         // DoAction();
-                    
+
                         _timer = RepeatInterval;
                         _currentClickState = ClickState.Repeating;
                     }
+
                     break;
 
                 case ClickState.Repeating:
@@ -86,6 +95,7 @@ public class PlayerController : FreeCameraController
                         // DoAction();
                         _timer = RepeatInterval;
                     }
+
                     break;
             }
         }
@@ -103,11 +113,11 @@ public class PlayerController : FreeCameraController
             _raycaster.Trace();
             BreakBlock?.Invoke();
         }
+
         if (mouse.IsButtonDown(MouseButton.Right))
         {
             PlaceBlock?.Invoke();
         }
-        
     }
 
     public override void OnMouseDown(MouseButtonEventArgs e, MouseState mouse)
@@ -117,6 +127,7 @@ public class PlayerController : FreeCameraController
             _raycaster.Trace();
             BreakBlock?.Invoke();
         }
+
         if (e.Button == MouseButton.Right)
         {
             PlaceBlock?.Invoke();

@@ -98,7 +98,6 @@ public partial class Octree<T> : IOctree<T>
                     int flatIndex = localX + localY * areaSize.X + localZ * areaSize.X * areaSize.Y;
 
                     var result = _linearOctree.SetData(data[flatIndex], worldPos, canReplace);
-                    Console.WriteLine($"{data[flatIndex]} -> {result}");
                 }
             }
         }
