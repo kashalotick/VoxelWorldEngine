@@ -74,11 +74,11 @@ public class TreeCommandFactory
     }
 
 
-    public ModifyRegionCommand GetCommand(VoxelWorld world, Vector3Int position)
+    public ModifyRegionCommand GetCommand(IWorldRegion region, Vector3Int position)
     {
         var globalPosition = position - _rootOffset;
 
-        var command = new ModifyRegionCommand(world, globalPosition, _dataSize, _voxelData, ModifyMode.ReplaceAir);
+        var command = new ModifyRegionCommand(region, globalPosition, _dataSize, _voxelData, ModifyMode.ReplaceAir);
         return command;
     }
 }
