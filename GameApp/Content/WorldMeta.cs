@@ -18,5 +18,9 @@ public class WorldMeta
         PlayTime = playTime;
         LastPlayed = lastPlayed ?? DateTime.UtcNow;
     }
-    
+
+    public override string ToString()
+    {
+        return $"WorldMeta(Slot={Slot}, Name='{Name}', Seed={Seed}, PlayTime={PlayTime}, LastPlayed={LastPlayed})";
+    }
 }

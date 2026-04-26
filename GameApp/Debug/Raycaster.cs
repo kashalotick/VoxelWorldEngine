@@ -58,9 +58,9 @@ public class Raycaster : ILoadable, IRenderable
 
     public void Trace()
     {
+        if (!_meshInitialized) return;
         Console.WriteLine(LastRay);
         Console.WriteLine(LastHit);
-        if (!_meshInitialized) return;
 
         _rayMesh.UpdateRay(LastRay, LastHit);
         _rayHitPointsMesh.UpdateHitPoints(LastRay, LastHit);

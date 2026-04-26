@@ -114,7 +114,7 @@ public class DemoScene : BaseScene
 
     private void LoadWorld()
     {
-        var (array, map) = new BlockMapper().Build(GameContext.TextureArrayRepository);
+        var (array, map) = new BlockMapper().Build(GameContext.TextureArrayRepository); // essential
 
         var material = new GameWorldMaterial(
             GameContext.ShaderRepository.Get("chunk"),
@@ -296,9 +296,8 @@ public class DemoScene : BaseScene
 
     private void SaveWorld()
     {
-        Console.WriteLine("Save world");
         _worldRepository.SaveState(_worldMeta.Slot, _worldState);
-        _worldRepository.AddPlayTime(_worldMeta, _elapsedTime);
+        _worldMeta = _worldRepository.UpdateMeta(_worldMeta, _elapsedTime);
         _elapsedTime = 0;
     }
 

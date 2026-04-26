@@ -52,11 +52,13 @@ public class WorldRepository
     }
 
     // --- world
-    public void AddPlayTime(WorldMeta meta, double playTime)
+    public WorldMeta UpdateMeta(WorldMeta meta, double playTime)
     {
         var newPlayTime = meta.PlayTime + playTime;
         var newMeta = new WorldMeta(meta.Slot, meta.Name, meta.Seed, newPlayTime, DateTime.UtcNow);
+        
         WriteMeta(newMeta);
+        return newMeta;
     }
 
     public VoxelWorld LoadWorld(WorldMeta meta)

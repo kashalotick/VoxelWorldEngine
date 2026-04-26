@@ -131,10 +131,6 @@ public class VoxelWorld : IWorldRegion
                 var hit = chunk.Raycast(ray);
                 if (!hit.Voxel.IsAir) return hit;
             }
-            else
-            {
-                Console.WriteLine($"Chunk {enumerator.CurrentPos} not loaded");
-            }
         } while (enumerator.MoveNext());
 
         return RayHit.NoHit;
