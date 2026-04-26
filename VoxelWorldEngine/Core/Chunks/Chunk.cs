@@ -1,18 +1,15 @@
 ﻿using System.Numerics;
-using VoxelWorldEngine.Core;
-using VoxelWorldEngine.Core.Commands;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.Core.Serialization;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
-using VoxelWorldEngine.Utils;
 
-namespace VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
+namespace VoxelWorldEngine.Core.Chunks;
 
 // TODO: implement logic
-public class Chunk : IWorldRegion
+public partial class Chunk : IWorldRegion
 {
     public bool IsDirty { get; private set; } = false;
     public ChunkMeshData ChunkMesh { get; set; }
@@ -47,30 +44,6 @@ public class Chunk : IWorldRegion
     }
 
 
-    public static int ChunkSize => Constants.ChunkSize;
-
-    public static Vector3Int ChunkToGlobal(Vector3Int position)
-    {
-        return position * ChunkSize;
-    }
-
-    public static Vector3Int GlobalToChunk(Vector3Int position)
-    {
-        return new Vector3Int(
-            MathHelper.FloorDiv(position.X, ChunkSize),
-            MathHelper.FloorDiv(position.Y, ChunkSize),
-            MathHelper.FloorDiv(position.Z, ChunkSize)
-        );
-    }
-
-    public static Vector3Int GlobalToLocal(Vector3Int position)
-    {
-        return new Vector3Int(
-            MathHelper.Mod(position.X, ChunkSize),
-            MathHelper.Mod(position.Y, ChunkSize),
-            MathHelper.Mod(position.Z, ChunkSize)
-        );
-    }
 
 
     public ChunkMemento Save()
@@ -107,11 +80,6 @@ public class Chunk : IWorldRegion
         var localVoxelIndex = GlobalToLocal(voxelPositionIndex);
         var isDataChanged = Octree.PlaceBlock(localVoxelIndex, blockId);
 
-        if (isDataChanged)
-        {
-            MarkDirty();
-        }
-
         return isDataChanged;
     }
 
@@ -127,6 +95,5 @@ public class Chunk : IWorldRegion
 
         Octree.ModifyArea(relativeInsertPosition, areaSize, data, canReplace);
 
-        MarkDirty();
     }
 }

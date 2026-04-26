@@ -3,9 +3,9 @@ using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Core.Threading;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.ChunkLoading;
+using VoxelWorldEngine.Core.Chunks;
 using VoxelWorldEngine.Core.Serialization;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
 namespace GameApp.Content.Systems;
 

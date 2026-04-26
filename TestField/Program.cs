@@ -2,9 +2,9 @@
 using VoxelWorldEngine;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Builders;
+using VoxelWorldEngine.Core.Chunks;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
 namespace TestField;
 

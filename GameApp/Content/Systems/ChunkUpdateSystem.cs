@@ -3,8 +3,8 @@ using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Core.Threading;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Builders;
+using VoxelWorldEngine.Core.Chunks;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
 namespace GameApp.Content.Systems;
 

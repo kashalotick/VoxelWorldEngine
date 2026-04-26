@@ -8,9 +8,9 @@ using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core;
+using VoxelWorldEngine.Core.Chunks;
 using VoxelWorldEngine.Core.Serialization;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
 namespace GameApp.Content;
 

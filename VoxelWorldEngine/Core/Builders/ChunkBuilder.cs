@@ -1,6 +1,6 @@
-﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+﻿using VoxelWorldEngine.Core.Chunks;
+using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
 namespace VoxelWorldEngine.Core.Builders;
 

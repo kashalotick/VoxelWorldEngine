@@ -4,7 +4,6 @@ using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Collections;
 using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 

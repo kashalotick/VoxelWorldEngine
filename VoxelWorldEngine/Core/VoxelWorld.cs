@@ -1,8 +1,8 @@
 using System.Numerics;
+using VoxelWorldEngine.Core.Chunks;
 using VoxelWorldEngine.Core.Commands;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 using VoxelWorldEngine.Utils;
 
@@ -67,18 +67,25 @@ public class VoxelWorld : IWorldRegion
         var result = chunk.PlaceBlock(voxelPositionIndex, blockId);
         if (result)
         {
+            chunk.MarkDirty();
             _meshDirtyChunks.Add(chunkPos);
         }
+
 
         return result;
     }
 
-    public void ModifyArea(Vector3Int insertPosition, Vector3Int areaSize, Voxel[] data, Func<Voxel, Voxel, bool>? canReplace = null)
+    public void ModifyArea(
+        Vector3Int insertPosition,
+        Vector3Int areaSize,
+        Voxel[] data,
+        Func<Voxel, Voxel, bool>? canReplace = null
+    )
     {
         var firstChunk = Chunk.GlobalToChunk(insertPosition);
         var lastChunk = Chunk.GlobalToChunk(insertPosition + areaSize - Vector3Int.One);
-        
-        
+
+
         for (int x = firstChunk.X; x <= lastChunk.X; x++)
         for (int y = firstChunk.Y; y <= lastChunk.Y; y++)
         for (int z = firstChunk.Z; z <= lastChunk.Z; z++)
@@ -86,10 +93,11 @@ public class VoxelWorld : IWorldRegion
             var chunkPos = new Vector3Int(x, y, z);
             var chunk = _chunks[chunkPos];
             chunk.ModifyArea(insertPosition, areaSize, data, canReplace);
+            chunk.MarkDirty();
             _meshDirtyChunks.Add(chunkPos);
         }
     }
-    
+
 
     public RayHit Raycast(Ray ray)
     {
@@ -111,4 +119,5 @@ public class VoxelWorld : IWorldRegion
         }
 
         return new RayHit { Voxel = Voxel.Air };
-    }}
+    }
+}

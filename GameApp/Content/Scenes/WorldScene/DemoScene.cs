@@ -16,10 +16,10 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using VoxelWorldEngine.Content.Commands;
 using VoxelWorldEngine.Core;
+using VoxelWorldEngine.Core.Chunks;
 using VoxelWorldEngine.Core.Commands;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 using VoxelWorldEngine.Utils;
 

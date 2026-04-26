@@ -1,7 +1,7 @@
 ﻿using VoxelWorldEngine.Core.Builders;
+using VoxelWorldEngine.Core.Chunks;
 using VoxelWorldEngine.Core.Serialization;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 
 namespace VoxelWorldEngine.Core.ChunkLoading;
 

@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
+using VoxelWorldEngine.Core.Chunks;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Structures.Chunks;
 using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.Core;
