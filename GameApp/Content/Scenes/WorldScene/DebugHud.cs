@@ -55,7 +55,7 @@ public class DebugHud : ListElement
 
     public void UpdateRayHit(RayHit hit)
     {
-        _rayIsHitText.SetTextContent($"Ray hit: {hit.IsHit}");
+        _rayIsHitText.SetTextContent($"Ray hit: {hit.IsHit} : {hit.Voxel.BlockId.ToString()}");
         _aabbText.SetTextContent($"AABB: {hit.HitIn.ToVector3Int()} / {hit.HitIn.ToVector3Int() + Vector3Int.One}");
     }
     

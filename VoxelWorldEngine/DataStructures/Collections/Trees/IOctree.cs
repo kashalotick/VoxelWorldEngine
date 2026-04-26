@@ -3,7 +3,10 @@ using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 
 namespace VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
-public interface IOctree<T>
+
+
+
+public interface IOctree<T> 
 {
     int MaxDepth { get; }
     int Size { get; }
@@ -17,8 +20,8 @@ public interface IOctree<T>
     // IOctreeNode<T> Root(); // TODO: remove?
 
 
-    bool SetData(Vector3Int index, T data);
-    void ModifyArea(Vector3Int minIndex, Vector3Int maxIndex, T data);
+    bool SetData(Vector3Int index, T data, Func<T, T, bool>? canReplace);
+    void ModifyArea(Vector3Int insertPosition, Vector3Int areaSize, T[] data, Func<T, T, bool>? canReplace);
     // bool Remove(Vector3Int position);
 
 

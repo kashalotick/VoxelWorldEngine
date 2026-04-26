@@ -71,6 +71,8 @@ public class Chunk
         );
     }
 
+
+
     public ChunkMemento Save()
     {
         var memento = new ChunkMemento(Position, Octree.Save());

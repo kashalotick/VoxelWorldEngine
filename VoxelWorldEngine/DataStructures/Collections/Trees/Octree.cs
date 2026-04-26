@@ -57,15 +57,53 @@ public partial class Octree<T> : IOctree<T>
         return node.Data;
     }
 
-    public bool SetData(Vector3Int index, T data)
+    public bool SetData(Vector3Int index, T data, Func<T, T, bool>? canReplace = null)
     {
-        return _linearOctree.SetData(data, index);
+        return _linearOctree.SetData(data, index, canReplace);
     }
 
-    public void ModifyArea(Vector3Int minIndex, Vector3Int maxIndex, T data)
+    public void ModifyArea(
+        Vector3Int insertPosition,
+        Vector3Int areaSize,
+        T[] data,
+        Func<T, T, bool>? canReplace = null
+    )
     {
-        _linearOctree.ModifyArea(data, minIndex, maxIndex);
+        Console.WriteLine($"[Octree] Executing ModifyRegion at {insertPosition} area size: {areaSize}");
+
+        // 1. Обчислюємо межі перетину
+        // Початок: беремо максимум між 0 та позицією вставки
+        int startX = Math.Max(0, insertPosition.X);
+        int startY = Math.Max(0, insertPosition.Y);
+        int startZ = Math.Max(0, insertPosition.Z);
+
+        // Кінець: беремо мінімум між розміром дерева та кінцем області вставки
+        int endX = Math.Min(Size, insertPosition.X + areaSize.X);
+        int endY = Math.Min(Size, insertPosition.Y + areaSize.Y);
+        int endZ = Math.Min(Size, insertPosition.Z + areaSize.Z);
+
+        // 2. Ітеруємося тільки в межах цього перетину
+        for (int z = startZ; z < endZ; z++)
+        {
+            for (int y = startY; y < endY; y++)
+            {
+                for (int x = startX; x < endX; x++)
+                {
+                    var worldPos = new Vector3Int(x, y, z);
+
+                    int localX = x - insertPosition.X;
+                    int localY = y - insertPosition.Y;
+                    int localZ = z - insertPosition.Z;
+
+                    int flatIndex = localX + localY * areaSize.X + localZ * areaSize.X * areaSize.Y;
+
+                    var result = _linearOctree.SetData(data[flatIndex], worldPos, canReplace);
+                    Console.WriteLine($"{data[flatIndex]} -> {result}");
+                }
+            }
+        }
     }
+
 
     public OctreeMemento<T> Save()
     {

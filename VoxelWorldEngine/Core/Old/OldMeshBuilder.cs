@@ -37,7 +37,7 @@ public class OldMeshBuilder
 
             if (node.IsLeaf)
             {
-                if (node.Data.IsEmpty) continue;
+                if (node.Data.IsAir) continue;
 
                 AddFaces(node);
             }
@@ -129,7 +129,7 @@ public class OldMeshBuilder
         if (cached.HasValue)
             return cached.Value;
     
-        var isEmpty = _octree.GetData(pos).IsEmpty;
+        var isEmpty = _octree.GetData(pos).IsAir;
         _isEmptyCache[pos.X, pos.Y, pos.Z] = isEmpty;
         return isEmpty;
 

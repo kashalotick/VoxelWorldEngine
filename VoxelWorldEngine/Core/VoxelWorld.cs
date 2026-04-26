@@ -75,6 +75,34 @@ public class VoxelWorld : IRaycastable
         }
     }
 
+    public void ModifyArea(Vector3Int insertPosition, Vector3Int areaSize, Voxel[] data, Func<Voxel, Voxel, bool>? canReplace = null)
+    {
+        var firstChunk = Chunk.GlobalToChunk(insertPosition);
+        var lastChunk = Chunk.GlobalToChunk(insertPosition + areaSize - Vector3Int.One);
+        
+        
+        for (int x = firstChunk.X; x <= lastChunk.X; x++)
+        for (int y = firstChunk.Y; y <= lastChunk.Y; y++)
+        for (int z = firstChunk.Z; z <= lastChunk.Z; z++)
+            ModifyChunk(new Vector3Int(x, y, z), insertPosition, areaSize, data, canReplace);
+    }
+
+    private void ModifyChunk(Vector3Int chunkPosition, Vector3Int insertPosition, Vector3Int areaSize, Voxel[] data, Func<Voxel, Voxel, bool>? canReplace)
+    {
+        Console.WriteLine($"[VoxelWorld] Executing ModifyRegion at chunk {chunkPosition}, insert position {insertPosition}, area size: {areaSize}");
+
+        var chunk = _chunks[chunkPosition];
+        var chunkOriginGlobal = Chunk.ChunkToGlobal(chunkPosition);
+        var relativeInsertPosition = insertPosition - chunkOriginGlobal;
+        
+        chunk.Octree.ModifyArea(relativeInsertPosition, areaSize, data, canReplace);
+        
+        chunk.MarkDirty();
+        _meshDirtyChunks.Add(chunkPosition);
+    }
+        
+    
+
     public RayHit Raycast(Ray ray)
     {
         var chunkPos = Chunk.GlobalToChunk(ray.Origin.ToVector3Int());
@@ -112,7 +140,7 @@ public class VoxelWorld : IRaycastable
                 // var localRay = ray;
 
                 var hit = chunk.Octree.Raycast(localRay);
-                if (!hit.Voxel.IsEmpty)
+                if (!hit.Voxel.IsAir)
                 {
                     hit.HitIn += (Vector3)chunk.GlobalPosition;
                     hit.HitOut += (Vector3)chunk.GlobalPosition;
@@ -141,6 +169,6 @@ public class VoxelWorld : IRaycastable
             }
         }
 
-        return new RayHit { Voxel = Voxel.Empty };
+        return new RayHit { Voxel = Voxel.Air };
     }
 }

@@ -2,6 +2,7 @@
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Collections.Trees;
+using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
@@ -70,11 +71,11 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
 
         // Знаходимо точку входу/виходу променя в AABB кореня
         if (!RaycastUtils.IntersectAABB(ray, minF, maxF, out float tMin, out float tMax, out Vector3 normal))
-            return new RayHit { Voxel = Voxel.Empty };
+            return new RayHit { Voxel = Voxel.Air };
 
         tMin = MathF.Max(tMin, 0f);
         if (tMin > tMax)
-            return new RayHit { Voxel = Voxel.Empty };
+            return new RayHit { Voxel = Voxel.Air };
 
         return RaycastNode(root, ray, tMin, tMax, normal);
     }
@@ -82,13 +83,13 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
     private RayHit RaycastNode(OctreeNode node, Ray ray, float tMin, float tMax, Vector3 normal)
     {
         if (tMin > ray.Length)
-            return new RayHit { Voxel = Voxel.Empty };
+            return new RayHit { Voxel = Voxel.Air };
 
         if (node.IsLeaf)
         {
             var voxel = node.Data;
-            if (voxel.IsEmpty)
-                return new RayHit { Voxel = Voxel.Empty };
+            if (voxel.IsAir)
+                return new RayHit { Voxel = Voxel.Air };
 
             return new RayHit
             {
@@ -141,6 +142,6 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree
                 return result;
         }
 
-        return new RayHit { Voxel = Voxel.Empty };
+        return new RayHit { Voxel = Voxel.Air };
     }
 }

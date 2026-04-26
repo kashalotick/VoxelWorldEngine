@@ -14,6 +14,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using VoxelWorldEngine.Content.Commands;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Commands;
 using VoxelWorldEngine.Core.Raycasting;
@@ -42,6 +43,7 @@ public class DemoScene : BaseScene
     private Raycaster _raycaster;
     private Reactive<Vector3Int?> _hitVoxelPosition = new();
     private VoxelSelection _voxelSelection;
+    private TreeCommandFactory _treeFactory;
 
     private VoxelWorld _voxelWorld;
     private GameWorld _gameWorld;
@@ -77,7 +79,8 @@ public class DemoScene : BaseScene
         LoadPause();
         LoadHud();
         LoadInventory();
-
+        LoadTreeFactory();
+        
         Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
         var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero
             ? Vector3.UnitX
@@ -90,6 +93,7 @@ public class DemoScene : BaseScene
         _playerController.ToggleDebug += OnToggleDebug;
         _playerController.PlaceBlock += OnPlaceBlock;
         _playerController.BreakBlock += OnBreakBlock;
+        _playerController.MiddleButtonClick += OnMiddleButtonClick;
         _playerController.InventoryNext += _inventory.NextSlot;
         _playerController.InventoryPrevious += _inventory.PreviousSlot;
 
@@ -176,9 +180,8 @@ public class DemoScene : BaseScene
         var inventoryHudMaterial = new InventoryHudMaterial(
             GameContext.ShaderRepository.Get("plain"),
             GameContext.UiAtlas.Get("Plain"),
-            
-                GameContext.UiAtlas.Get("Selection"),
-                inventoryBlocks.Select(block => (ITexture)GameContext.BlockAtlas.Get(block.ToString())).ToArray(),
+            GameContext.UiAtlas.Get("Selection"),
+            inventoryBlocks.Select(block => (ITexture)GameContext.BlockAtlas.Get(block.ToString())).ToArray(),
             GameContext.UiAtlas.Get("Empty")
         );
         var inventoryHud = new InventoryHud(_inventory, inventoryHudMaterial)
@@ -215,6 +218,11 @@ public class DemoScene : BaseScene
         {
             if (e.Key == Keys.Escape && !e.IsRepeat) OnResume();
         }
+    }
+
+    private void LoadTreeFactory()
+    {
+        _treeFactory = new TreeCommandFactory();
     }
 
 
@@ -291,7 +299,7 @@ public class DemoScene : BaseScene
     {
         _hud.ToggleDebug();
     }
-    
+
     private void OnToggleHud()
     {
         if (_hud.IsDisabled) _hud.Enable();
@@ -354,10 +362,23 @@ public class DemoScene : BaseScene
         command.Execute();
     }
 
+    private void OnMiddleButtonClick()
+    {
+        var lastHit = _raycaster.LastHit;
+        if (!lastHit.IsHit) return;
+
+        var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f);
+        var voxelPlaceIndex = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
+        Console.WriteLine(
+            $"Place Tree at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
+        var command = _treeFactory.GetCommand(_voxelWorld, voxelPlaceIndex);
+        command.Execute();
+
+    }
+
     protected override void ReleaseManagedResources()
     {
         _gameWorld.Dispose();
         SaveWorld();
-        
     }
 }

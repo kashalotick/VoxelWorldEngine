@@ -28,7 +28,7 @@ public class MeshBuilder : IMeshBuilder
 
     public void Visit(IOctreeNodeReadonly<Voxel> node)
     {
-        if (node.IsLeaf && !node.Data.IsEmpty)
+        if (node.IsLeaf && !node.Data.IsAir)
         {
             AddFaces(node);
         }
@@ -50,11 +50,11 @@ public class MeshBuilder : IMeshBuilder
     {
         var neighbor =  node.GetNeighbor(normal);
         if (neighbor == null) return false;
-        // return !neighbor.Data.IsEmpty;
+        // return !neighbor.Data.IsAir;
     
         var neighborFace = GetNeighborFaceIndices(node, normal);
         var queryResult = neighbor.Query(neighborFace.min, neighborFace.max);
-        return queryResult.All(v => !v.IsEmpty);
+        return queryResult.All(v => !v.IsAir);
     }
     
     

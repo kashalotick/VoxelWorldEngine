@@ -15,6 +15,7 @@ public class PlayerController : FreeCameraController
 
     public event Action PlaceBlock;
     public event Action BreakBlock;
+    public event Action MiddleButtonClick;
 
     public event Action InventoryNext;
     public event Action InventoryPrevious;
@@ -106,6 +107,7 @@ public class PlayerController : FreeCameraController
         {
             PlaceBlock?.Invoke();
         }
+        
     }
 
     public override void OnMouseDown(MouseButtonEventArgs e, MouseState mouse)
@@ -118,6 +120,11 @@ public class PlayerController : FreeCameraController
         if (e.Button == MouseButton.Right)
         {
             PlaceBlock?.Invoke();
+        }
+
+        if (e.Button == MouseButton.Middle)
+        {
+            MiddleButtonClick?.Invoke();
         }
     }
 

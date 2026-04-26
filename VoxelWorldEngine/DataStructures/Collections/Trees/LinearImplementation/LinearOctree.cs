@@ -52,7 +52,7 @@ public class LinearOctree<T>
         return _nodes[index];
     }
 
-    public bool SetData(T data, Vector3Int posIndex)
+    public bool SetData(T newData, Vector3Int posIndex, Func<T, T, bool>? canReplace = null)
     {
         if (!posIndex.IsInBounds(Size)) return false;
 
@@ -75,12 +75,18 @@ public class LinearOctree<T>
         }
 
         var targetNode = _nodes[nodeIndex];
-        if (targetNode.Data != null && targetNode.Data.Equals(data))
+        var oldData = targetNode.Data;
+        if (oldData != null && oldData.Equals(newData))
         {
             return false;
         }
 
-        targetNode.Data = data;
+        if (canReplace != null && !canReplace(oldData, newData))
+        {
+            return false;
+        }
+
+        targetNode.Data = newData;
         _nodes[nodeIndex] = targetNode;
 
         for (var i = way.Length - 1; i >= 0; i--)
@@ -93,13 +99,6 @@ public class LinearOctree<T>
         }
 
         return true;
-    }
-
-    public void ModifyArea(T data, Vector3Int minIndex, Vector3Int maxIndex)
-    {
-        // split
-        // try merge
-        throw new NotImplementedException();
     }
 
     public void SetNodeData(int index, T data)
@@ -191,10 +190,11 @@ public class LinearOctree<T>
     {
         _nodes.Clear();
     }
+
     public void Pack()
     {
         // Якщо сміття немає, нічого не робимо
-        if (_freeClusters.Count == 0) return; 
+        if (_freeClusters.Count == 0) return;
 
         // Виділяємо пам'ять тільки під реальну кількість живих нодів
         var packedNodes = new List<LinearOctreeNode<T>>(_nodes.Count - _freeClusters.Count * 8);
@@ -227,7 +227,7 @@ public class LinearOctree<T>
                     int newChildIdx = packedNodes.Count;
 
                     packedNodes.Add(_nodes[oldChildIdx]);
-                
+
                     // Якщо дитина теж має своїх дітей, додаємо в чергу для обробки
                     if (!_nodes[oldChildIdx].IsLeaf)
                     {
@@ -242,6 +242,7 @@ public class LinearOctree<T>
         _nodes.AddRange(packedNodes);
         _freeClusters.Clear(); // Тепер сміття немає, стек пустий
     }
+
     public OctreeMemento<T> Save()
     {
         Pack();
@@ -253,7 +254,7 @@ public class LinearOctree<T>
     {
         _nodes.Clear();
         _nodes.AddRange(memento.Nodes);
-        
+
         _freeClusters.Clear();
     }
 }

@@ -10,5 +10,5 @@ public struct RayHit
     public Vector3 HitFaceNormal;
     public Voxel Voxel;
     public float Distance => (HitOut - HitIn).Length();
-    public bool IsHit => !Voxel.IsEmpty;
+    public bool IsHit => !Voxel.IsAir;
 }

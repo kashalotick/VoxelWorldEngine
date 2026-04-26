@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using VoxelWorldEngine.DataStructures.Common.Collections.Trees;
 
 namespace VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
@@ -13,12 +14,12 @@ public struct Voxel : IEquatable<Voxel>
         BlockId = blockId;
     }
     
-    public bool IsEmpty => BlockId == 0;
+    public bool IsAir => BlockId == BlockId.Air;
+    public bool IsVoid => BlockId == BlockId.Void;
     
+    public static Voxel Air => new Voxel(BlockId.Air);
+    public static Voxel Void => new Voxel(BlockId.Void);
     
-    public static Voxel Empty => new Voxel(BlockId.Air);
-
-
     public bool Equals(Voxel other)
     {
         return BlockId == other.BlockId;
@@ -27,5 +28,10 @@ public struct Voxel : IEquatable<Voxel>
     public override int GetHashCode()
     {
         return (int)BlockId;
+    }
+    
+    public override string ToString()
+    {
+        return $"[{BlockId}]";
     }
 }
