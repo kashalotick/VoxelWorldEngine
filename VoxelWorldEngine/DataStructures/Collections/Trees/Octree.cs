@@ -69,7 +69,6 @@ public partial class Octree<T> : IOctree<T>
         Func<T, T, bool>? canReplace = null
     )
     {
-        Console.WriteLine($"[Octree] Executing ModifyRegion at {insertPosition} area size: {areaSize}");
 
         // 1. Обчислюємо межі перетину
         // Початок: беремо максимум між 0 та позицією вставки

@@ -40,7 +40,7 @@ class Program
 
             // 1. Етап Генератора
             sw.Restart();
-            IGenerator generator = new ProceduralGenerator(seed, Chunk.ChunkToGlobal(position));
+            IGenerator generator = new SurfaceGenerator(seed, Chunk.ChunkToGlobal(position));
             sw.Stop();
             totalGenTime += sw.Elapsed.TotalMilliseconds;
 
@@ -98,7 +98,7 @@ class Program
             Counter.Increment(CounterType.VoxelOctreeBuild);
 
             sw.Restart();
-            IGenerator generator = new ProceduralGenerator(seed, Chunk.ChunkToGlobal(position));
+            IGenerator generator = new SurfaceGenerator(seed, Chunk.ChunkToGlobal(position));
             sw.Stop();
             totalGenTime += sw.Elapsed.TotalMilliseconds;
 

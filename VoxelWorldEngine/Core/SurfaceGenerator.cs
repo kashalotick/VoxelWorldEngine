@@ -6,7 +6,7 @@ using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.Core;
 
-public class ProceduralGenerator : IGenerator
+public class SurfaceGenerator : IGenerator
 {
     public Vector3Int Offset;
     private FastNoise _noise;
@@ -22,7 +22,7 @@ public class ProceduralGenerator : IGenerator
     private (Vector2Int min, Vector2Int max) _cacheVector;
     private (float min, float max) _cacheValue;
 
-    public ProceduralGenerator(int seed, Vector3Int offset)
+    public SurfaceGenerator(int seed, Vector3Int offset)
     {
         Offset = offset;
         _noise = new FastNoise(seed);
@@ -220,7 +220,21 @@ public class ProceduralGenerator : IGenerator
         return _cacheValue;
     }
 
-    private float ModifyHeight(float value)
+    public int GetSurfaceY(int worldX, int worldZ)
+    {
+        var point = new Vector2Int(worldX, worldZ);
+        var height = _noise.GetNoiseMinMax(point, point);
+        var subHeight = _noise2.GetNoiseMinMax(point * 3, point * 3);
+        var baseHeight = _noiseBase.GetNoiseMinMax(point, point);
+
+        float h = height.min + subHeight.min * 0.05f;
+        h += baseHeight.min * 2;
+        h *= (baseHeight.min * 0.5f + 1f);
+
+        return (int)MathF.Floor(ModifyHeight(h));  // ModifyHeight треба зробити internal або продублювати
+    }
+    
+    internal float ModifyHeight(float value)
     {
         const int baseHeight = 0;
         const int amplitude  = 25;

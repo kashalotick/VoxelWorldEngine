@@ -20,8 +20,6 @@ public record ModifyRegionCommand(
 {
     public virtual void Execute()
     {
-        Console.WriteLine(
-            $"[ModifyRegionCommand] Executing ModifyRegion at {InsertPosition}, mode: {Mode}, area size: {AreaSize}");
         switch (Mode)
         {
             case ModifyMode.ReplaceAll:
