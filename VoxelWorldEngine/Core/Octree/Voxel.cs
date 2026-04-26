@@ -16,9 +16,12 @@ public struct Voxel : IEquatable<Voxel>
     
     public bool IsAir => BlockId == BlockId.Air;
     public bool IsVoid => BlockId == BlockId.Void;
+
+    public bool IsTransparent => BlockId is BlockId.Glass or BlockId.Air;
     
     public static Voxel Air => new Voxel(BlockId.Air);
     public static Voxel Void => new Voxel(BlockId.Void);
+    
     
     public bool Equals(Voxel other)
     {

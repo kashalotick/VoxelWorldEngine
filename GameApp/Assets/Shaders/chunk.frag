@@ -18,15 +18,12 @@ uniform float shininess;
 uniform vec3 fogColor = vec3(0.5, 0.6, 0.7);
 uniform float fogDensity = 0.003;
 
-
 vec3 applyFog(vec3 lightingResult) {
     float dist = length(viewPos - fragPos);
     float fogFactor = exp(-pow(dist * fogDensity, 2.0));
     fogFactor = clamp(fogFactor, 0.0, 1.0);
 
-    vec3 finalColor = mix(fogColor, lightingResult, fogFactor);
-    
-    return finalColor;
+    return mix(fogColor, lightingResult, fogFactor);
 }
 
 void main()
@@ -38,19 +35,20 @@ void main()
 
     float diff = max(dot(N, L), 0.0);
 
-    vec3 tex = texture(uTextureArray, vec3(texCoord, blockId)).rgb;
+    vec4 texColor = texture(uTextureArray, vec3(texCoord, blockId));
+
+    if(texColor.a < 0.1)
+    discard;
 
     float spec = pow(max(dot(V, R), 0.0), shininess);
-    
-    vec3 ambient = tex * vec3(ambientColor.xyz) * ambientColor.w;
-    vec3 diffuse = tex * lightColor * diff;
+
+    vec3 ambient = texColor.rgb * vec3(ambientColor.xyz) * ambientColor.w;
+    vec3 diffuse = texColor.rgb * lightColor * diff;
     vec3 specular = lightColor * spec;
 
     vec3 lightingResult = ambient + diffuse + specular;
 
-
     vec3 withFog = applyFog(lightingResult);
 
-    FragColor = vec4(withFog, 1.0);
-
+    FragColor = vec4(withFog, texColor.a);
 }

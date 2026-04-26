@@ -107,7 +107,7 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Assets\Textures\Blocks\Glass.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Assets\Textures\Blocks\Planks.png">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

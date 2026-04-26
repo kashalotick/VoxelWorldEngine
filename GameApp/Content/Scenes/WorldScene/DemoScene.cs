@@ -230,6 +230,9 @@ public class DemoScene : BaseScene
 
     protected override void Render(RenderContext renderContext)
     {
+        GL.Enable(EnableCap.Blend);
+        GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
         GL.Enable(EnableCap.DepthTest);
         _sky.Render(renderContext);
 
