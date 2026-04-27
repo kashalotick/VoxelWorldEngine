@@ -1,6 +1,5 @@
 using GameApp.Content.Controllers.MovementStrategies;
 using GameApp.Content.Systems;
-using GameApp.Debug;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.Input;
 using OpenTK.Windowing.Common;
@@ -10,6 +9,44 @@ namespace GameApp.Content.Controllers;
 
 public class PlayerController : SceneController
 {
+    private const double DoubleTapWindow = 0.35;
+    private const double InitialDelay = 0.25;
+    private const double RepeatInterval = 0.2;
+    private readonly FlightBaseMovementStrategy _flightBaseStrategy;
+    private readonly FreeCameraBaseMovementStrategy _freeCameraBaseStrategy;
+
+
+    private readonly Raycaster _raycaster;
+    private readonly WalkBaseMovementStrategy _walkBaseStrategy;
+
+    private ClickState _currentClickState;
+    private MovementMode _movementMode = MovementMode.Walk;
+
+    private IMovementStrategy _movementStrategy;
+
+    private double _timer;
+
+    public PlayerController(Camera camera, Raycaster raycaster, CharacterPhysics physics)
+    {
+        _raycaster = raycaster;
+
+        _walkBaseStrategy
+            = new WalkBaseMovementStrategy(camera, physics, MouseSensitivity, MoveSpeed, SprintMultiplier, JumpForce);
+        _flightBaseStrategy = new FlightBaseMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed,
+            FlightSprintMultiplier, FlightSpeed);
+        _freeCameraBaseStrategy = new FreeCameraBaseMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed,
+            FlightSprintMultiplier, FlightSpeed);
+        _movementStrategy = _walkBaseStrategy;
+        _movementStrategy.OnEnter();
+    }
+
+    public float MouseSensitivity { get; set; } = 0.2f;
+    public float MoveSpeed { get; set; } = 5f;
+    public float SprintMultiplier { get; set; } = 1.75f;
+    public float FlightSpeed { get; set; } = 10f;
+    public float FlightSprintMultiplier { get; set; } = 2.5f;
+
+    public float JumpForce { get; set; } = 8f;
     public event Action? Pause;
     public event Action? ToggleHud;
     public event Action? ToggleDebug;
@@ -20,42 +57,10 @@ public class PlayerController : SceneController
 
     public event Action? InventoryNext;
     public event Action? InventoryPrevious;
-    
+
     public event Action<MovementMode>? SetMovementMode;
     public event Action<int>? SetBrushSize;
     public event Action? ToggleBrushType;
-
-
-    private readonly Raycaster _raycaster;
-    private readonly WalkBaseMovementStrategy _walkBaseStrategy;
-    private readonly FlightBaseMovementStrategy _flightBaseStrategy;
-    private readonly FreeCameraBaseMovementStrategy _freeCameraBaseStrategy;
-
-    private IMovementStrategy _movementStrategy;
-    private MovementMode _movementMode = MovementMode.Walk;
-
-
-    private const double DoubleTapWindow = 0.35;
-
-    public float MouseSensitivity { get; set; } = 0.2f;
-    public float MoveSpeed { get; set; } = 5f;
-    public float SprintMultiplier { get; set; } = 1.75f;
-    public float FlightSpeed { get; set; } = 10f;
-    public float FlightSprintMultiplier { get; set; } = 2.5f;
-
-    public float JumpForce { get; set; } = 8f;
-
-    public PlayerController(Camera camera, Raycaster raycaster, CharacterPhysics physics)
-    {
-        _raycaster = raycaster;
-
-        _walkBaseStrategy
-            = new WalkBaseMovementStrategy(camera, physics, MouseSensitivity, MoveSpeed, SprintMultiplier, JumpForce);
-        _flightBaseStrategy = new FlightBaseMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed, FlightSprintMultiplier, FlightSpeed);
-        _freeCameraBaseStrategy = new FreeCameraBaseMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed, FlightSprintMultiplier, FlightSpeed);
-        _movementStrategy = _walkBaseStrategy;
-        _movementStrategy.OnEnter();
-    }
 
     public override void OnUpdate(double deltaTime, KeyboardState keyboard, MouseState mouse)
     {
@@ -79,11 +84,13 @@ public class PlayerController : SceneController
             ToggleFlightMode();
             return;
         }
+
         if (e.Key == Keys.F)
         {
             ToggleFreeCam();
             return;
         }
+
         if (e.Key == Keys.B)
         {
             ToggleBrushType?.Invoke();
@@ -101,7 +108,7 @@ public class PlayerController : SceneController
             Keys.D7 => 7,
             Keys.D8 => 8,
             Keys.D9 => 9,
-            _ => 0,
+            _ => 0
         };
         if (brushSize != 0)
         {
@@ -130,16 +137,18 @@ public class PlayerController : SceneController
         if (_movementMode == MovementMode.FreeCamera) SwitchMovementMode(MovementMode.Walk);
         else SwitchMovementMode(MovementMode.FreeCamera);
     }
+
     private void ToggleFlightMode()
     {
         if (_movementMode == MovementMode.Flight) SwitchMovementMode(MovementMode.Walk);
         else SwitchMovementMode(MovementMode.Flight);
     }
+
     private void SwitchMovementMode(MovementMode nextMode)
     {
         if (_movementMode == nextMode) return;
 
-        
+
         _movementStrategy.OnExit();
         _movementMode = nextMode;
         _movementStrategy = _movementMode switch
@@ -152,19 +161,6 @@ public class PlayerController : SceneController
         SetMovementMode?.Invoke(_movementMode);
         _movementStrategy.OnEnter();
     }
-
-    private enum ClickState
-    {
-        Idle,
-        WaitingForFirstRepeat,
-        Repeating
-    }
-
-    private ClickState _currentClickState;
-
-    private double _timer;
-    private const double InitialDelay = 0.25;
-    private const double RepeatInterval = 0.2;
 
     public override void OnMousePressed(double deltaTime, MouseState mouse)
     {
@@ -253,5 +249,12 @@ public class PlayerController : SceneController
         {
             InventoryNext?.Invoke();
         }
+    }
+
+    private enum ClickState
+    {
+        Idle,
+        WaitingForFirstRepeat,
+        Repeating
     }
 }

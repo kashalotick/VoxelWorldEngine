@@ -1,6 +1,6 @@
 ﻿using OpenTK.Mathematics;
 
-namespace GameApp;
+namespace GameApp.Utils;
 
 public static class ColorStyle
 {
@@ -23,13 +23,12 @@ public static class ColorStyle
 
     public static class Field
     {
-        public static readonly Vector4 Background = new (0.027f, 0.027f, 0.027f, 1);
+        public static readonly Vector4 Background = new(0.027f, 0.027f, 0.027f, 1);
         public static readonly Vector4 BackgroundHover = new(0.1f, 0.1f, 0.1f, 1);
-        public static readonly Vector4 BackgroundFocus= new(0.2f, 0.2f, 0.2f, 1);
+        public static readonly Vector4 BackgroundFocus = new(0.2f, 0.2f, 0.2f, 1);
 
         public static readonly Vector4 Text = White;
 
         public static readonly Vector4 Placeholder = new(0.2f, 0.2f, 0.2f, 1);
-
     }
 }

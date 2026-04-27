@@ -4,7 +4,7 @@ using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
 
-namespace GameApp.Content.Ui;
+namespace GameApp.Content.Ui.Elements;
 
 public record MovementInfoMaterial(
     IShader Shader,
@@ -15,18 +15,17 @@ public record MovementInfoMaterial(
 
 public class MovementIndicator : DynamicElement
 {
+    private readonly MovementInfoMaterial _material;
     private MovementMode _movementInfo = MovementMode.Walk;
-
-    private MovementInfoMaterial _material;
 
     public MovementIndicator(MovementInfoMaterial material) : base(material.Shader, material.WalkIcon)
     {
         _material = material;
-        
+
         Transform = new RectTransform
         {
             Width = 16,
-            Height = 16,
+            Height = 16
         };
     }
 
@@ -45,6 +44,5 @@ public class MovementIndicator : DynamicElement
                 SetTexture(_material.FreeFlyIcon);
                 break;
         }
-
     }
 }

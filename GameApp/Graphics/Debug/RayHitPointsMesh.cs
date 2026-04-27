@@ -4,7 +4,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core.Raycasting;
 
-namespace GameApp.Debug;
+namespace GameApp.Graphics.Debug;
 
 public class RayHitPointsMesh : Mesh<LineVertex, uint>
 {
@@ -19,10 +19,10 @@ public class RayHitPointsMesh : Mesh<LineVertex, uint>
 
         var newVerts = new LineVertex[]
         {
-            new((Vector3)(ray.Origin), new Vector3(1f, 1f, 0f)), // жовта ● HitIn
-            new((Vector3)(hit.HitIn), new Vector3(0f, 1f, 0f)), // зелена ● HitIn
-            new((Vector3)(hit.HitOut), new Vector3(1f, 0f, 0f)), // червона  ● HitOut
-            new((Vector3)(endPoint),     new Vector3(1f, 0f, 1f)), // рожева end
+            new((Vector3)ray.Origin, new Vector3(1f, 1f, 0f)), // жовта ● HitIn
+            new((Vector3)hit.HitIn, new Vector3(0f, 1f, 0f)), // зелена ● HitIn
+            new((Vector3)hit.HitOut, new Vector3(1f, 0f, 0f)), // червона  ● HitOut
+            new((Vector3)endPoint, new Vector3(1f, 0f, 1f)) // рожева end
         };
 
         UpdateVertices(newVerts);
@@ -30,10 +30,10 @@ public class RayHitPointsMesh : Mesh<LineVertex, uint>
 
     protected override void DefineAttributePointers()
     {
-        int stride = SizeOfTVertex; // sizeof(LineVertex)
+        var stride = SizeOfTVertex; // sizeof(LineVertex)
 
         new VaoBuilder(SizeOfTVertex)
-            .AddFloat(3) 
+            .AddFloat(3)
             .AddFloat(3);
         // // location = 0 → Position
         // GL.EnableVertexAttribArray(0);

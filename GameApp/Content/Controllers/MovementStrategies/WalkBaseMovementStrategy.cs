@@ -7,14 +7,22 @@ namespace GameApp.Content.Controllers.MovementStrategies;
 
 public class WalkBaseMovementStrategy : BaseMovementStrategy
 {
-    public float JumpForce { get; }
     private bool _jumpHeld;
 
-    public WalkBaseMovementStrategy(Camera camera, CharacterPhysics physics, float mouseSensitivity, float moveSpeed, float sprintMultiplier, float jumpForce)
+    public WalkBaseMovementStrategy(
+        Camera camera,
+        CharacterPhysics physics,
+        float mouseSensitivity,
+        float moveSpeed,
+        float sprintMultiplier,
+        float jumpForce
+    )
         : base(camera, physics, mouseSensitivity, moveSpeed, sprintMultiplier)
     {
         JumpForce = jumpForce;
     }
+
+    public float JumpForce { get; }
 
     public override MovementMode Mode => MovementMode.Walk;
 
@@ -41,7 +49,7 @@ public class WalkBaseMovementStrategy : BaseMovementStrategy
 
     protected override void ApplyPhysics(double deltaTime, Vector3 velocity)
     {
-        Physics.Update((float)deltaTime, applyGravity: true, resolveCollisions: true);
+        Physics.Update((float)deltaTime, true, true);
         Camera.Position = Physics.Position;
     }
 }

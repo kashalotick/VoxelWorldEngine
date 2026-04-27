@@ -1,31 +1,51 @@
-﻿using LearningOpenTK.Core.DTO;
+﻿using GameApp.Graphics.Debug;
+using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using VoxelWorldEngine.Core.Raycasting;
-using VoxelWorldEngine.Utils;
 
-namespace GameApp.Debug;
+namespace GameApp.Content.Systems;
 
 public class Raycaster : ILoadable, IRenderable
 {
-    private IShader _shader;
+    private readonly IShader _shader;
 
-    public Ray LastRay { get; private set; }
-    public RayHit LastHit { get; private set; }
-    
-    private bool _meshInitialized = false;
-    private LineMesh _rayMesh;
+    private bool _meshInitialized;
     private RayHitPointsMesh _rayHitPointsMesh;
+    private LineMesh _rayMesh;
 
     public Raycaster(IShader shader)
     {
         _shader = shader;
     }
 
+    public Ray LastRay { get; private set; }
+    public RayHit LastHit { get; private set; }
+
     public void Load()
     {
         // InitRayMesh();
+    }
+
+
+    public void Dispose()
+    {
+        if (!_meshInitialized) return;
+
+        _rayMesh.Dispose();
+        _rayHitPointsMesh.Dispose();
+    }
+
+    public void Render(RenderContext renderContext)
+    {
+        if (!_meshInitialized) return;
+
+        _shader.Use();
+        var viewProjection = renderContext.ViewMatrix * renderContext.ProjectionMatrix3D;
+        _shader.SetMatrix4("uViewProjection", viewProjection);
+        _rayMesh.Render();
+        _rayHitPointsMesh.Render();
     }
 
     private void InitRayMesh()
@@ -35,17 +55,6 @@ public class Raycaster : ILoadable, IRenderable
         _rayMesh.Load(BufferUsageHint.DynamicDraw);
         _rayHitPointsMesh = new RayHitPointsMesh();
         _rayHitPointsMesh.Load(BufferUsageHint.DynamicDraw);
-    }
-
-    public void Render(RenderContext renderContext)
-    {
-        if (!_meshInitialized) return;
-        
-        _shader.Use();
-        var viewProjection = renderContext.ViewMatrix * renderContext.ProjectionMatrix3D;
-        _shader.SetMatrix4("uViewProjection", viewProjection);
-        _rayMesh.Render();
-        _rayHitPointsMesh.Render();
     }
 
     public RayHit Shoot(Ray ray, IRaycastable target)
@@ -64,14 +73,5 @@ public class Raycaster : ILoadable, IRenderable
 
         _rayMesh.UpdateRay(LastRay, LastHit);
         _rayHitPointsMesh.UpdateHitPoints(LastRay, LastHit);
-    }
-
-
-    public void Dispose()
-    {
-        if (!_meshInitialized) return;
-
-        _rayMesh.Dispose();
-        _rayHitPointsMesh.Dispose();
     }
 }

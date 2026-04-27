@@ -1,16 +1,15 @@
-﻿using LearningOpenTK.Content.Ui.DynamicDraw;
+﻿using GameApp.Utils;
+using LearningOpenTK.Content.Ui.DynamicDraw;
 using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
 using LearningOpenTK.Content.Ui.StaticDraw;
-using LearningOpenTK.Core;
 using LearningOpenTK.Core.Components;
-using LearningOpenTK.Engine.Meshes;
 using LearningOpenTK.Engine.Resources.Fonts;
 using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Mathematics;
 
-namespace GameApp.Content.Ui;
+namespace GameApp.Content.Ui.Elements;
 
 public record WorldTileMaterial(
     IShader Shader,
@@ -22,9 +21,6 @@ public record WorldTileMaterial(
 
 public class WorldTile : StaticElement
 {
-    public event Action Play;
-    public event Action Delete;
-
     private const int TileWidth = 220;
     private const int TileHeight = 20;
 
@@ -43,7 +39,7 @@ public class WorldTile : StaticElement
         {
             Width = TileWidth,
             Height = TileHeight,
-            Scale = 4,
+            Scale = 4
         };
         Color = ColorStyle.Transparent;
 
@@ -53,16 +49,19 @@ public class WorldTile : StaticElement
         AddDeleteButton();
     }
 
+    public event Action Play;
+    public event Action Delete;
+
     private void AddWorldName()
     {
         var label = new DynamicText(Shader, _material.TextFont, _meta.Name);
-        label.Color = new(1);
+        label.Color = new Vector4(1);
         label.Transform = new RectTransform
         {
             Width = label.Transform.Width,
             Height = label.Transform.Height,
             Anchor = (0, 1),
-            Pivot = (0, 1),
+            Pivot = (0, 1)
         };
         AddChild(label);
     }
@@ -92,9 +91,9 @@ public class WorldTile : StaticElement
             Width = TileHeight,
             Height = TileHeight,
             Anchor = (1, 1),
-            Pivot = (1, 1),
+            Pivot = (1, 1)
         };
-        button.Color = new(1);
+        button.Color = new Vector4(1);
         button.HoverColor = ColorStyle.GreenLight;
         button.Click += () => Play?.Invoke();
         AddChild(button);
@@ -109,7 +108,7 @@ public class WorldTile : StaticElement
             Height = TileHeight,
             Anchor = (1, 1),
             Pivot = (1, 1),
-            Offset = (-(TileHeight + 4), 0),
+            Offset = (-(TileHeight + 4), 0)
         };
         button.Color = ColorStyle.White;
         button.HoverColor = ColorStyle.RedLight;

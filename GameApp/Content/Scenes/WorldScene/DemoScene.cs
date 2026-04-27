@@ -1,14 +1,15 @@
-﻿using GameApp.Content.Controllers;
-using GameApp.Content.Controllers.MovementStrategies;
+﻿using GameApp.Application;
+using GameApp.Content.Controllers;
 using GameApp.Content.Services;
 using GameApp.Content.Systems;
 using GameApp.Content.Ui;
-using GameApp.Content.VoxelSelectionSystem;
-using GameApp.Debug;
+using GameApp.Content.Ui.Elements;
+using GameApp.Graphics.VoxelSelectionSystem;
+using GameApp.Graphics.World;
+using GameApp.Utils;
 using LearningOpenTK.Content;
 using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Core;
-using LearningOpenTK.Core.Components;
 using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Input;
 using LearningOpenTK.Core.Scenes;
@@ -32,39 +33,38 @@ namespace GameApp.Content.Scenes.WorldScene;
 
 public class DemoScene : BaseScene
 {
+    private const float TextUpdateInterval = 1 / 60f;
+    private readonly Reactive<Vector3Int?> _hitVoxelPosition = new();
+    private readonly ThrottleReactive<RayHit> _rayHit = new(TextUpdateInterval);
+
+    private readonly WorldRepository _worldRepository;
+    private CharacterPhysics _characterPhysics;
     private ChunkLoadingSystem _chunkLoadingSystem;
     private ChunkUpdateSystem _chunkUpdateSystem;
+    private CubeCommandFactory _cubeFactory;
+
+    private double _elapsedTime;
 
 
     private FpsCounter _fpsCounter;
-    private PlayerController _playerController;
-    private CharacterPhysics _characterPhysics;
-    private UiController _uiController;
-    private Inventory _inventory;
+    private GameWorld _gameWorld;
     private GameHud _hud;
+    private Inventory _inventory;
     private MovementIndicator _movementIndicator;
     private Pause _pause;
-
-    private const float TextUpdateInterval = 1 / 60f;
-    private ThrottleReactive<RayHit> _rayHit = new(TextUpdateInterval);
+    private PlayerController _playerController;
     private Raycaster _raycaster;
-    private Reactive<Vector3Int?> _hitVoxelPosition = new();
-    private VoxelSelection _voxelSelection;
-    private TreeCommandFactory _treeFactory;
-    private SphereCommandFactory _sphereFactory;
-    private CubeCommandFactory _cubeFactory;
-
-    
-    private VoxelWorld _voxelWorld;
-    private GameWorld _gameWorld;
 
     private Sky _sky;
+    private SphereCommandFactory _sphereFactory;
+    private TreeCommandFactory _treeFactory;
+    private UiController _uiController;
+    private VoxelSelection _voxelSelection;
 
-    private WorldRepository _worldRepository;
+
+    private VoxelWorld _voxelWorld;
     private WorldMeta _worldMeta;
     private WorldState _worldState;
-
-    private double _elapsedTime;
 
     public DemoScene(MyGameContext gameContext, WorldRepository repository, WorldMeta worldMeta) : base(gameContext)
     {
@@ -72,8 +72,15 @@ public class DemoScene : BaseScene
         _worldMeta = worldMeta;
     }
 
-    public override void StateEnter() => ((IScene)this).Load();
-    public override void StateExit() => ((IScene)this).Dispose();
+    public override void StateEnter()
+    {
+        ((IScene)this).Load();
+    }
+
+    public override void StateExit()
+    {
+        ((IScene)this).Dispose();
+    }
 
     protected override void Load()
     {
@@ -128,7 +135,7 @@ public class DemoScene : BaseScene
 
     private void LoadWorld()
     {
-        var (array, map) = new BlockMapper().Build(GameContext.TextureArrayRepository); // essential
+        new BlockRegistry().Build(GameContext.TextureArrayRepository); // essential
 
         var material = new GameWorldMaterial(
             GameContext.ShaderRepository.Get("chunk"),
@@ -185,7 +192,7 @@ public class DemoScene : BaseScene
         var inventory = LoadInventory();
         var brushInfo = LoadBrushIndicator();
         var movementIndicator = LoadMovementIndicator();
-        
+
         var hudList = new ListElement(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"))
         {
             Transform =
@@ -204,10 +211,10 @@ public class DemoScene : BaseScene
         hudList.AddChild(movementIndicator);
         hudList.AddChild(inventory);
         hudList.AddChild(brushInfo);
-        
+
         _hud.Add(hudList);
     }
-        
+
     private UiElement LoadInventory()
     {
         BlockId[] inventoryBlocks =
@@ -219,18 +226,18 @@ public class DemoScene : BaseScene
             BlockId.Glass,
             BlockId.Planks,
             BlockId.Wood,
-            BlockId.Leaves,
+            BlockId.Leaves
         ];
         _inventory = new Inventory(inventoryBlocks);
 
-        var inventoryHudMaterial = new InventoryHudMaterial(
+        var inventoryHudMaterial = new InventoryPanelMaterial(
             GameContext.ShaderRepository.Get("plain"),
             GameContext.UiAtlas.Get("Plain"),
             GameContext.UiAtlas.Get("Selection"),
             inventoryBlocks.Select(block => (ITexture)GameContext.BlockAtlas.Get(block.ToString())).ToArray(),
             GameContext.UiAtlas.Get("Empty")
         );
-        var inventoryHud = new InventoryHud(_inventory, inventoryHudMaterial);
+        var inventoryHud = new InventoryPanel(_inventory, inventoryHudMaterial);
 
         return inventoryHud;
     }
@@ -246,7 +253,7 @@ public class DemoScene : BaseScene
         var brushInfo = new BrushIndicator(material);
         _inventory.BrushSize.OnChanged += size => brushInfo.UpdateBrushSize(size);
         _inventory.BrushType.OnChanged += _ => brushInfo.ToggleBrushType();
-        
+
         return brushInfo;
     }
 
@@ -403,7 +410,7 @@ public class DemoScene : BaseScene
         SaveWorld();
         SceneContext.SetState(new MainMenu(GameContext));
     }
-    
+
     private void OnPlaceBlock()
     {
         var blockToPlace = _inventory.SelectedBlock;
@@ -411,7 +418,7 @@ public class DemoScene : BaseScene
         var lastHit = _raycaster.LastHit;
         if (!lastHit.IsHit) return;
 
-        var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f);
+        var hitVoxel = lastHit.HitIn - lastHit.HitFaceNormal * 0.001f;
         var placeVoxel = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
 
         Console.WriteLine(
@@ -438,14 +445,15 @@ public class DemoScene : BaseScene
         {
             return new PlaceBlockCommand(_voxelWorld, position, blockId);
         }
+
         var modifyMode = blockId == BlockId.Air ? ModifyMode.ReplaceAll : ModifyMode.ReplaceAir;
- 
+
         switch (brashType)
         {
             case BrushShape.Cube:
                 return _cubeFactory.GetCommand(_voxelWorld, position, new CubeArgs(brushSize, blockId, modifyMode));
             case BrushShape.Sphere:
-                return  _sphereFactory.GetCommand(_voxelWorld, position, new SphereArgs(brushSize, blockId, modifyMode));
+                return _sphereFactory.GetCommand(_voxelWorld, position, new SphereArgs(brushSize, blockId, modifyMode));
             default:
                 throw new ArgumentException();
         }
@@ -456,7 +464,7 @@ public class DemoScene : BaseScene
         var lastHit = _raycaster.LastHit;
         if (!lastHit.IsHit) return;
 
-        var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f);
+        var hitVoxel = lastHit.HitIn - lastHit.HitFaceNormal * 0.001f;
         var voxelPlaceIndex = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
         Console.WriteLine(
             $"Place Tree at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");

@@ -2,17 +2,20 @@
 
 public class WorldState
 {
-    public Player Player { get; set; } = new Player();
-    
-    public WorldState() { }
+    public WorldState()
+    {
+    }
+
     public WorldState(Player player)
     {
         Player = player;
     }
-    
+
+    public Player Player { get; set; } = new();
+
     public static explicit operator WorldStateDto(WorldState obj)
     {
-        return new WorldStateDto()
+        return new WorldStateDto
         {
             Player = (PlayerDto)obj.Player
         };
@@ -22,9 +25,10 @@ public class WorldState
 public record WorldStateDto
 {
     public PlayerDto Player { get; set; }
+
     public static explicit operator WorldState(WorldStateDto dto)
     {
-        return new WorldState()
+        return new WorldState
         {
             Player = (Player)dto.Player ?? new Player()
         };

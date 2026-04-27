@@ -37,7 +37,7 @@ void main()
 
     vec4 texColor = texture(uTextureArray, vec3(texCoord, blockId));
 
-    if(texColor.a < 0.1)
+    if (texColor.a < 0.1)
     discard;
 
     float spec = pow(max(dot(V, R), 0.0), shininess);

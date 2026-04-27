@@ -6,24 +6,21 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace GameApp.Content.Controllers;
 
-
 // TODO: make ui controller interface
 public class UiController : SceneController
 {
+    public UiController(GameContext gameContext)
+    {
+        GameContext = gameContext;
+    }
+
+
+    public GameContext GameContext { get; }
     public event Action<Vector2> Click;
     public event Action<Vector2> MouseMove;
     public event Action<KeyboardKeyEventArgs> KeyUp;
     public event Action<KeyboardKeyEventArgs> KeyDown;
     public event Action<TextInputEventArgs> TextInput;
-
-
-
-    public GameContext GameContext { get; }
-
-    public UiController(GameContext gameContext)
-    {
-        GameContext = gameContext;
-    }
 
     public override void OnKeyUp(KeyboardKeyEventArgs e, KeyboardState keyboard)
     {
@@ -33,6 +30,7 @@ public class UiController : SceneController
                 RequestWindowAction(new ToggleFullscreenWindow());
                 break;
         }
+
         KeyUp?.Invoke(e);
     }
 

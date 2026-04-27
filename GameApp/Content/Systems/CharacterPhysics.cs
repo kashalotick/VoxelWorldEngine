@@ -5,11 +5,16 @@ namespace GameApp.Content.Systems;
 
 public class CharacterPhysics
 {
-    private readonly Func<Vector3Int, bool> _isSolidVoxel;
-
     private const float DefaultGravity = -25f;
     private const float DefaultTerminalVelocity = -50f;
     private const float StepSize = 0.05f;
+    private readonly Func<Vector3Int, bool> _isSolidVoxel;
+
+    public CharacterPhysics(Vector3 initialPosition, Func<Vector3Int, bool> isSolidVoxel)
+    {
+        Position = initialPosition;
+        _isSolidVoxel = isSolidVoxel;
+    }
 
     public float Gravity { get; set; } = DefaultGravity;
     public float TerminalVelocity { get; set; } = DefaultTerminalVelocity;
@@ -21,12 +26,6 @@ public class CharacterPhysics
     public float Width { get; set; } = 0.6f;
     public float Height { get; set; } = 1.8f;
     public float EyeHeight { get; set; } = 1.65f;
-
-    public CharacterPhysics(Vector3 initialPosition, Func<Vector3Int, bool> isSolidVoxel)
-    {
-        Position = initialPosition;
-        _isSolidVoxel = isSolidVoxel;
-    }
 
     public void Teleport(Vector3 position)
     {
@@ -55,7 +54,7 @@ public class CharacterPhysics
 
     public void Update(float deltaTime)
     {
-        Update(deltaTime, applyGravity: true, resolveCollisions: true);
+        Update(deltaTime, true, true);
     }
 
     public void Update(float deltaTime, bool applyGravity, bool resolveCollisions)
@@ -80,9 +79,9 @@ public class CharacterPhysics
         var movement = Velocity * deltaTime;
         var nextPosition = Position;
 
-        MoveAxis(ref nextPosition, movement.X, axis: 0);
-        MoveAxis(ref nextPosition, movement.Y, axis: 1);
-        MoveAxis(ref nextPosition, movement.Z, axis: 2);
+        MoveAxis(ref nextPosition, movement.X, 0);
+        MoveAxis(ref nextPosition, movement.Y, 1);
+        MoveAxis(ref nextPosition, movement.Z, 2);
 
         Position = nextPosition;
     }
@@ -184,5 +183,3 @@ public class CharacterPhysics
         }
     }
 }
-
-

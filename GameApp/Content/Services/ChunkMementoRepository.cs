@@ -8,9 +8,9 @@ namespace GameApp.Content.Services;
 
 public class ChunkMementoRepository : IChunkMementoRepository
 {
-    private readonly string _directory;
     private readonly ConcurrentDictionary<Vector3Int, object> _chunkLocks = new();
-    
+    private readonly string _directory;
+
     public ChunkMementoRepository(string directory)
     {
         _directory = directory;
@@ -37,7 +37,7 @@ public class ChunkMementoRepository : IChunkMementoRepository
                 }
             }
 
-            File.Move(tmp, path, overwrite: true); // atomic
+            File.Move(tmp, path, true); // atomic
         }
     }
 
@@ -49,7 +49,7 @@ public class ChunkMementoRepository : IChunkMementoRepository
         using var reader = new BinaryReader(File.OpenRead(path));
         var count = reader.ReadInt32();
         var nodes = new LinearOctreeNode<Voxel>[count];
-        for (int i = 0; i < count; i++)
+        for (var i = 0; i < count; i++)
         {
             var blockId = (BlockId)reader.ReadByte();
             var childrenStart = reader.ReadInt32();
@@ -59,8 +59,13 @@ public class ChunkMementoRepository : IChunkMementoRepository
         return new ChunkMemento(position, nodes);
     }
 
-    public bool Exists(Vector3Int position) => File.Exists(GetPath(position));
+    public bool Exists(Vector3Int position)
+    {
+        return File.Exists(GetPath(position));
+    }
 
-    private string GetPath(Vector3Int pos) =>
-        Path.Combine(_directory, $"chunk_{pos.X}_{pos.Y}_{pos.Z}.bin");
+    private string GetPath(Vector3Int pos)
+    {
+        return Path.Combine(_directory, $"chunk_{pos.X}_{pos.Y}_{pos.Z}.bin");
+    }
 }

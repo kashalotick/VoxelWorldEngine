@@ -3,7 +3,7 @@ using LearningOpenTK.Core;
 using LearningOpenTK.Engine.Meshes;
 using OpenTK.Graphics.OpenGL4;
 
-namespace GameApp.Content.VoxelSelectionSystem;
+namespace GameApp.Graphics.VoxelSelectionSystem;
 
 public class CubeEdgeMesh : Mesh<CubeEdgeVertex, uint>
 {
@@ -11,14 +11,14 @@ public class CubeEdgeMesh : Mesh<CubeEdgeVertex, uint>
     {
         Vertices =
         [
-            new(new Vector3(0, 0, 0), color),
-            new(new Vector3(0, 0, 1), color),
-            new(new Vector3(0, 1, 0), color),
-            new(new Vector3(0, 1, 1), color),
-            new(new Vector3(1, 0, 0), color),
-            new(new Vector3(1, 0, 1), color),
-            new(new Vector3(1, 1, 0), color),
-            new(new Vector3(1, 1, 1), color),
+            new CubeEdgeVertex(new Vector3(0, 0, 0), color),
+            new CubeEdgeVertex(new Vector3(0, 0, 1), color),
+            new CubeEdgeVertex(new Vector3(0, 1, 0), color),
+            new CubeEdgeVertex(new Vector3(0, 1, 1), color),
+            new CubeEdgeVertex(new Vector3(1, 0, 0), color),
+            new CubeEdgeVertex(new Vector3(1, 0, 1), color),
+            new CubeEdgeVertex(new Vector3(1, 1, 0), color),
+            new CubeEdgeVertex(new Vector3(1, 1, 1), color)
         ];
 
         Indices =
@@ -32,12 +32,12 @@ public class CubeEdgeMesh : Mesh<CubeEdgeVertex, uint>
 
     protected override void DefineAttributePointers()
     {
-        int stride = SizeOfTVertex; // sizeof(LineVertex)
+        var stride = SizeOfTVertex; // sizeof(LineVertex)
 
         // location = 0 → Position
         // location = 1 → Color
         new VaoBuilder(SizeOfTVertex)
-            .AddFloat(3) 
+            .AddFloat(3)
             .AddFloat(3);
         // // location = 0 → Position
         // GL.EnableVertexAttribArray(0);

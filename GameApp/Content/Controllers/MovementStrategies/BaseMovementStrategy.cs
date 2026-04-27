@@ -10,11 +10,13 @@ public abstract class BaseMovementStrategy : IMovementStrategy
     protected readonly Camera Camera;
     protected readonly CharacterPhysics Physics;
 
-    protected float MouseSensitivity { get; }
-    protected float MoveSpeed { get; }
-    public float SprintMultiplier { get; }
-
-    protected BaseMovementStrategy(Camera camera, CharacterPhysics physics, float mouseSensitivity, float moveSpeed, float sprintMultiplier)
+    protected BaseMovementStrategy(
+        Camera camera,
+        CharacterPhysics physics,
+        float mouseSensitivity,
+        float moveSpeed,
+        float sprintMultiplier
+    )
     {
         Camera = camera;
         Physics = physics;
@@ -23,9 +25,22 @@ public abstract class BaseMovementStrategy : IMovementStrategy
         SprintMultiplier = sprintMultiplier;
     }
 
+    protected float MouseSensitivity { get; }
+    protected float MoveSpeed { get; }
+    public float SprintMultiplier { get; }
+
     public abstract MovementMode Mode { get; }
-    public virtual void OnEnter() => Physics.Teleport(Camera.Position);
-    public virtual void OnExit() => Physics.Teleport(Camera.Position);
+
+    public virtual void OnEnter()
+    {
+        Physics.Teleport(Camera.Position);
+    }
+
+    public virtual void OnExit()
+    {
+        Physics.Teleport(Camera.Position);
+    }
+
     public abstract void Update(double deltaTime, KeyboardState keyboard, MouseState mouse);
 
     protected void ApplyMouseLook(MouseState mouse)
@@ -59,7 +74,7 @@ public abstract class BaseMovementStrategy : IMovementStrategy
 
         return movement.LengthSquared > 0f ? Vector3.Normalize(movement) : Vector3.Zero;
     }
-    
+
     protected float CalculateSpeed(KeyboardState keyboard)
     {
         var speed = keyboard.IsKeyDown(Keys.LeftControl) ? MoveSpeed * SprintMultiplier : MoveSpeed;
@@ -69,9 +84,3 @@ public abstract class BaseMovementStrategy : IMovementStrategy
 
     protected abstract void ApplyPhysics(double deltaTime, Vector3 velocity);
 }
-
-
-
-
-
-

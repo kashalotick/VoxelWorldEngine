@@ -7,9 +7,16 @@ namespace GameApp.Content.Controllers.MovementStrategies;
 
 public class FlightBaseMovementStrategy : BaseMovementStrategy
 {
-    private float _verticalSpeed = 1f;
-    
-    public FlightBaseMovementStrategy(Camera camera, CharacterPhysics physics, float mouseSensitivity, float moveSpeed, float sprintMultiplier, float verticalSpeed)
+    private readonly float _verticalSpeed = 1f;
+
+    public FlightBaseMovementStrategy(
+        Camera camera,
+        CharacterPhysics physics,
+        float mouseSensitivity,
+        float moveSpeed,
+        float sprintMultiplier,
+        float verticalSpeed
+    )
         : base(camera, physics, mouseSensitivity, moveSpeed, sprintMultiplier)
     {
         _verticalSpeed = verticalSpeed;
@@ -36,9 +43,7 @@ public class FlightBaseMovementStrategy : BaseMovementStrategy
     protected override void ApplyPhysics(double deltaTime, Vector3 velocity)
     {
         Physics.SetVelocity(velocity);
-        Physics.Update((float)deltaTime, applyGravity: false, resolveCollisions: true);
+        Physics.Update((float)deltaTime, false, true);
         Camera.Position = Physics.Position;
-
     }
-
 }

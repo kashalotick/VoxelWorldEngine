@@ -1,4 +1,5 @@
-﻿using GameApp.Content.Scenes.WorldScene;
+﻿using GameApp.Content.Systems;
+using GameApp.Utils;
 using LearningOpenTK.Content.Ui.DynamicDraw;
 using LearningOpenTK.Core.Components;
 using LearningOpenTK.Engine.Resources.Fonts;
@@ -7,7 +8,7 @@ using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Mathematics;
 
-namespace GameApp.Content.Ui;
+namespace GameApp.Content.Ui.Elements;
 
 public record BrushInfoMaterial(
     IShader Shader,
@@ -18,12 +19,11 @@ public record BrushInfoMaterial(
 
 public class BrushIndicator : DynamicElement
 {
+    private readonly BrushInfoMaterial _material;
     private BrushShape _brushShape = BrushShape.Cube;
     private int _brushSize = 1;
-
-    private BrushInfoMaterial _material;
     private DynamicText _text;
-    
+
     public BrushIndicator(BrushInfoMaterial material) : base(material.Shader, material.CubeIcon)
     {
         _material = material;
@@ -31,7 +31,7 @@ public class BrushIndicator : DynamicElement
         Transform = new RectTransform
         {
             Width = 16,
-            Height = 16,
+            Height = 16
         };
 
         InitBrushSizeText();
@@ -69,7 +69,7 @@ public class BrushIndicator : DynamicElement
             Transform = new RectTransform
             {
                 Anchor = new Vector2(0, 0.25f),
-                Offset = new Vector2(20, 0),
+                Offset = new Vector2(20, 0)
             }
         };
         _text.Color = ColorStyle.White;

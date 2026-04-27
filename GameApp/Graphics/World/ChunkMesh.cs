@@ -2,7 +2,7 @@
 using LearningOpenTK.Engine.Meshes;
 using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
 
-namespace GameApp.Content;
+namespace GameApp.Graphics.World;
 
 public class ChunkMesh : Mesh<ChunkVertex, uint>
 {

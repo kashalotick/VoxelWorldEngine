@@ -3,7 +3,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core.Raycasting;
 
-namespace GameApp.Debug;
+namespace GameApp.Graphics.Debug;
 
 public class LineMesh : Mesh<LineVertex, uint>
 {
@@ -15,8 +15,8 @@ public class LineMesh : Mesh<LineVertex, uint>
     }
 
     /// <summary>
-    /// Оновлює позиції вершин за даними Ray.
-    /// Якщо є RayHit — підсвічує точку потрапляння.
+    ///     Оновлює позиції вершин за даними Ray.
+    ///     Якщо є RayHit — підсвічує точку потрапляння.
     /// </summary>
     public void UpdateRay(Ray ray, RayHit? hit = null)
     {
@@ -29,16 +29,16 @@ public class LineMesh : Mesh<LineVertex, uint>
             // 4 точки: Origin, HitIn, HitOut, End
             var newVerts = new LineVertex[]
             {
-                new((Vector3)(ray.Origin),   new Vector3(1f, 1f, 0f)),  // жовтий
-                new((Vector3)(h.HitIn),      new Vector3(1f, 1f, 0f)),  // жовтий end
-                new((Vector3)(h.HitIn),      new Vector3(0f, 1f, 0f)),  // зелений
-                new((Vector3)(h.HitOut),     new Vector3(0f, 1f, 0f)),  // зелений end
-                new((Vector3)(h.HitOut),     new Vector3(1f, 0f, 0f)), // червоний
-                new((Vector3)(endPoint),     new Vector3(1f, 0f, 0f)), // червоний end
+                new((Vector3)ray.Origin, new Vector3(1f, 1f, 0f)), // жовтий
+                new((Vector3)h.HitIn, new Vector3(1f, 1f, 0f)), // жовтий end
+                new((Vector3)h.HitIn, new Vector3(0f, 1f, 0f)), // зелений
+                new((Vector3)h.HitOut, new Vector3(0f, 1f, 0f)), // зелений end
+                new((Vector3)h.HitOut, new Vector3(1f, 0f, 0f)), // червоний
+                new((Vector3)endPoint, new Vector3(1f, 0f, 0f)) // червоний end
             };
 
             // 3 лінії: [0→1], [2→3], [4→5]
-            var newIndices = new uint[] { 0, 1,  2, 3,  4, 5 };
+            var newIndices = new uint[] { 0, 1, 2, 3, 4, 5 };
 
             UpdateVertices(newVerts);
             UpdateIndices(newIndices);
@@ -48,8 +48,8 @@ public class LineMesh : Mesh<LineVertex, uint>
             // Немає попадання — просто суцільна жовта лінія
             var newVerts = new LineVertex[]
             {
-                new((Vector3)(ray.Origin), new Vector3(1f, 1f, 0f)),
-                new((Vector3)(endPoint),   new Vector3(1f, 1f, 0f)),
+                new((Vector3)ray.Origin, new Vector3(1f, 1f, 0f)),
+                new((Vector3)endPoint, new Vector3(1f, 1f, 0f))
             };
 
             UpdateVertices(newVerts);
@@ -59,7 +59,7 @@ public class LineMesh : Mesh<LineVertex, uint>
 
     protected override void DefineAttributePointers()
     {
-        int stride = SizeOfTVertex; // sizeof(LineVertex)
+        var stride = SizeOfTVertex; // sizeof(LineVertex)
 
         // location = 0 → Position
         GL.EnableVertexAttribArray(0);

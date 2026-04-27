@@ -1,34 +1,16 @@
 ﻿using LearningOpenTK.Core.DTO;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
-namespace GameApp.Content.Scenes.WorldScene;
+namespace GameApp.Content.Systems;
 
 public enum BrushShape
 {
     Cube,
-    Sphere,
+    Sphere
 }
 
 public class Inventory
 {
-    public Reactive<int> BrushSize { get; } = new(1);
-    public Reactive<BrushShape> BrushType { get; } = new(BrushShape.Cube);
-    public int InventorySize { get; }
-
-    private int _selectedSlot
-    {
-        get;
-        set
-        {
-            field = ((value % InventorySize) + InventorySize) % InventorySize;
-            SelectedSlot.Value = _selectedSlot;
-        }
-    }
-
-    public Reactive<int> SelectedSlot { get; }
-    public BlockId SelectedBlock => InventorySlots[_selectedSlot];
-
     public BlockId[] InventorySlots;
 
 
@@ -39,6 +21,23 @@ public class Inventory
         InventorySlots = inventorySlots;
         _selectedSlot = 0;
     }
+
+    public Reactive<int> BrushSize { get; } = new(1);
+    public Reactive<BrushShape> BrushType { get; } = new(BrushShape.Cube);
+    public int InventorySize { get; }
+
+    private int _selectedSlot
+    {
+        get;
+        set
+        {
+            field = (value % InventorySize + InventorySize) % InventorySize;
+            SelectedSlot.Value = _selectedSlot;
+        }
+    }
+
+    public Reactive<int> SelectedSlot { get; }
+    public BlockId SelectedBlock => InventorySlots[_selectedSlot];
 
     public void NextSlot()
     {

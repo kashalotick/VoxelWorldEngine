@@ -5,7 +5,7 @@ using VoxelWorldEngine.Core.Serialization;
 namespace GameApp.Content.Services;
 
 /// <summary>
-///  generate, save, load worlds
+///     generate, save, load worlds
 /// </summary>
 public class WorldRepository
 {
@@ -20,7 +20,7 @@ public class WorldRepository
     public WorldMeta?[] GetSlots()
     {
         var slots = new WorldMeta?[SlotCount];
-        for (int i = 0; i < SlotCount; i++)
+        for (var i = 0; i < SlotCount; i++)
             slots[i] = ReadMeta(i);
         return slots;
     }
@@ -42,7 +42,7 @@ public class WorldRepository
         ValidateSlot(slot);
         var path = SlotPath(slot);
         if (Directory.Exists(path))
-            Directory.Delete(path, recursive: true);
+            Directory.Delete(path, true);
     }
 
     public bool SlotExists(int slot)
@@ -56,7 +56,7 @@ public class WorldRepository
     {
         var newPlayTime = meta.PlayTime + playTime;
         var newMeta = new WorldMeta(meta.Slot, meta.Name, meta.Seed, newPlayTime, DateTime.UtcNow);
-        
+
         WriteMeta(newMeta);
         return newMeta;
     }
@@ -71,10 +71,10 @@ public class WorldRepository
     {
         var path = StatePath(slot);
         if (!File.Exists(path)) return null;
-        var dto = JsonSerializer.Deserialize<WorldStateDto>(File.ReadAllText(path), new JsonSerializerOptions()
+        var dto = JsonSerializer.Deserialize<WorldStateDto>(File.ReadAllText(path), new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true,
-            IncludeFields = true,
+            IncludeFields = true
         });
         return dto == null ? null : (WorldState)dto;
     }
@@ -84,7 +84,7 @@ public class WorldRepository
         var json = JsonSerializer.Serialize((WorldStateDto)state, new JsonSerializerOptions
         {
             WriteIndented = true,
-            IncludeFields = true,
+            IncludeFields = true
         });
         File.WriteAllText(StatePath(slot), json);
     }
@@ -107,10 +107,25 @@ public class WorldRepository
         File.WriteAllText(MetaPath(meta.Slot), json);
     }
 
-    private string SlotPath(int slot) => Path.Combine(_savesPath, $"slot_{slot}");
-    private string ChunksPath(int slot) => Path.Combine(SlotPath(slot), "chunks");
-    private string MetaPath(int slot) => Path.Combine(SlotPath(slot), "meta.json");
-    private string StatePath(int slot) => Path.Combine(SlotPath(slot), "state.json");
+    private string SlotPath(int slot)
+    {
+        return Path.Combine(_savesPath, $"slot_{slot}");
+    }
+
+    private string ChunksPath(int slot)
+    {
+        return Path.Combine(SlotPath(slot), "chunks");
+    }
+
+    private string MetaPath(int slot)
+    {
+        return Path.Combine(SlotPath(slot), "meta.json");
+    }
+
+    private string StatePath(int slot)
+    {
+        return Path.Combine(SlotPath(slot), "state.json");
+    }
 
     private static void ValidateSlot(int slot)
     {

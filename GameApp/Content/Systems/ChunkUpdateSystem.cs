@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Core.Threading;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Builders;
@@ -10,20 +9,25 @@ namespace GameApp.Content.Systems;
 
 public class ChunkUpdateSystem : IDisposable
 {
-    private readonly VoxelWorld _voxelWorld;
-    private readonly DynamicWorkerPool<ChunkTask> _workerPool;
     private readonly HashSet<Vector3Int> _inProgress = new();
     private readonly ConcurrentQueue<ChunkTask> _readyMeshes = new();
+    private readonly VoxelWorld _voxelWorld;
+    private readonly DynamicWorkerPool<ChunkTask> _workerPool;
 
     public ChunkUpdateSystem(VoxelWorld voxelWorld)
     {
         _voxelWorld = voxelWorld;
         _workerPool = new DynamicWorkerPool<ChunkTask>(
-            minWorkers: 1,
-            maxWorkers: 1,
-            queueTriggerSize: 999,
-            processTask: ProcessChunk
+            1,
+            1,
+            999,
+            ProcessChunk
         );
+    }
+
+    public void Dispose()
+    {
+        _workerPool.Dispose();
     }
 
     public void Update(double deltaTime)
@@ -46,6 +50,7 @@ public class ChunkUpdateSystem : IDisposable
             {
                 if (!_inProgress.Add(chunkPos)) continue;
             }
+
             _workerPool.Enqueue(new ChunkTask(chunkPos, chunk));
         }
     }
@@ -67,8 +72,6 @@ public class ChunkUpdateSystem : IDisposable
         }
     }
 
-    public void Dispose() => _workerPool.Dispose();
-
     private record ChunkTask(Vector3Int Position, Chunk Chunk)
         : IComparable<ChunkTask>
     {
@@ -83,7 +86,8 @@ public class ChunkUpdateSystem : IDisposable
         }
     }
 }
-public record ChunkTask(Vector3Int Position, Chunk Chunk) 
+
+public record ChunkTask(Vector3Int Position, Chunk Chunk)
     : IComparable<ChunkTask>
 {
     public int CompareTo(ChunkTask? other)
@@ -95,5 +99,4 @@ public record ChunkTask(Vector3Int Position, Chunk Chunk)
         if (cy != 0) return cy;
         return Position.Z.CompareTo(other.Position.Z);
     }
-
 }

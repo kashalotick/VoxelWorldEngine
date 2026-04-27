@@ -1,14 +1,13 @@
-﻿using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
+﻿using GameApp.Utils;
+using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
 using LearningOpenTK.Content.Ui.StaticDraw;
-using LearningOpenTK.Core;
 using LearningOpenTK.Core.Components;
 using LearningOpenTK.Engine.Resources.Fonts;
 using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
 
-namespace GameApp.Content.Scenes.WorldScene;
-
+namespace GameApp.Content.Ui;
 
 public record PauseMaterial(
     IShader Shader,
@@ -18,23 +17,23 @@ public record PauseMaterial(
 
 public class Pause : UiLayout
 {
-    public event Action Resume;
-    public event Action Save;
-    public event Action SaveAndExit;
-
     private readonly PauseMaterial _material;
-    
+
     public Pause(float width, float height, PauseMaterial material) : base(width, height)
     {
         _material = material;
     }
+
+    public event Action Resume;
+    public event Action Save;
+    public event Action SaveAndExit;
 
 
     protected override void Load()
     {
         Add(CreateBackground());
         Add(CreateButtonList());
-        
+
         base.Load();
     }
 
@@ -47,7 +46,7 @@ public class Pause : UiLayout
                 Anchor = (0.5f, 0.5f),
                 Pivot = (0.5f, 0.5f),
                 Offset = (0, 0),
-                Scale = 4,
+                Scale = 4
             },
             Color = ColorStyle.Transparent,
             Gap = 16
@@ -93,12 +92,11 @@ public class Pause : UiLayout
 
     private Button CreateButton(string label)
     {
-
         var button = new ButtonWithLabel(_material.Shader, _material.Background, _material.TextFont, label);
         button.Transform = new RectTransform
         {
             Width = 120,
-            Height = 24,
+            Height = 24
         };
         button.Color = ColorStyle.White;
         button.HoverColor = ColorStyle.Black;

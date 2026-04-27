@@ -1,13 +1,13 @@
-﻿using LearningOpenTK.Content.Ui.StaticDraw;
-using LearningOpenTK.Core.DTO;
+﻿using GameApp.Content.Systems;
+using GameApp.Utils;
+using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
-using OpenTK.Graphics.OpenGL4;
 
-namespace GameApp.Content.Scenes.WorldScene;
+namespace GameApp.Content.Ui.Elements;
 
-public record InventoryHudMaterial(
+public record InventoryPanelMaterial(
     IShader Shader,
     ITexture Background,
     ITexture Selection,
@@ -15,16 +15,16 @@ public record InventoryHudMaterial(
     ITexture Empty
 );
 
-public class InventoryHud : ListElement
+public class InventoryPanel : ListElement
 {
-    private InventoryHudMaterial _material;
-    private Inventory _inventory;
+    private readonly Inventory _inventory;
+    private readonly InventoryPanelMaterial _material;
 
-    private Slot[] _slots;
+    private readonly Slot[] _slots;
 
-    private int _previousSelectedSlot = 0;
+    private int _previousSelectedSlot;
 
-    public InventoryHud(Inventory inventory, InventoryHudMaterial material) : base(material.Shader,
+    public InventoryPanel(Inventory inventory, InventoryPanelMaterial material) : base(material.Shader,
         material.Background)
     {
         _inventory = inventory;
@@ -35,7 +35,7 @@ public class InventoryHud : ListElement
         Gap = 4;
         AutoSize = true;
         Color = ColorStyle.Transparent;
-        
+
         IsReversed = true;
 
         _slots = new Slot[_inventory.InventorySize];
@@ -46,7 +46,7 @@ public class InventoryHud : ListElement
 
     private void InitBlockSlots()
     {
-        for (int i = 0; i < _inventory.InventorySize; i++)
+        for (var i = 0; i < _inventory.InventorySize; i++)
         {
             if (i < _material.Slots.Length)
             {
@@ -56,8 +56,8 @@ public class InventoryHud : ListElement
             {
                 _slots[i] = new Slot(i, _material.Shader, _material.Selection, _material.Empty);
             }
-            AddChild(_slots[i].Item);
 
+            AddChild(_slots[i].Item);
         }
     }
 
@@ -71,8 +71,24 @@ public class InventoryHud : ListElement
 
     private class Slot
     {
-        public UiElement Selection { get; set; }
-        public UiElement Item { get; set; }
+        private readonly ITexture _itemTexture;
+        private readonly ITexture _selectionTexture;
+
+        private readonly IShader _shader;
+
+        public Slot(int index, IShader shader, ITexture selection, ITexture item)
+        {
+            _shader = shader;
+            _selectionTexture = selection;
+            _itemTexture = item;
+            Item = CreateBlockSlot();
+            Selection = CreateSelection();
+
+            Item.AddChild(Selection);
+        }
+
+        public UiElement Selection { get; }
+        public UiElement Item { get; }
 
 
         public bool IsSelected
@@ -85,21 +101,6 @@ public class InventoryHud : ListElement
             }
         } = false;
 
-        private IShader _shader;
-        private ITexture _itemTexture;
-        private ITexture _selectionTexture;
-
-        public Slot(int index, IShader shader, ITexture selection, ITexture item)
-        {
-            _shader =  shader;
-            _selectionTexture = selection;
-            _itemTexture = item;
-            Item = CreateBlockSlot();
-            Selection = CreateSelection();
-
-            Item.AddChild(Selection);
-        }
-
         private UiElement CreateSelection()
         {
             var element = new StaticElement(_shader, _selectionTexture)
@@ -109,9 +110,9 @@ public class InventoryHud : ListElement
                     Width = 20,
                     Height = 20,
                     Pivot = (0.5f, 0.5f),
-                    Anchor = (0.5f, 0.5f),
+                    Anchor = (0.5f, 0.5f)
                 },
-                IsVisible =  false
+                IsVisible = false
             };
             return element;
         }
@@ -123,7 +124,7 @@ public class InventoryHud : ListElement
                 Transform =
                 {
                     Width = 16,
-                    Height = 16,
+                    Height = 16
                 }
             };
 

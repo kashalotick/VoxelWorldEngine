@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using OpenTK.Mathematics;
 
-namespace GameApp.Debug;
+namespace GameApp.Graphics.Debug;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct LineVertex
@@ -14,5 +14,4 @@ public struct LineVertex
         Position = position;
         Color = color;
     }
-
 }

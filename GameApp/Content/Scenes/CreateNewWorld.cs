@@ -1,9 +1,10 @@
 ﻿using System.Text.RegularExpressions;
+using GameApp.Application;
 using GameApp.Content.Controllers;
 using GameApp.Content.Services;
+using GameApp.Utils;
 using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
 using LearningOpenTK.Content.Ui.StaticDraw;
-using LearningOpenTK.Core;
 using LearningOpenTK.Core.Components;
 using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Input;
@@ -12,23 +13,22 @@ using LearningOpenTK.Engine.Resources.Fonts;
 using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources;
-using OpenTK.Graphics.OpenGL4;
 
 namespace GameApp.Content.Scenes;
 
 public class CreateNewWorld : BaseScene
 {
-    private Shader _plainShader;
-    private Texture _plainTexture;
-    private Font _pixelFont;
-
-    private WorldRepository _repository;
-    private int _slot;
-
-    private Reactive<string> _worldName;
-    private Reactive<string> _worldSeed;
     private const string DefaultWorldName = "New World";
     private const int FormWidth = 180;
+
+    private readonly WorldRepository _repository;
+    private readonly int _slot;
+
+    private readonly Reactive<string> _worldName;
+    private readonly Reactive<string> _worldSeed;
+    private Font _pixelFont;
+    private Shader _plainShader;
+    private Texture _plainTexture;
 
 
     public CreateNewWorld(MyGameContext gameContext, WorldRepository repository, int slot) : base(gameContext)
@@ -91,7 +91,7 @@ public class CreateNewWorld : BaseScene
             Anchor = (0.5f, 0.5f),
             Pivot = (0.5f, 0.5f),
             Offset = (0, 0),
-            Scale = 4,
+            Scale = 4
         };
         list.Color = ColorStyle.Transparent;
         list.Gap = 16;
@@ -109,7 +109,7 @@ public class CreateNewWorld : BaseScene
         rect.Transform = new RectTransform
         {
             Width = width,
-            Height = height,
+            Height = height
         };
         // rect.Color = ColorStyle.Black;
         return rect;
@@ -125,13 +125,13 @@ public class CreateNewWorld : BaseScene
                 Height = 20,
                 Anchor = (0.5f, 0),
                 Pivot = (0.5f, 0),
-                Offset = (0, 0),
+                Offset = (0, 0)
             },
             Color = ColorStyle.Field.Background,
             HoverColor = ColorStyle.Field.BackgroundHover,
             FocusColor = ColorStyle.Field.BackgroundFocus,
             ValueColor = ColorStyle.Field.Text,
-            PlaceholderColor = ColorStyle.Field.Placeholder,
+            PlaceholderColor = ColorStyle.Field.Placeholder
         };
         field.ValueText.Transform.Anchor = (0.5f, 0.5f);
         field.ValueText.Transform.Pivot = (0.5f, 0.5f);
@@ -175,7 +175,7 @@ public class CreateNewWorld : BaseScene
                 Height = 24,
                 Anchor = (0.5f, 0),
                 Pivot = (0.5f, 0),
-                Offset = (0, 0),
+                Offset = (0, 0)
             },
             Color = ColorStyle.White,
             HoverColor = ColorStyle.GreenLight,
@@ -190,12 +190,12 @@ public class CreateNewWorld : BaseScene
     {
         var label = new StaticText(_plainShader, _pixelFont, $"Create world #{_slot}");
         label.Color = ColorStyle.White;
-        label.Transform = new RectTransform()
+        label.Transform = new RectTransform
         {
             Anchor = (0, 1),
             Pivot = (0, 1),
             Offset = (32 + 20 * 4 + 20, -43),
-            Scale = 4,
+            Scale = 4
         };
 
         return label;
@@ -204,7 +204,7 @@ public class CreateNewWorld : BaseScene
     private UiElement CreateBackButton()
     {
         var button = new Button(_plainShader, GameContext.UiAtlas.Get("ArrowLeft"));
-        button.Transform = new RectTransform()
+        button.Transform = new RectTransform
         {
             Width = 20,
             Height = 20,

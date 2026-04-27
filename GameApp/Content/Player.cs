@@ -4,15 +4,15 @@ namespace GameApp.Content;
 
 public class Player
 {
-    public Vector3 Position { get; set; } = new Vector3(0, 0, 0);
-    public Vector3 ViewDirection { get; set; }  = new Vector3(0, 0, 0);
+    public Vector3 Position { get; set; } = new(0, 0, 0);
+    public Vector3 ViewDirection { get; set; } = new(0, 0, 0);
     public Matrix4 ViewMatrix { get; set; }
     public int ChunkViewRadius { get; set; } = 5;
     public int ChunkViewHeightRadius { get; set; } = 5;
 
     public static explicit operator PlayerDto(Player obj)
     {
-        return new PlayerDto()
+        return new PlayerDto
         {
             Position = (System.Numerics.Vector3)obj.Position,
             ViewDirection = (System.Numerics.Vector3)obj.ViewDirection,
@@ -34,7 +34,7 @@ public record PlayerDto
     {
         return new Player
         {
-            Position = (Vector3)(dto.Position),
+            Position = (Vector3)dto.Position,
             ViewDirection = (Vector3)dto.ViewDirection,
             ChunkViewRadius = dto.ChunkViewRadius,
             ChunkViewHeightRadius = dto.ChunkViewHeightRadius
