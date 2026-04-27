@@ -29,7 +29,7 @@ using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 using VoxelWorldEngine.Utils;
 
-namespace GameApp.Content.Scenes.WorldScene;
+namespace GameApp.Content.Scenes;
 
 public class DemoScene : BaseScene
 {
