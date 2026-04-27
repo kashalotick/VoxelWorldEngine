@@ -22,7 +22,7 @@ public abstract class ShapeCommandFactoryBase<TArgs> : ICommandFactory<TArgs>
         var data = BuildVoxelData(shape.FillMask, args.Block);
         var globalPosition = position - shape.RootOffset;
 
-        return new ModifyRegionCommand(region, globalPosition, shape.Size, data, ModifyMode.ReplaceAir);
+        return new ModifyRegionCommand(region, globalPosition, shape.Size, data, args.Mode);
     }
     
     protected abstract CachedShapeData CreateShape(TArgs args);

@@ -51,7 +51,10 @@ public class DemoScene : BaseScene
     private Reactive<Vector3Int?> _hitVoxelPosition = new();
     private VoxelSelection _voxelSelection;
     private TreeCommandFactory _treeFactory;
+    private SphereCommandFactory _sphereFactory;
+    private CubeCommandFactory _cubeFactory;
 
+    
     private VoxelWorld _voxelWorld;
     private GameWorld _gameWorld;
 
@@ -86,7 +89,7 @@ public class DemoScene : BaseScene
         LoadPause();
         LoadHud();
         LoadMainHudPanel();
-        LoadTreeFactory();
+        LoadCommandFactories();
 
         Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
         var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero
@@ -283,9 +286,11 @@ public class DemoScene : BaseScene
         }
     }
 
-    private void LoadTreeFactory()
+    private void LoadCommandFactories()
     {
         _treeFactory = new TreeCommandFactory();
+        _sphereFactory = new SphereCommandFactory();
+        _cubeFactory = new CubeCommandFactory();
     }
 
 
@@ -407,11 +412,11 @@ public class DemoScene : BaseScene
         if (!lastHit.IsHit) return;
 
         var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f);
-        var voxelPlaceIndex = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
+        var placeVoxel = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
 
         Console.WriteLine(
-            $"Place block at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
-        var command = new PlaceBlockCommand(_voxelWorld, voxelPlaceIndex, blockToPlace);
+            $"Place block at {placeVoxel}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
+        var command = DispatchCommand(_inventory.BrushSize.Value, _inventory.BrushType.Value, placeVoxel, blockToPlace);
         command.Execute();
     }
 
@@ -423,8 +428,27 @@ public class DemoScene : BaseScene
         var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f).FloorToVector3Int();
 
         Console.WriteLine($"Breaking block at {hitVoxel}");
-        var command = new BreakBlockCommand(_voxelWorld, hitVoxel);
+        var command = DispatchCommand(_inventory.BrushSize.Value, _inventory.BrushType.Value, hitVoxel, BlockId.Air);
         command.Execute();
+    }
+
+    private ICommand DispatchCommand(int brushSize, BrushShape brashType, Vector3Int position, BlockId blockId)
+    {
+        if (brushSize == 1)
+        {
+            return new PlaceBlockCommand(_voxelWorld, position, blockId);
+        }
+        var modifyMode = blockId == BlockId.Air ? ModifyMode.ReplaceAll : ModifyMode.ReplaceAir;
+ 
+        switch (brashType)
+        {
+            case BrushShape.Cube:
+                return _cubeFactory.GetCommand(_voxelWorld, position, new CubeArgs(brushSize, blockId, modifyMode));
+            case BrushShape.Sphere:
+                return  _sphereFactory.GetCommand(_voxelWorld, position, new SphereArgs(brushSize, blockId, modifyMode));
+            default:
+                throw new ArgumentException();
+        }
     }
 
     private void OnMiddleButtonClick()

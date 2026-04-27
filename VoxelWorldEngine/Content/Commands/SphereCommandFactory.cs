@@ -1,16 +1,17 @@
-﻿using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+﻿using VoxelWorldEngine.Core.Commands;
+using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.Content.Commands;
 
-public readonly record struct SphereArgs(int Radius, BlockId Block) : IShapeFactoryArgs;
+public readonly record struct SphereArgs(int Radius, BlockId Block, ModifyMode Mode) : IShapeFactoryArgs;
 
 public class SphereCommandFactory : ShapeCommandFactoryBase<SphereArgs>
 {
 
     protected override CachedShapeData CreateShape(SphereArgs args)
     {
-        var radius = args.Radius;
+        var radius = args.Radius - 1;
         var diameter = radius * 2 + 1;
         var size = new Vector3Int(diameter, diameter, diameter);
         var rootOffset = new Vector3Int(radius, radius, radius);
