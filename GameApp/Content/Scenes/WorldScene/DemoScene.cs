@@ -6,6 +6,7 @@ using GameApp.Content.Ui;
 using GameApp.Content.VoxelSelectionSystem;
 using GameApp.Debug;
 using LearningOpenTK.Content;
+using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Core;
 using LearningOpenTK.Core.Components;
 using LearningOpenTK.Core.DTO;
@@ -84,10 +85,8 @@ public class DemoScene : BaseScene
         LoadRaycasting();
         LoadPause();
         LoadHud();
-        LoadInventory();
+        LoadMainHudPanel();
         LoadTreeFactory();
-        LoadBrushIndicator();
-        LoadMovementIndicator();
 
         Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
         var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero
@@ -178,7 +177,35 @@ public class DemoScene : BaseScene
         _rayHit.OnChanged += hit => _hud.UpdateRayHit(hit);
     }
 
-    private void LoadInventory()
+    private void LoadMainHudPanel()
+    {
+        var inventory = LoadInventory();
+        var brushInfo = LoadBrushIndicator();
+        var movementIndicator = LoadMovementIndicator();
+        
+        var hudList = new ListElement(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"))
+        {
+            Transform =
+            {
+                Pivot = new Vector2(0.5f, 0),
+                Anchor = new Vector2(0.5f, 0),
+                Offset = new Vector2(0, 16),
+                Scale = 4
+            },
+            Orientation = ListOrientation.Horizontal,
+            Gap = 16,
+            AutoSize = true,
+            Color = ColorStyle.Transparent,
+            IsReversed = true
+        };
+        hudList.AddChild(movementIndicator);
+        hudList.AddChild(inventory);
+        hudList.AddChild(brushInfo);
+        
+        _hud.Add(hudList);
+    }
+        
+    private UiElement LoadInventory()
     {
         BlockId[] inventoryBlocks =
         [
@@ -200,20 +227,12 @@ public class DemoScene : BaseScene
             inventoryBlocks.Select(block => (ITexture)GameContext.BlockAtlas.Get(block.ToString())).ToArray(),
             GameContext.UiAtlas.Get("Empty")
         );
-        var inventoryHud = new InventoryHud(_inventory, inventoryHudMaterial)
-        {
-            Transform =
-            {
-                Pivot = new Vector2(0.5f, 0),
-                Anchor = new Vector2(0.5f, 0),
-                Offset = new Vector2(0, 16),
-                Scale = 4
-            }
-        };
-        _hud.Add(inventoryHud);
+        var inventoryHud = new InventoryHud(_inventory, inventoryHudMaterial);
+
+        return inventoryHud;
     }
 
-    private void LoadBrushIndicator()
+    private UiElement LoadBrushIndicator()
     {
         var material = new BrushInfoMaterial(
             GameContext.ShaderRepository.Get("plain"),
@@ -222,17 +241,13 @@ public class DemoScene : BaseScene
             GameContext.UiAtlas.Get("Sphere")
         );
         var brushInfo = new BrushIndicator(material);
-        brushInfo.Transform.Anchor = new Vector2(0.5f, 0.5f);
-        brushInfo.Transform.Pivot = new Vector2(0.5f, 0.5f);
-        brushInfo.Transform.Offset = new Vector2(32, 0);
-        brushInfo.Transform.Scale = 4;
         _inventory.BrushSize.OnChanged += size => brushInfo.UpdateBrushSize(size);
         _inventory.BrushType.OnChanged += _ => brushInfo.ToggleBrushType();
         
-        _hud.Add(brushInfo);
+        return brushInfo;
     }
 
-    private void LoadMovementIndicator()
+    private UiElement LoadMovementIndicator()
     {
         var material = new MovementInfoMaterial(
             GameContext.ShaderRepository.Get("plain"),
@@ -240,13 +255,9 @@ public class DemoScene : BaseScene
             GameContext.UiAtlas.Get("Fly"),
             GameContext.UiAtlas.Get("FreeFly")
         );
-        _movementIndicator = new MovementIndicator(material);
-        _movementIndicator.Transform.Anchor = new Vector2(0.5f, 0.5f);
-        _movementIndicator.Transform.Pivot = new Vector2(0.5f, 0.5f);
-        _movementIndicator.Transform.Offset = new Vector2(-32, 0);
-        _movementIndicator.Transform.Scale = 4;
-        _hud.Add(_movementIndicator);
-
+        var movementIndicator = new MovementIndicator(material);
+        _movementIndicator = movementIndicator;
+        return movementIndicator;
     }
 
     private void LoadPause()
