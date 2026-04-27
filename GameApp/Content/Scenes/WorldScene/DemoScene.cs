@@ -377,7 +377,7 @@ public class DemoScene : BaseScene
         var voxelPlaceIndex = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
         Console.WriteLine(
             $"Place Tree at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
-        var command = _treeFactory.GetCommand(_voxelWorld, voxelPlaceIndex);
+        var command = _treeFactory.GetCommand(_voxelWorld, voxelPlaceIndex, new TreeArgs(1));
         command.Execute();
 
     }

@@ -6,7 +6,12 @@ using VoxelWorldEngine.Utils;
 
 namespace VoxelWorldEngine.Content.Commands;
 
-public class TreeCommandFactory
+
+public readonly record struct TreeArgs(int Seed);
+
+
+public class TreeCommandFactory : ICommandFactory<TreeArgs>
+
 {
     private readonly BlockId[,,] _data =
     {
@@ -74,7 +79,7 @@ public class TreeCommandFactory
     }
 
 
-    public ModifyRegionCommand GetCommand(IWorldRegion region, Vector3Int position)
+    public ModifyRegionCommand GetCommand(IWorldRegion region, Vector3Int position, TreeArgs args)
     {
         var globalPosition = position - _rootOffset;
 

@@ -47,7 +47,7 @@ public class ChunkBuilder
 
     public void PlaceTree(Chunk chunk, Vector3Int position)
     {
-        var command = _treeFactory.GetCommand(chunk, position);
+        var command = _treeFactory.GetCommand(chunk, position, new TreeArgs(_seed));
         command.Execute();
     }
 }
