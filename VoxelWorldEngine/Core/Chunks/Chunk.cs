@@ -71,7 +71,6 @@ public partial class Chunk : IWorldRegion
             hit.HitIn += (Vector3)GlobalPosition;
             hit.HitOut += (Vector3)GlobalPosition;
         }
-        Console.WriteLine($"[Chunk] {hit}");
 
         return hit;
     }

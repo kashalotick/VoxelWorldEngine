@@ -375,7 +375,7 @@ public class DemoScene : BaseScene
     public override void Update(double deltaTime)
     {
         _elapsedTime += deltaTime;
-        // ProcessRaycast(deltaTime); // TODO: temp
+        ProcessRaycast(deltaTime);
     }
 
     public override void FixedUpdate(double deltaTime)
