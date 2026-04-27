@@ -137,6 +137,23 @@ public class ChunkLoadingSystem : ILoadable
 
         _chunksToRemove.Clear();
     }
+    
+    public Chunk LoadChunkImmediately(Vector3Int position)
+    {
+        if (_voxelWorld.Chunks.TryGetValue(position, out var existingChunk))
+        {
+            return existingChunk;
+        }
+
+        var chunkLoader = _threadLocalChunkLoader.Value;
+        var chunk = chunkLoader.GetChunk(position);
+
+        _voxelWorld.AddChunk(chunk);
+        _requestedNewChunks.Remove(position);
+        _workerPool.RemoveWhere(task => task.Position == position);
+
+        return chunk;
+    }
 }
 
 public struct ChunkLoadTask : IComparable<ChunkLoadTask>

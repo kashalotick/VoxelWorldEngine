@@ -98,11 +98,51 @@ public class DemoScene : BaseScene
         LoadMainHudPanel();
         LoadCommandFactories();
 
-        Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
-        var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero
-            ? Vector3.UnitX
-            : _worldState.Player.ViewDirection;
-        Camera.LookAt(_worldState.Player.Position + viewDirection);
+
+        if (_worldMeta.LastPlayed == DateTime.MinValue)
+        {
+            const int startHeight = 128; 
+            var spawnPosition = new Vector3(0.5f, startHeight, 0.5f);
+            RayHit hit = RayHit.NoHit;
+
+            while (!hit.IsHit && spawnPosition.Y > -startHeight)
+            {
+                var chunkPos = Chunk.GlobalToChunk(spawnPosition.ToVector3Int());
+                _chunkLoadingSystem.LoadChunkImmediately(chunkPos);
+                hit = _voxelWorld.Raycast(new Ray
+                {
+                    Length = Chunk.ChunkSize,
+                    Origin = (System.Numerics.Vector3)spawnPosition,
+                    Direction = -System.Numerics.Vector3.UnitY,
+                });
+
+                if (!hit.IsHit)
+                {
+                    spawnPosition.Y -= Chunk.ChunkSize;
+                }
+            }
+
+            if (hit.IsHit)
+            {
+                spawnPosition.Y = hit.HitIn.Y + 3;
+            }
+            else
+            {
+                spawnPosition.Y = 100;
+            }
+    
+            Camera = new Camera(spawnPosition, (float)GameContext.ScreenWidth / GameContext.ScreenHeight);
+            Camera.LookAt(spawnPosition + Vector3.UnitX);
+        }
+        else
+        {
+            Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
+            var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero
+                ? Vector3.UnitX
+                : _worldState.Player.ViewDirection;
+            Camera.LookAt(_worldState.Player.Position + viewDirection);
+        }
+
 
         _characterPhysics = new CharacterPhysics(_worldState.Player.Position,
             voxelPosition => _voxelWorld.IsSolid(voxelPosition));
@@ -123,6 +163,7 @@ public class DemoScene : BaseScene
         ControllerContext.SetState(_playerController);
         SceneContext.RequestWindowAction(new GrabCursor());
     }
+
 
     private void LoadSky()
     {

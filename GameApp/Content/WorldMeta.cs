@@ -12,7 +12,7 @@ public class WorldMeta
         Name = name;
         Seed = seed;
         PlayTime = playTime;
-        LastPlayed = lastPlayed ?? DateTime.UtcNow;
+        LastPlayed = lastPlayed ?? DateTime.MinValue;
     }
 
     public string Name { get; init; }
