@@ -8,7 +8,6 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.Core.Chunks;
 
-// TODO: implement logic
 public partial class Chunk : IWorldRegion
 {
     public bool IsDirty { get; private set; } = false;

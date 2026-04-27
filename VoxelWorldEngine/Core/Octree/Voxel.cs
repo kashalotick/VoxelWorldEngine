@@ -7,8 +7,6 @@ public struct Voxel : IEquatable<Voxel>
 {
     public BlockId BlockId;
     
-    // TODO: make equality operation
-    
     public Voxel(BlockId blockId)
     {
         BlockId = blockId;

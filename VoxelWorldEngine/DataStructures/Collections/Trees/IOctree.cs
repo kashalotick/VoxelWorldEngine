@@ -22,7 +22,6 @@ public interface IOctree<T>
 
     bool SetData(Vector3Int index, T data, Func<T, T, bool>? canReplace);
     void ModifyArea(Vector3Int insertPosition, Vector3Int areaSize, T[] data, Func<T, T, bool>? canReplace);
-    // bool Remove(Vector3Int position);
 
 
     OctreeMemento<T> Save();

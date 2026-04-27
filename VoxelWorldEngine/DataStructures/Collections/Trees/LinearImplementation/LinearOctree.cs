@@ -9,7 +9,7 @@ public class LinearOctree<T>
     public int MaxDepth { get; set; }
     public int Count => _nodes.Count - _freeClusters.Count * 8;
     private readonly Stack<int> _freeClusters = new();
-    private readonly List<LinearOctreeNode<T>> _nodes; // TODO: make stack with free cells indices (after merge)
+    private readonly List<LinearOctreeNode<T>> _nodes; 
 
     public LinearOctree(int maxDepth)
     {
@@ -166,7 +166,6 @@ public class LinearOctree<T>
         _nodes[index] = parent;
 
         _freeClusters.Push(firstChildIdx);
-        // TODO: Додати індекси дітей у список вільних комірок для повторного використання
         return true;
     }
 
