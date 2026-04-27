@@ -75,9 +75,9 @@ public abstract class BaseMovementStrategy : IMovementStrategy
         return movement.LengthSquared > 0f ? Vector3.Normalize(movement) : Vector3.Zero;
     }
 
-    protected float CalculateSpeed(KeyboardState keyboard)
+    protected float CalculateSpeed(float moveSpeed, KeyboardState keyboard)
     {
-        var speed = keyboard.IsKeyDown(Keys.LeftControl) ? MoveSpeed * SprintMultiplier : MoveSpeed;
+        var speed = keyboard.IsKeyDown(Keys.LeftControl) ? moveSpeed * SprintMultiplier : moveSpeed;
         return speed;
     }
 

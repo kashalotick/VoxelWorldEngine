@@ -35,7 +35,7 @@ public class WalkBaseMovementStrategy : BaseMovementStrategy
         ApplyMouseLook(mouse);
 
         var movement = GetFlatMoveDirection(keyboard);
-        var speed = CalculateSpeed(keyboard);
+        var speed = CalculateSpeed(MoveSpeed, keyboard);
         var velocity = new Vector2(movement.X, movement.Z) * speed;
         Physics.SetHorizontalVelocity(velocity);
 

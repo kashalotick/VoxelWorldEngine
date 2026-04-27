@@ -29,13 +29,11 @@ public class FlightBaseMovementStrategy : BaseMovementStrategy
         ApplyMouseLook(mouse);
 
         var movement = GetFlatMoveDirection(keyboard);
-        var speed = CalculateSpeed(keyboard);
-
         var vertical = 0f;
         if (keyboard.IsKeyDown(Keys.Space)) vertical += 1;
         if (keyboard.IsKeyDown(Keys.LeftShift) || keyboard.IsKeyDown(Keys.RightShift)) vertical -= 1;
 
-        var velocity = movement * speed + Vector3.UnitY * vertical * _verticalSpeed;
+        var velocity = movement * CalculateSpeed(MoveSpeed, keyboard) + Vector3.UnitY * vertical * CalculateSpeed(_verticalSpeed, keyboard);
 
         ApplyPhysics(deltaTime, velocity);
     }
