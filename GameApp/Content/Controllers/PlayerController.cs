@@ -21,7 +21,9 @@ public class PlayerController : SceneController
     public event Action? InventoryNext;
     public event Action? InventoryPrevious;
     
-    public event Action<MovementMode>? ToggleMovementMode;
+    public event Action<MovementMode>? SetMovementMode;
+    public event Action<int>? SetBrushSize;
+    public event Action? ToggleBrushType;
 
 
     private readonly Raycaster _raycaster;
@@ -82,7 +84,29 @@ public class PlayerController : SceneController
             ToggleFreeCam();
             return;
         }
+        if (e.Key == Keys.B)
+        {
+            ToggleBrushType?.Invoke();
+            return;
+        }
 
+        var brushSize = e.Key switch
+        {
+            Keys.D1 => 1,
+            Keys.D2 => 2,
+            Keys.D3 => 3,
+            Keys.D4 => 4,
+            Keys.D5 => 5,
+            Keys.D6 => 6,
+            Keys.D7 => 7,
+            Keys.D8 => 8,
+            Keys.D9 => 9,
+            _ => 0,
+        };
+        if (brushSize != 0)
+        {
+            SetBrushSize?.Invoke(brushSize);
+        }
     }
 
     public override void OnKeyUp(KeyboardKeyEventArgs e, KeyboardState keyboard)
@@ -115,7 +139,6 @@ public class PlayerController : SceneController
     {
         if (_movementMode == nextMode) return;
 
-        ToggleMovementMode?.Invoke(nextMode);
         
         _movementStrategy.OnExit();
         _movementMode = nextMode;
@@ -126,6 +149,7 @@ public class PlayerController : SceneController
             MovementMode.FreeCamera => _freeCameraBaseStrategy,
             _ => _walkBaseStrategy
         };
+        SetMovementMode?.Invoke(_movementMode);
         _movementStrategy.OnEnter();
     }
 

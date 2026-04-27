@@ -1,14 +1,18 @@
 ﻿using GameApp.Content.Controllers;
+using GameApp.Content.Controllers.MovementStrategies;
 using GameApp.Content.Services;
 using GameApp.Content.Systems;
+using GameApp.Content.Ui;
 using GameApp.Content.VoxelSelectionSystem;
 using GameApp.Debug;
 using LearningOpenTK.Content;
 using LearningOpenTK.Core;
+using LearningOpenTK.Core.Components;
 using LearningOpenTK.Core.DTO;
 using LearningOpenTK.Core.Input;
 using LearningOpenTK.Core.Scenes;
 using LearningOpenTK.Engine.Resources.Textures;
+using LearningOpenTK.Engine.UI;
 using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
@@ -37,6 +41,7 @@ public class DemoScene : BaseScene
     private UiController _uiController;
     private Inventory _inventory;
     private GameHud _hud;
+    private MovementIndicator _movementIndicator;
     private Pause _pause;
 
     private const float TextUpdateInterval = 1 / 60f;
@@ -81,14 +86,17 @@ public class DemoScene : BaseScene
         LoadHud();
         LoadInventory();
         LoadTreeFactory();
-        
+        LoadBrushIndicator();
+        LoadMovementIndicator();
+
         Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
         var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero
             ? Vector3.UnitX
             : _worldState.Player.ViewDirection;
         Camera.LookAt(_worldState.Player.Position + viewDirection);
 
-        _characterPhysics = new CharacterPhysics(_worldState.Player.Position, voxelPosition => _voxelWorld.IsSolid(voxelPosition));
+        _characterPhysics = new CharacterPhysics(_worldState.Player.Position,
+            voxelPosition => _voxelWorld.IsSolid(voxelPosition));
         _playerController = new PlayerController(Camera, _raycaster, _characterPhysics);
         _playerController.Pause += OnPause;
         _playerController.ToggleHud += OnToggleHud;
@@ -98,6 +106,10 @@ public class DemoScene : BaseScene
         _playerController.MiddleButtonClick += OnMiddleButtonClick;
         _playerController.InventoryNext += _inventory.NextSlot;
         _playerController.InventoryPrevious += _inventory.PreviousSlot;
+        _playerController.SetBrushSize += _inventory.SetBrushSize;
+        _playerController.ToggleBrushType += _inventory.ToggleBrushType;
+        _playerController.SetMovementMode += _movementIndicator.UpdatedMovementMode;
+
 
         ControllerContext.SetState(_playerController);
         SceneContext.RequestWindowAction(new GrabCursor());
@@ -199,6 +211,42 @@ public class DemoScene : BaseScene
             }
         };
         _hud.Add(inventoryHud);
+    }
+
+    private void LoadBrushIndicator()
+    {
+        var material = new BrushInfoMaterial(
+            GameContext.ShaderRepository.Get("plain"),
+            GameContext.FontRepository.Get("Pixel"),
+            GameContext.UiAtlas.Get("Cube"),
+            GameContext.UiAtlas.Get("Sphere")
+        );
+        var brushInfo = new BrushIndicator(material);
+        brushInfo.Transform.Anchor = new Vector2(0.5f, 0.5f);
+        brushInfo.Transform.Pivot = new Vector2(0.5f, 0.5f);
+        brushInfo.Transform.Offset = new Vector2(32, 0);
+        brushInfo.Transform.Scale = 4;
+        _inventory.BrushSize.OnChanged += size => brushInfo.UpdateBrushSize(size);
+        _inventory.BrushType.OnChanged += _ => brushInfo.ToggleBrushType();
+        
+        _hud.Add(brushInfo);
+    }
+
+    private void LoadMovementIndicator()
+    {
+        var material = new MovementInfoMaterial(
+            GameContext.ShaderRepository.Get("plain"),
+            GameContext.UiAtlas.Get("Walk"),
+            GameContext.UiAtlas.Get("Fly"),
+            GameContext.UiAtlas.Get("FreeFly")
+        );
+        _movementIndicator = new MovementIndicator(material);
+        _movementIndicator.Transform.Anchor = new Vector2(0.5f, 0.5f);
+        _movementIndicator.Transform.Pivot = new Vector2(0.5f, 0.5f);
+        _movementIndicator.Transform.Offset = new Vector2(-32, 0);
+        _movementIndicator.Transform.Scale = 4;
+        _hud.Add(_movementIndicator);
+
     }
 
     private void LoadPause()
@@ -339,7 +387,7 @@ public class DemoScene : BaseScene
         SaveWorld();
         SceneContext.SetState(new MainMenu(GameContext));
     }
-
+    
     private void OnPlaceBlock()
     {
         var blockToPlace = _inventory.SelectedBlock;
@@ -379,7 +427,6 @@ public class DemoScene : BaseScene
             $"Place Tree at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
         var command = _treeFactory.GetCommand(_voxelWorld, voxelPlaceIndex, new TreeArgs(1));
         command.Execute();
-
     }
 
     protected override void ReleaseManagedResources()
