@@ -26,23 +26,36 @@ public class WalkBaseMovementStrategy : BaseMovementStrategy
 
     public override MovementMode Mode => MovementMode.Walk;
 
+
+    private double _jumpBufferTimer = 0;
+    private const double _jumpBufferTime = 0.1;
+
     public override void Update(double deltaTime, KeyboardState keyboard, MouseState mouse)
     {
         ApplyMouseLook(mouse);
 
         var movement = GetFlatMoveDirection(keyboard);
         var speed = CalculateSpeed(keyboard);
-
         var velocity = new Vector2(movement.X, movement.Z) * speed;
         Physics.SetHorizontalVelocity(velocity);
 
-        var jumpDown = keyboard.IsKeyDown(Keys.Space);
-        if (jumpDown && !_jumpHeld)
+        if (_jumpBufferTimer > 0)
+        {
+            _jumpBufferTimer -= deltaTime;
+        }
+        
+        bool jumpDown = keyboard.IsKeyDown(Keys.Space);
+        if (jumpDown && !_jumpHeld) 
+        {
+            _jumpBufferTimer = _jumpBufferTime;
+        }
+        _jumpHeld = jumpDown;
+        
+        if (_jumpBufferTimer > 0 && Physics.IsGrounded) 
         {
             Physics.Jump(JumpForce);
+            _jumpBufferTimer = 0;
         }
-
-        _jumpHeld = jumpDown;
 
         ApplyPhysics(deltaTime, new Vector3(velocity));
     }
