@@ -101,36 +101,7 @@ public class DemoScene : BaseScene
 
         if (_worldMeta.LastPlayed == DateTime.MinValue)
         {
-            const int startHeight = 128; 
-            var spawnPosition = new Vector3(0.5f, startHeight, 0.5f);
-            RayHit hit = RayHit.NoHit;
-
-            while (!hit.IsHit && spawnPosition.Y > -startHeight)
-            {
-                var chunkPos = Chunk.GlobalToChunk(spawnPosition.ToVector3Int());
-                _chunkLoadingSystem.LoadChunkImmediately(chunkPos);
-                hit = _voxelWorld.Raycast(new Ray
-                {
-                    Length = Chunk.ChunkSize,
-                    Origin = (System.Numerics.Vector3)spawnPosition,
-                    Direction = -System.Numerics.Vector3.UnitY,
-                });
-
-                if (!hit.IsHit)
-                {
-                    spawnPosition.Y -= Chunk.ChunkSize;
-                }
-            }
-
-            if (hit.IsHit)
-            {
-                spawnPosition.Y = hit.HitIn.Y + 3;
-            }
-            else
-            {
-                spawnPosition.Y = 100;
-            }
-    
+            var spawnPosition = SpawnPosition();
             Camera = new Camera(spawnPosition, (float)GameContext.ScreenWidth / GameContext.ScreenHeight);
             Camera.LookAt(spawnPosition + Vector3.UnitX);
         }
@@ -162,6 +133,50 @@ public class DemoScene : BaseScene
 
         ControllerContext.SetState(_playerController);
         SceneContext.RequestWindowAction(new GrabCursor());
+    }
+
+    private Vector3 SpawnPosition()
+    {
+        const int startHeight = 128;
+        const int endLimit = -512;
+        const float epsilon = 0.02f;
+                
+        var spawnPosition = new Vector3(0.5f, startHeight, 0.5f);
+        RayHit hit = RayHit.NoHit;
+
+        while (!hit.IsHit && spawnPosition.Y > -startHeight)
+        {
+            var chunkPos = Chunk.GlobalToChunk(spawnPosition.FloorToVector3Int());
+            _chunkLoadingSystem.LoadChunkImmediately(chunkPos);
+                
+            var rayOrigin = (System.Numerics.Vector3)spawnPosition;
+            rayOrigin.Y += epsilon;
+                
+            hit = _voxelWorld.Raycast(new Ray
+            {
+                Length = Chunk.ChunkSize + 1f,
+                Origin = (System.Numerics.Vector3)new Vector3(0.5f, chunkPos.Y * Chunk.ChunkSize + Chunk.ChunkSize - epsilon, 0.5f),
+                Direction = -System.Numerics.Vector3.UnitY,
+            });
+
+            if (!hit.IsHit)
+            {
+                spawnPosition.Y -= Chunk.ChunkSize;
+                    
+                if (spawnPosition.Y < endLimit) break;
+            }
+        }
+
+        if (hit.IsHit)
+        {
+            spawnPosition.Y = hit.HitIn.Y + 2;
+        }
+        else
+        {
+            spawnPosition.Y = 100;
+        }
+
+        return spawnPosition;
     }
 
 
@@ -360,7 +375,7 @@ public class DemoScene : BaseScene
     public override void Update(double deltaTime)
     {
         _elapsedTime += deltaTime;
-        ProcessRaycast(deltaTime);
+        // ProcessRaycast(deltaTime); // TODO: temp
     }
 
     public override void FixedUpdate(double deltaTime)

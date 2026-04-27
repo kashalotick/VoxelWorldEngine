@@ -82,5 +82,7 @@
   &lt;Assembly Path="C:\Users\sasha\.nuget\packages\opentk.mathematics\4.9.4\lib\netcoreapp3.1\OpenTK.Mathematics.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=f4bda4f3_002Dccb8_002D4cf8_002Db74e_002D75d209882d99/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from &amp;lt;VoxelWorldEngineTests&amp;gt;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;Project Location="F:\Univer\VoxelWorldEngine\VoxelWorldEngineTests" Presentation="&amp;lt;VoxelWorldEngineTests&amp;gt;" /&gt;&#xD;
+  &lt;TestAncestor&gt;&#xD;
+    &lt;TestId&gt;NUnit3x::CF0139B4-42F0-4E71-9193-E8B74F8B7261::net10.0::VoxelWorldEngineTests.Core.VoxelWorldRaycastTest&lt;/TestId&gt;&#xD;
+  &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

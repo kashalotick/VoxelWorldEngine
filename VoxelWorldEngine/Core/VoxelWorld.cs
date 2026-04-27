@@ -128,7 +128,9 @@ public class VoxelWorld : IWorldRegion
         {
             if (_chunks.TryGetValue(enumerator.CurrentPos, out var chunk))
             {
+                Console.WriteLine($"[Raycast] trying chunk {enumerator.CurrentPos}, ray origin Y={ray.Origin.Y}");
                 var hit = chunk.Raycast(ray);
+                Console.WriteLine($"[Raycast] chunk result: {hit}");
                 if (!hit.Voxel.IsAir) return hit;
             }
         } while (enumerator.MoveNext());

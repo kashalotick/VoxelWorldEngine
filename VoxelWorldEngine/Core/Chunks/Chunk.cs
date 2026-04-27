@@ -61,7 +61,8 @@ public partial class Chunk : IWorldRegion
 
     public RayHit Raycast(Ray ray)
     {
-        var localRay = ray with { Origin = ray.Origin - (Vector3)GlobalPosition };
+        var localRay = ray;
+        localRay.Origin = ray.Origin - (Vector3)GlobalPosition;
 
         var hit = Octree.Raycast(localRay);
 
@@ -70,6 +71,7 @@ public partial class Chunk : IWorldRegion
             hit.HitIn += (Vector3)GlobalPosition;
             hit.HitOut += (Vector3)GlobalPosition;
         }
+        Console.WriteLine($"[Chunk] {hit}");
 
         return hit;
     }
