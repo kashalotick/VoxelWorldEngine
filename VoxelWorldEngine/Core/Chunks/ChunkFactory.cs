@@ -8,13 +8,11 @@ namespace VoxelWorldEngine.Core.ChunkLoading;
 public class ChunkFactory
 {
     private IChunkMementoRepository _repository;
-    private readonly IMeshBuilder _meshBuilder;
     private readonly ChunkBuilder _chunkBuilder;
 
     public ChunkFactory(IChunkMementoRepository repository, int seed)
     {
         _repository = repository;
-        _meshBuilder = new MeshBuilder();
         _chunkBuilder = new ChunkBuilder(seed);
     }
 
@@ -34,7 +32,6 @@ public class ChunkFactory
             chunk.Restore(memento);
         }
 
-        chunk.ChunkMesh = _meshBuilder.Build(chunk.Octree);
 
         return chunk;
     }

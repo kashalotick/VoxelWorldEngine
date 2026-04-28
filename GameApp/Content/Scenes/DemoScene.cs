@@ -40,7 +40,7 @@ public class DemoScene : BaseScene
     private readonly WorldRepository _worldRepository;
     private CharacterPhysics _characterPhysics;
     private ChunkLoadingSystem _chunkLoadingSystem;
-    private ChunkUpdateSystem _chunkUpdateSystem;
+    private ChunkPipeline _chunkPipeline;
     private CubeCommandFactory _cubeFactory;
 
     private double _elapsedTime;
@@ -204,14 +204,14 @@ public class DemoScene : BaseScene
         _worldState = worldState ?? new WorldState();
 
         _gameWorld = new GameWorld(_voxelWorld, material, _worldRepository.GetChunkRepository(_worldMeta.Slot));
-        _voxelWorld.ChunkAdded += _gameWorld.AddChunk;
-        _voxelWorld.ChunkUpdated += _gameWorld.UpdateChunk;
-        _voxelWorld.ChunkRemoved += _gameWorld.RemoveChunk;
         _gameWorld.Load();
 
-        _chunkLoadingSystem
-            = SOR.Register(new ChunkLoadingSystem(_voxelWorld, _worldRepository.GetChunkRepository(_worldMeta.Slot)));
-        _chunkUpdateSystem = new ChunkUpdateSystem(_voxelWorld);
+        _chunkPipeline = new ChunkPipeline(_voxelWorld);
+        _voxelWorld.ChunkDirtySink = _chunkPipeline;
+
+        _chunkLoadingSystem = SOR.Register(
+            new ChunkLoadingSystem(_voxelWorld, _gameWorld, _chunkPipeline, _worldRepository.GetChunkRepository(_worldMeta.Slot))
+        );
 
         LightComposition(material.Shader);
     }
@@ -390,7 +390,7 @@ public class DemoScene : BaseScene
         _hud.UpdateChunkPosition(Chunk.GlobalToChunk(_worldState.Player.Position.ToVector3Int()));
 
         _chunkLoadingSystem.Update(deltaTime, _worldState.Player);
-        _chunkUpdateSystem.Update(deltaTime);
+        _chunkPipeline.FlushToGpu(_gameWorld);
     }
 
     private void ProcessRaycast(double deltaTime)
@@ -547,7 +547,9 @@ public class DemoScene : BaseScene
 
     protected override void ReleaseManagedResources()
     {
+        _chunkPipeline.Dispose();
         _gameWorld.Dispose();
         SaveWorld();
     }
 }
+

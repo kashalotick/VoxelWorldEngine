@@ -10,9 +10,7 @@ namespace VoxelWorldEngine.Core;
 
 public class VoxelWorld : IWorldRegion
 {
-    public event Action<Chunk> ChunkAdded;
-    public event Action<Chunk> ChunkUpdated;
-    public event Action<Chunk> ChunkRemoved;
+    public IChunkDirtySink? ChunkDirtySink { get; set; }
 
 
     public VoxelWorld(int seed)
@@ -21,56 +19,66 @@ public class VoxelWorld : IWorldRegion
     }
 
     public int Seed { get; }
+    private readonly object _chunksLock = new();
     private Dictionary<Vector3Int, Chunk> _chunks = new();
     public IReadOnlyDictionary<Vector3Int, Chunk> Chunks => _chunks;
 
-    private readonly HashSet<Vector3Int> _meshDirtyChunks = new();
-    public IReadOnlySet<Vector3Int> MeshDirtyChunks => _meshDirtyChunks;
-
-
     public void AddChunk(Chunk chunk)
     {
-        _chunks[chunk.Position] = chunk;
-        ChunkAdded?.Invoke(chunk);
+        lock (_chunksLock)
+        {
+            _chunks[chunk.Position] = chunk;
+        }
     }
 
     public void UpdateChunk(Chunk chunk)
     {
-        _chunks[chunk.Position] = chunk;
-        ChunkUpdated?.Invoke(chunk);
+        lock (_chunksLock)
+        {
+            _chunks[chunk.Position] = chunk;
+        }
     }
 
     public void RemoveChunk(Vector3Int chunkPosition)
     {
-        if (_chunks.TryGetValue(chunkPosition, out var chunk))
+        lock (_chunksLock)
         {
-            ChunkRemoved?.Invoke(chunk); // ???????? ????? ? chunk ?? ? ????????
             _chunks.Remove(chunkPosition);
         }
     }
 
-    public void ClearMeshDirty()
+    public bool TryGetChunk(Vector3Int chunkPosition, out Chunk chunk)
     {
-        _meshDirtyChunks.Clear();
+        lock (_chunksLock)
+        {
+            return _chunks.TryGetValue(chunkPosition, out chunk);
+        }
     }
 
-    public void MarkChunkMeshClean(Vector3Int chunkPos)
+    public Vector3Int[] GetChunkPositionsSnapshot()
     {
-        _meshDirtyChunks.Remove(chunkPos);
+        lock (_chunksLock)
+        {
+            var result = new Vector3Int[_chunks.Count];
+            _chunks.Keys.CopyTo(result, 0);
+            return result;
+        }
     }
 
     public bool PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
     {
         var chunkPos = Chunk.GlobalToChunk(voxelPositionIndex);
-        var chunk = _chunks[chunkPos];
+        if (!TryGetChunk(chunkPos, out var chunk))
+        {
+            return false;
+        }
 
         var result = chunk.PlaceBlock(voxelPositionIndex, blockId);
         if (result)
         {
             chunk.MarkDirty();
-            _meshDirtyChunks.Add(chunkPos);
+            ChunkDirtySink?.MarkDirty(chunkPos);
         }
-
 
         return result;
     }
@@ -85,23 +93,26 @@ public class VoxelWorld : IWorldRegion
         var firstChunk = Chunk.GlobalToChunk(insertPosition);
         var lastChunk = Chunk.GlobalToChunk(insertPosition + areaSize - Vector3Int.One);
 
-
         for (int x = firstChunk.X; x <= lastChunk.X; x++)
         for (int y = firstChunk.Y; y <= lastChunk.Y; y++)
         for (int z = firstChunk.Z; z <= lastChunk.Z; z++)
         {
             var chunkPos = new Vector3Int(x, y, z);
-            var chunk = _chunks[chunkPos];
+            if (!TryGetChunk(chunkPos, out var chunk))
+            {
+                continue;
+            }
+
             chunk.ModifyArea(insertPosition, areaSize, data, canReplace);
             chunk.MarkDirty();
-            _meshDirtyChunks.Add(chunkPos);
+            ChunkDirtySink?.MarkDirty(chunkPos);
         }
     }
 
     public bool TryGetVoxel(Vector3Int voxelPosition, out Voxel voxel)
     {
         var chunkPos = Chunk.GlobalToChunk(voxelPosition);
-        if (!_chunks.TryGetValue(chunkPos, out var chunk))
+        if (!TryGetChunk(chunkPos, out var chunk))
         {
             voxel = Voxel.Void;
             return false;
@@ -119,14 +130,13 @@ public class VoxelWorld : IWorldRegion
             : true;
     }
 
-
     public RayHit Raycast(Ray ray)
     {
         var enumerator = new RayGridEnumerator(ray, Chunk.ChunkSize);
 
         do
         {
-            if (_chunks.TryGetValue(enumerator.CurrentPos, out var chunk))
+            if (TryGetChunk(enumerator.CurrentPos, out var chunk))
             {
                 var hit = chunk.Raycast(ray);
                 if (!hit.Voxel.IsAir) return hit;
