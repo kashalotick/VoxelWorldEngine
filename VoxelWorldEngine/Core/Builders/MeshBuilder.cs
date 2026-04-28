@@ -53,7 +53,16 @@ public class MeshBuilder : IMeshBuilder
     
         var neighborFace = GetNeighborFaceIndices(node, normal);
         var queryResult = neighbor.Query(neighborFace.min, neighborFace.max);
-        return queryResult.All(v => !v.IsTransparent);
+        return queryResult.All(v =>
+        {
+            if (node.Data.IsTransparent)
+            {
+                return v.IsTransparent;
+            }
+            
+            return !(v.IsTransparent || v.IsAir);
+            
+        });
     }
     
     
