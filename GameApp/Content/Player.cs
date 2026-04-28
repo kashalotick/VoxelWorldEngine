@@ -7,7 +7,7 @@ public class Player
     public Vector3 Position { get; set; } = new(0, 0, 0);
     public Vector3 ViewDirection { get; set; } = new(0, 0, 0);
     public Matrix4 ViewMatrix { get; set; }
-    public int ChunkViewRadius { get; set; } = 5;
+    public int ChunkViewRadius { get; set; } = 8;
     public int ChunkViewHeightRadius { get; set; } = 5;
 
     public static explicit operator PlayerDto(Player obj)
