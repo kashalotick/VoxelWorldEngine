@@ -5,7 +5,6 @@ using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelWorldEngine.Core.Builders;
 
-[Obsolete("Use MeshGenerator instead.")]
 public interface IMeshBuilder : IOctreeVisitor<Voxel>
 {
     ChunkMeshData Build(IVoxelOctree octree);

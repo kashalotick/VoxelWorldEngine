@@ -1,5 +1,4 @@
-﻿using System.Threading.Channels;
-using GameApp.Graphics.World;
+﻿using System.Collections.Concurrent;
 using GameApp.Utils;
 using LearningOpenTK.Core.Primitives;
 using LearningOpenTK.Core.Threading;
@@ -15,34 +14,23 @@ public class ChunkLoadingSystem : ILoadable
 {
     private const int ChunkPerFrameLimit = 8;
     private const float CooldownTime = 0.5f;
-    private readonly Channel<Chunk> _readyChunks;
+    private readonly ConcurrentQueue<Chunk> _readyChunks = new();
     private readonly HashSet<Vector3Int> _requestedNewChunks = new();
 
     // Використовуємо ThreadLocal замість звичайного поля
     private readonly ThreadLocal<ChunkFactory> _threadLocalChunkLoader;
 
-    private readonly GameWorld _gameWorld;
     private readonly VoxelWorld _voxelWorld;
     private readonly DynamicWorkerPool<ChunkLoadTask> _workerPool;
-    private ChunkPipeline _pipeline;
 
     private Vector3Int? _activeChunkPosition;
 
     private HashSet<Vector3Int> _chunksToRemove = new();
     private double _cooldown;
 
-    public ChunkLoadingSystem(VoxelWorld voxelWorld, GameWorld gameWorld, ChunkPipeline pipeline, IChunkMementoRepository chunkRepository)
+    public ChunkLoadingSystem(VoxelWorld voxelWorld, IChunkMementoRepository chunkRepository)
     {
         _voxelWorld = voxelWorld;
-        _gameWorld = gameWorld;
-        _pipeline = pipeline;
-
-        _readyChunks = Channel.CreateBounded<Chunk>(new BoundedChannelOptions(ChunkPerFrameLimit * 8)
-        {
-            FullMode = BoundedChannelFullMode.Wait,
-            SingleReader = true,
-            SingleWriter = false
-        });
 
         // Ініціалізуємо ThreadLocal. Він викличе лямбду ТІЛЬКИ тоді, 
         // коли новий потік вперше звернеться до Value.
@@ -93,12 +81,12 @@ public class ChunkLoadingSystem : ILoadable
         var chunkLoader = _threadLocalChunkLoader.Value;
         var chunk = chunkLoader.GetChunk(task.Position);
 
-        _readyChunks.Writer.TryWrite(chunk);
+        _readyChunks.Enqueue(chunk);
     }
 
     private void RecalculateChunksAround(Player player)
     {
-        // ...existing code...
+        // ... (код залишився без змін, такий як у попередньому повідомленні) ...
         var playerChunkPosition = Chunk.GlobalToChunk(player.Position.ToVector3Int());
         var shouldBeLoaded = new HashSet<Vector3Int>();
 
@@ -109,7 +97,7 @@ public class ChunkLoadingSystem : ILoadable
             var chunkPosition = playerChunkPosition + new Vector3Int(x, y, z);
             shouldBeLoaded.Add(chunkPosition);
 
-            if (!_voxelWorld.TryGetChunk(chunkPosition, out _) && !_requestedNewChunks.Contains(chunkPosition))
+            if (!_voxelWorld.Chunks.ContainsKey(chunkPosition) && !_requestedNewChunks.Contains(chunkPosition))
             {
                 _requestedNewChunks.Add(chunkPosition);
                 var dist = Vector3Int.Distance(playerChunkPosition, chunkPosition);
@@ -117,8 +105,7 @@ public class ChunkLoadingSystem : ILoadable
             }
         }
 
-        var currentChunks = _voxelWorld.GetChunkPositionsSnapshot();
-        var toRemove = currentChunks.Except(shouldBeLoaded).ToHashSet();
+        var toRemove = _voxelWorld.Chunks.Keys.Except(shouldBeLoaded).ToHashSet();
         var pendingToCancel = _requestedNewChunks.Except(shouldBeLoaded).ToHashSet();
 
         _chunksToRemove = toRemove;
@@ -134,25 +121,18 @@ public class ChunkLoadingSystem : ILoadable
     {
         // ... (код залишився без змін) ...
         var chunksProcessed = 0;
-        while (chunksProcessed < ChunkPerFrameLimit && _readyChunks.Reader.TryRead(out var chunk))
+        while (chunksProcessed < ChunkPerFrameLimit && _readyChunks.TryDequeue(out var chunk))
         {
             if (!_requestedNewChunks.Contains(chunk.Position)) continue;
 
             _requestedNewChunks.Remove(chunk.Position);
             _voxelWorld.AddChunk(chunk);
-            _gameWorld.AddChunk(chunk);
-            _pipeline.MarkDirty(chunk.Position);
             chunksProcessed++;
         }
 
         foreach (var chunkPosition in _chunksToRemove)
         {
-            if (_voxelWorld.TryGetChunk(chunkPosition, out var chunk))
-            {
-                _pipeline.RequestUnload(chunkPosition);
-                _gameWorld.RemoveChunk(chunk);
-                _voxelWorld.RemoveChunk(chunkPosition);
-            }
+            _voxelWorld.RemoveChunk(chunkPosition);
         }
 
         _chunksToRemove.Clear();
@@ -160,7 +140,7 @@ public class ChunkLoadingSystem : ILoadable
     
     public Chunk LoadChunkImmediately(Vector3Int position)
     {
-        if (_voxelWorld.TryGetChunk(position, out var existingChunk))
+        if (_voxelWorld.Chunks.TryGetValue(position, out var existingChunk))
         {
             return existingChunk;
         }
@@ -169,8 +149,6 @@ public class ChunkLoadingSystem : ILoadable
         var chunk = chunkLoader.GetChunk(position);
 
         _voxelWorld.AddChunk(chunk);
-        _gameWorld.AddChunk(chunk);
-        _pipeline.MarkDirty(position);
         _requestedNewChunks.Remove(position);
         _workerPool.RemoveWhere(task => task.Position == position);
 

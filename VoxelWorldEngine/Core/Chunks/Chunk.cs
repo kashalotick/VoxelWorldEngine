@@ -2,6 +2,7 @@
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.Core.Serialization;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
@@ -10,6 +11,7 @@ namespace VoxelWorldEngine.Core.Chunks;
 public partial class Chunk : IWorldRegion
 {
     public bool IsDirty { get; private set; } = false;
+    public ChunkMeshData ChunkMesh { get; set; }
     public VoxelOctree Octree { get; set; }
 
     public Vector3Int Position

@@ -34,8 +34,6 @@ class Program
 
         Console.WriteLine($"Початок профілювання: {iterations} ітерацій...");
 
-        var meshGenerator = new MeshGenerator();
-
         for (int i = 0; i < iterations; i++)
         {
             Counter.Increment(CounterType.VoxelOctreeBuild);
@@ -62,7 +60,8 @@ class Program
 
             // 3b. Етап Генерації ChunkMesh (Новий)
             sw.Restart();
-            using var newMesh = meshGenerator.Generate(octree);
+            var newMeshBuilder = new MeshBuilder();
+            var newMesh = newMeshBuilder.Build(octree);
             sw.Stop();
             totalNewMeshTime += sw.Elapsed.TotalMilliseconds;
 
@@ -70,6 +69,7 @@ class Program
             sw.Restart();
             var chunk = new Chunk(position);
             chunk.Octree = octree;
+            chunk.ChunkMesh = newMesh; // Використовуємо новий меш
             sw.Stop();
             totalChunkTime += sw.Elapsed.TotalMilliseconds;
         }
@@ -89,8 +89,6 @@ class Program
 
         var iterations = (max.X - min.X) * (max.Y - min.Y) * (max.Z - min.Z);
         Console.WriteLine($"Початок профілювання: AABB min={min} max={max} ({iterations} чанків)...");
-
-        var meshGenerator = new MeshGenerator();
 
         for (int x = 0; x < max.X - min.X; x++)
         for (int y = 0; y < max.Y - min.Y; y++)
@@ -119,13 +117,15 @@ class Program
 
             // New ChunkMesh Builder
             sw.Restart();
-            using var newMesh = meshGenerator.Generate(octree);
+            var newMeshBuilder = new MeshBuilder();
+            var newMesh = newMeshBuilder.Build(octree);
             sw.Stop();
             totalNewMeshTime += sw.Elapsed.TotalMilliseconds;
 
             sw.Restart();
             var chunk = new Chunk(position);
             chunk.Octree = octree;
+            chunk.ChunkMesh = newMesh;
             sw.Stop();
             totalChunkTime += sw.Elapsed.TotalMilliseconds;
         }

@@ -10,7 +10,6 @@ using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.Chunks;
 using VoxelWorldEngine.Core.Serialization;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Collections.Meshes;
 
 namespace GameApp.Graphics.World;
 
@@ -54,10 +53,13 @@ public class GameWorld : ILoadable, IRenderable
     {
         foreach (var pair in _chunks)
         {
-            if (_voxelWorld.TryGetChunk(pair.Key, out var chunk) && chunk.IsDirty)
+            var chunk = _voxelWorld.Chunks[pair.Key];
+
+            if (chunk.IsDirty)
             {
                 _chunkRepository.Save(chunk.Save());
             }
+
 
             pair.Value.Dispose();
         }
@@ -81,7 +83,7 @@ public class GameWorld : ILoadable, IRenderable
         {
             if (chunk.Value.Mesh == null) continue;
 
-            if (_voxelWorld.TryGetChunk(chunk.Key, out var chunkData))
+            if (_voxelWorld.Chunks.TryGetValue(chunk.Key, out var chunkData))
             {
                 var globalPos = chunkData.GlobalPosition.ToVector3();
                 if (!context.IsInFrustum(globalPos, globalPos + new Vector3(Chunk.ChunkSize)))
@@ -101,9 +103,17 @@ public class GameWorld : ILoadable, IRenderable
 
     public void AddChunk(Chunk chunk)
     {
+        if (chunk.ChunkMesh.Vertices.Length == 0)
+        {
+        }
+
+        // TODO: make proxy from no empty objects
         var wo = ConvertToWorldObject(chunk);
         _chunks[chunk.Position] = wo;
-        wo.Load();
+        if (wo.Mesh != null)
+        {
+            wo.Load();
+        }
     }
 
     public void UpdateChunk(Chunk chunk)
@@ -112,33 +122,17 @@ public class GameWorld : ILoadable, IRenderable
         {
             AddChunk(chunk);
         }
-    }
 
-    public void UploadMesh(Vector3Int chunkCoords, RentedMeshData meshData)
-    {
-        if (!_chunks.TryGetValue(chunkCoords, out var wo))
+        var wo = _chunks[chunk.Position];
+        if (wo.Mesh != null)
         {
-            if (_voxelWorld.TryGetChunk(chunkCoords, out var chunk))
-            {
-                wo = ConvertToWorldObject(chunk);
-                _chunks[chunkCoords] = wo;
-                wo.Load();
-            }
-            else
-            {
-                return;
-            }
+            wo.Mesh.UpdateVertices(chunk.ChunkMesh.Vertices);
+            wo.Mesh.UpdateIndices(chunk.ChunkMesh.Indices);
         }
-
-        var mesh = wo.Mesh;
-        if (mesh == null)
+        else
         {
-            mesh = new ChunkMesh();
-            wo.Mesh = mesh;
-            wo.Load();
+            AddChunk(chunk);
         }
-
-        mesh.Upload(meshData.VerticesSpan, meshData.IndicesSpan);
     }
 
     public void RemoveChunk(Chunk chunk)
@@ -155,8 +149,13 @@ public class GameWorld : ILoadable, IRenderable
     // TODO: temporary?????
     private WorldObject<ChunkMesh> ConvertToWorldObject(Chunk chunk)
     {
+        ChunkMesh? mesh = null;
+        if (chunk.ChunkMesh.Vertices.Length > 0)
+        {
+            mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
+        }
+        // var mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
 
-        var mesh = new ChunkMesh();
         var obj = new WorldObject<ChunkMesh>(mesh, _material.Shader, _material.TextureArray);
 
         obj.Transform3D.Position = chunk.GlobalPosition.ToVector3();
