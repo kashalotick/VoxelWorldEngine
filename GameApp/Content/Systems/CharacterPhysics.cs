@@ -98,7 +98,7 @@ public class CharacterPhysics
             var trial = position;
             SetAxis(ref trial, axis, GetAxis(trial, axis) + stepDelta);
 
-            if (IntersectsSolid(trial))
+            if (IntersectsSolid(trial, _isSolidVoxel))
             {
                 ZeroVelocityAxis(axis);
                 if (axis == 1 && delta < 0f) IsGrounded = true;
@@ -108,8 +108,9 @@ public class CharacterPhysics
             position = trial;
         }
     }
+    
 
-    private bool IntersectsSolid(Vector3 cameraPosition)
+    public bool IntersectsSolid(Vector3 cameraPosition, Func<Vector3Int, bool> isSolidVoxel)
     {
         var halfWidth = Width * 0.5f;
 
@@ -136,7 +137,7 @@ public class CharacterPhysics
         for (var y = minY; y <= maxY; y++)
         for (var z = minZ; z <= maxZ; z++)
         {
-            if (_isSolidVoxel(new Vector3Int(x, y, z)))
+            if (isSolidVoxel(new Vector3Int(x, y, z)))
             {
                 return true;
             }

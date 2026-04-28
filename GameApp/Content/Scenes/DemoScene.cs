@@ -475,7 +475,24 @@ public class DemoScene : BaseScene
         if (!lastHit.IsHit) return;
 
         var hitVoxel = lastHit.HitIn - lastHit.HitFaceNormal * 0.001f;
+        
         var placeVoxel = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
+        var playerPos = _worldState.Player.Position;
+        var halfWidth = _characterPhysics.Width * 0.5f;
+    
+        var min = new Vector3(playerPos.X - halfWidth, playerPos.Y - _characterPhysics.EyeHeight, playerPos.Z - halfWidth);
+        var max = new Vector3(playerPos.X + halfWidth, playerPos.Y + (_characterPhysics.Height - _characterPhysics.EyeHeight), playerPos.Z + halfWidth);
+
+        bool intersectsPlayer = 
+            placeVoxel.X + 1 > min.X && placeVoxel.X < max.X &&
+            placeVoxel.Y + 1 > min.Y && placeVoxel.Y < max.Y &&
+            placeVoxel.Z + 1 > min.Z && placeVoxel.Z < max.Z;
+
+        if (intersectsPlayer) 
+        {
+            Console.WriteLine("Cannot place");
+            return;
+        }            
 
         Console.WriteLine(
             $"Place block at {placeVoxel}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
