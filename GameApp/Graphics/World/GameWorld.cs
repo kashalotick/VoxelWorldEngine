@@ -1,9 +1,9 @@
 ﻿using GameApp.Utils;
 using LearningOpenTK.Core.Lifecycle;
 using LearningOpenTK.Core.Rendering;
+using LearningOpenTK.Core.Transform;
 using LearningOpenTK.Engine.Resources.Shaders;
 using LearningOpenTK.Engine.Resources.Textures.Array;
-using LearningOpenTK.Engine.World;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core;
@@ -24,7 +24,7 @@ public class GameWorld : ILoadable, IRenderable
 {
     private readonly IChunkMementoRepository _chunkRepository;
 
-    private readonly Dictionary<Vector3Int, WorldObject<ChunkMesh>> _chunks = new();
+    private readonly Dictionary<Vector3Int, ChunkObject> _chunks = new();
     private readonly GameWorldMaterial _material;
     private readonly VoxelWorld _voxelWorld;
 
@@ -32,7 +32,11 @@ public class GameWorld : ILoadable, IRenderable
     private float[] _tileOffsets;
 
     // TODO: temp repository usage here
-    public GameWorld(VoxelWorld voxelWorld, GameWorldMaterial material, IChunkMementoRepository chunkRepository)
+    public GameWorld(
+        VoxelWorld voxelWorld,
+        GameWorldMaterial material,
+        IChunkMementoRepository chunkRepository
+    )
     {
         _voxelWorld = voxelWorld;
         _material = material;
@@ -90,10 +94,10 @@ public class GameWorld : ILoadable, IRenderable
                     continue;
             }
 
-            var model = chunk.Value.Transform3D.GetModelMatrix();
+            var model = chunk.Value.Transform.GetModelMatrix();
             _material.Shader.SetMatrix4("model", model);
 
-            var normalMatrix = chunk.Value.Transform3D.GetCubeNormalMatrix();
+            var normalMatrix = chunk.Value.Transform.GetCubeNormalMatrix();
             _material.Shader.SetMatrix3("normalMatrix", normalMatrix);
 
 
@@ -103,12 +107,10 @@ public class GameWorld : ILoadable, IRenderable
 
     public void AddChunk(Chunk chunk)
     {
-        if (chunk.ChunkMesh.Vertices.Length == 0)
-        {
-        }
+        if (chunk.ChunkMesh.Vertices.Length == 0) { }
 
         // TODO: make proxy from no empty objects
-        var wo = ConvertToWorldObject(chunk);
+        var wo = new ChunkObject(chunk);
         _chunks[chunk.Position] = wo;
         if (wo.Mesh != null)
         {
@@ -145,26 +147,36 @@ public class GameWorld : ILoadable, IRenderable
         _chunks[chunk.Position].Dispose();
         _chunks.Remove(chunk.Position);
     }
-
-    // TODO: temporary?????
-    private WorldObject<ChunkMesh> ConvertToWorldObject(Chunk chunk)
+    
+    
+    private class ChunkObject : ILoadable
     {
-        ChunkMesh? mesh = null;
-        if (chunk.ChunkMesh.Vertices.Length > 0)
+        public ChunkMesh Mesh;
+        public Transform3D Transform;
+
+        public ChunkObject(Chunk chunk)
         {
-            mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
+            Mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
+            Transform = new Transform3D()
+            {
+                Position = chunk.GlobalPosition.ToVector3(),
+            };
         }
-        // var mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
 
-        var obj = new WorldObject<ChunkMesh>(mesh, _material.Shader, _material.TextureArray);
+        public void Load()
+        {
+            if (Mesh == null)
+            {
+                Console.WriteLine("! Warning: Try to load null mesh");
+                return;
+            }
 
-        obj.Transform3D.Position = chunk.GlobalPosition.ToVector3();
-        return obj;
-    }
+            Mesh.Load(BufferUsageHint.DynamicDraw);
+        }
 
-
-    public void Update(float deltaTime)
-    {
-        //
+        public void Dispose()
+        {
+            Mesh?.Dispose();
+        }
     }
 }
