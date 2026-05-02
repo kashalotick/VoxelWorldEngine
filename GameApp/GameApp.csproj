@@ -11,7 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\LearningOpenTK\LearningOpenTK\LearningOpenTK.csproj"/>
+        <ProjectReference Include="..\..\LearningOpenTK\GameEngine\GameEngine.csproj" />
         <ProjectReference Include="..\VoxelModule\VoxelModule.csproj" />
     </ItemGroup>
 

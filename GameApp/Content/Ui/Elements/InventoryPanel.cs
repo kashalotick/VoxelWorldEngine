@@ -1,9 +1,9 @@
 ﻿using GameApp.Content.Systems;
 using GameApp.Utils;
-using LearningOpenTK.Content.Ui.StaticDraw;
-using LearningOpenTK.Engine.Resources.Shaders;
-using LearningOpenTK.Engine.Resources.Textures;
-using LearningOpenTK.Engine.UI;
+using GameEngine.Content.Ui.StaticDraw;
+using GameEngine.Engine.Resources.Shaders;
+using GameEngine.Engine.Resources.Textures;
+using GameEngine.Engine.UI;
 
 namespace GameApp.Content.Ui.Elements;
 

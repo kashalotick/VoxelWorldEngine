@@ -1,6 +1,6 @@
-﻿using LearningOpenTK.Core;
-using LearningOpenTK.Engine;
-using LearningOpenTK.Engine.Input;
+﻿using GameEngine.Core;
+using GameEngine.Engine;
+using GameEngine.Engine.Input;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;

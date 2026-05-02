@@ -1,7 +1,7 @@
 ﻿using GameApp.Application;
 using GameApp.Content.Scenes;
-using LearningOpenTK.Core;
-using LearningOpenTK.Engine;
+using GameEngine.Core;
+using GameEngine.Engine;
 
 namespace GameApp;
 

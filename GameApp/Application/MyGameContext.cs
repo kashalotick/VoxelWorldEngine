@@ -1,10 +1,10 @@
-﻿using LearningOpenTK.Core;
-using LearningOpenTK.Engine;
-using LearningOpenTK.Engine.Resources.Fonts;
-using LearningOpenTK.Engine.Resources.Shaders;
-using LearningOpenTK.Engine.Resources.Textures;
-using LearningOpenTK.Engine.Resources.Textures.Array;
-using LearningOpenTK.Engine.Resources.Textures.Atlas;
+﻿using GameEngine.Core;
+using GameEngine.Engine;
+using GameEngine.Engine.Resources.Fonts;
+using GameEngine.Engine.Resources.Shaders;
+using GameEngine.Engine.Resources.Textures;
+using GameEngine.Engine.Resources.Textures.Array;
+using GameEngine.Engine.Resources.Textures.Atlas;
 
 namespace GameApp.Application;
 

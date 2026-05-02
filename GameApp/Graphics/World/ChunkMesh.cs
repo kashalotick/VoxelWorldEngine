@@ -1,5 +1,5 @@
-﻿using LearningOpenTK.Core;
-using LearningOpenTK.Engine.Meshing;
+﻿using GameEngine.Core;
+using GameEngine.Engine.Meshing;
 using VoxelModule.DataStructures.Special.Structures.Vertices;
 
 namespace GameApp.Graphics.World;

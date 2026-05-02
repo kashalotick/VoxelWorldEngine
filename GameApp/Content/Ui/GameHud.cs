@@ -1,10 +1,10 @@
 ﻿using GameApp.Content.Ui.Elements;
 using GameApp.Utils;
-using LearningOpenTK.Content.Ui.StaticDraw;
-using LearningOpenTK.Engine.Resources.Fonts;
-using LearningOpenTK.Engine.Resources.Shaders;
-using LearningOpenTK.Engine.Resources.Textures;
-using LearningOpenTK.Engine.UI;
+using GameEngine.Content.Ui.StaticDraw;
+using GameEngine.Engine.Resources.Fonts;
+using GameEngine.Engine.Resources.Shaders;
+using GameEngine.Engine.Resources.Textures;
+using GameEngine.Engine.UI;
 using OpenTK.Mathematics;
 using VoxelModule.Core.Raycasting;
 using VoxelModule.DataStructures.Common.Structures.Vectors;

@@ -1,5 +1,5 @@
 ﻿using GameApp.Content.Systems;
-using LearningOpenTK.Core;
+using GameEngine.Core;
 using OpenTK.Mathematics;
 
 namespace GameApp.Content.Controllers.MovementStrategies;

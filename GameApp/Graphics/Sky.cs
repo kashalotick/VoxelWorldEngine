@@ -1,6 +1,6 @@
-﻿using LearningOpenTK.Core.Lifecycle;
-using LearningOpenTK.Core.Rendering;
-using LearningOpenTK.Engine.Resources.Shaders;
+﻿using GameEngine.Core.Lifecycle;
+using GameEngine.Core.Rendering;
+using GameEngine.Engine.Resources.Shaders;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 

@@ -1,11 +1,11 @@
 ﻿using GameApp.Content.Systems;
 using GameApp.Utils;
-using LearningOpenTK.Content.Ui.DynamicDraw;
-using LearningOpenTK.Core.Transform;
-using LearningOpenTK.Engine.Resources.Fonts;
-using LearningOpenTK.Engine.Resources.Shaders;
-using LearningOpenTK.Engine.Resources.Textures;
-using LearningOpenTK.Engine.UI;
+using GameEngine.Content.Ui.DynamicDraw;
+using GameEngine.Core.Transform;
+using GameEngine.Engine.Resources.Fonts;
+using GameEngine.Engine.Resources.Shaders;
+using GameEngine.Engine.Resources.Textures;
+using GameEngine.Engine.UI;
 using OpenTK.Mathematics;
 
 namespace GameApp.Content.Ui.Elements;

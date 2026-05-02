@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using GameApp.Utils;
-using LearningOpenTK.Core.Lifecycle;
-using LearningOpenTK.Core.Threading;
+using GameEngine.Core.Lifecycle;
+using GameEngine.Core.Threading;
 using VoxelModule.Core;
 using VoxelModule.Core.ChunkLoading;
 using VoxelModule.Core.Chunks;

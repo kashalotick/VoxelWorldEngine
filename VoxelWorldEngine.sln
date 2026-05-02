@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelModule", "VoxelModule\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameApp", "GameApp\GameApp.csproj", "{46921D3B-53E8-4F4B-8142-F6005F6A073B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningOpenTK", "..\LearningOpenTK\LearningOpenTK\LearningOpenTK.csproj", "{7F0F5744-018B-4E92-AFCD-DDB2B16DD2A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameEngine", "..\LearningOpenTK\GameEngine\GameEngine.csproj", "{7F0F5744-018B-4E92-AFCD-DDB2B16DD2A2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestField", "TestField\TestField.csproj", "{1FC63B9A-132E-44C2-8CD2-3A899CC08783}"
 EndProject

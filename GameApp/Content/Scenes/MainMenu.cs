@@ -3,15 +3,15 @@ using GameApp.Content.Controllers;
 using GameApp.Content.Services;
 using GameApp.Content.Ui.Elements;
 using GameApp.Utils;
-using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
-using LearningOpenTK.Content.Ui.StaticDraw;
-using LearningOpenTK.Core;
-using LearningOpenTK.Core.Transform;
-using LearningOpenTK.Engine.Resources.Fonts;
-using LearningOpenTK.Engine.Resources.Shaders;
-using LearningOpenTK.Engine.Resources.Textures;
-using LearningOpenTK.Engine.Scenes;
-using LearningOpenTK.Engine.UI;
+using GameEngine.Content.Ui.DynamicDraw.Interactive;
+using GameEngine.Content.Ui.StaticDraw;
+using GameEngine.Core;
+using GameEngine.Core.Transform;
+using GameEngine.Engine.Resources.Fonts;
+using GameEngine.Engine.Resources.Shaders;
+using GameEngine.Engine.Resources.Textures;
+using GameEngine.Engine.Scenes;
+using GameEngine.Engine.UI;
 
 namespace GameApp.Content.Scenes;
 

@@ -1,9 +1,9 @@
 ﻿using GameApp.Utils;
-using LearningOpenTK.Core.Lifecycle;
-using LearningOpenTK.Core.Rendering;
-using LearningOpenTK.Core.Transform;
-using LearningOpenTK.Engine.Resources.Shaders;
-using LearningOpenTK.Engine.Resources.Textures.Array;
+using GameEngine.Core.Lifecycle;
+using GameEngine.Core.Rendering;
+using GameEngine.Core.Transform;
+using GameEngine.Engine.Resources.Shaders;
+using GameEngine.Engine.Resources.Textures.Array;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelModule.Core;

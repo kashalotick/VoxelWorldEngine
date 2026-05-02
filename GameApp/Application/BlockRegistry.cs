@@ -1,4 +1,4 @@
-﻿using LearningOpenTK.Engine.Resources.Textures.Array;
+﻿using GameEngine.Engine.Resources.Textures.Array;
 using VoxelModule.DataStructures.Special.Structures.Voxels;
 
 namespace GameApp.Application;
