@@ -107,9 +107,6 @@ public class GameWorld : ILoadable, IRenderable
 
     public void AddChunk(Chunk chunk)
     {
-        if (chunk.ChunkMesh.Vertices.Length == 0) { }
-
-        // TODO: make proxy from no empty objects
         var wo = new ChunkObject(chunk);
         _chunks[chunk.Position] = wo;
         if (wo.Mesh != null)
@@ -151,12 +148,20 @@ public class GameWorld : ILoadable, IRenderable
     
     private class ChunkObject : ILoadable
     {
-        public ChunkMesh Mesh;
+        public ChunkMesh? Mesh;
         public Transform3D Transform;
 
         public ChunkObject(Chunk chunk)
         {
-            Mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
+
+            if (chunk.ChunkMesh.Vertices.Length == 0)
+            {
+                Mesh = null;
+            }
+            else
+            {
+                Mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
+            }
             Transform = new Transform3D()
             {
                 Position = chunk.GlobalPosition.ToVector3(),
