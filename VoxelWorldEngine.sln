@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelWorldEngine", "VoxelWorldEngine\VoxelWorldEngine.csproj", "{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelWorldEngineTests", "VoxelWorldEngineTests\VoxelWorldEngineTests.csproj", "{CF0139B4-42F0-4E71-9193-E8B74F8B7261}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameApp", "GameApp\GameApp.csproj", "{46921D3B-53E8-4F4B-8142-F6005F6A073B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningOpenTK", "..\LearningOpenTK\LearningOpenTK\LearningOpenTK.csproj", "{7F0F5744-018B-4E92-AFCD-DDB2B16DD2A2}"
@@ -20,10 +18,6 @@ Global
 		{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CF0139B4-42F0-4E71-9193-E8B74F8B7261}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CF0139B4-42F0-4E71-9193-E8B74F8B7261}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CF0139B4-42F0-4E71-9193-E8B74F8B7261}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CF0139B4-42F0-4E71-9193-E8B74F8B7261}.Release|Any CPU.Build.0 = Release|Any CPU
 		{46921D3B-53E8-4F4B-8142-F6005F6A073B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{46921D3B-53E8-4F4B-8142-F6005F6A073B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46921D3B-53E8-4F4B-8142-F6005F6A073B}.Release|Any CPU.ActiveCfg = Release|Any CPU
