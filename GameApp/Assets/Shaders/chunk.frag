@@ -44,7 +44,7 @@ void main()
 
     vec3 ambient = texColor.rgb * vec3(ambientColor.xyz) * ambientColor.w;
     vec3 diffuse = texColor.rgb * lightColor * diff;
-    vec3 specular = lightColor * spec;
+    vec3 specular = lightColor * spec * 0;
 
     vec3 lightingResult = ambient + diffuse + specular;
 
