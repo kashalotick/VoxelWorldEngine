@@ -4,7 +4,7 @@ using LearningOpenTK.Core.Rendering;
 using LearningOpenTK.Core.Transform;
 using LearningOpenTK.Engine.Resources.Shaders;
 using OpenTK.Graphics.OpenGL4;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+using VoxelModule.DataStructures.Common.Structures.Vectors;
 using Vector3 = OpenTK.Mathematics.Vector3;
 
 namespace GameApp.Graphics.VoxelSelectionSystem;

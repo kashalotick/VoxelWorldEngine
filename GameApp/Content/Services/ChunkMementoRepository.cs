@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
-using VoxelWorldEngine.Core.Serialization;
-using VoxelWorldEngine.DataStructures.Common.Collections.Trees.LinearImplementation;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
+using VoxelModule.Core.Serialization;
+using VoxelModule.DataStructures.Common.Collections.Trees.LinearImplementation;
+using VoxelModule.DataStructures.Common.Structures.Vectors;
+using VoxelModule.DataStructures.Special.Structures.Voxels;
 
 namespace GameApp.Content.Services;
 

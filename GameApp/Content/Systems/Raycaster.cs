@@ -3,7 +3,7 @@ using LearningOpenTK.Core.Lifecycle;
 using LearningOpenTK.Core.Rendering;
 using LearningOpenTK.Engine.Resources.Shaders;
 using OpenTK.Graphics.OpenGL4;
-using VoxelWorldEngine.Core.Raycasting;
+using VoxelModule.Core.Raycasting;
 
 namespace GameApp.Content.Systems;
 

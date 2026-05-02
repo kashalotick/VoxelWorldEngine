@@ -2,11 +2,11 @@
 using GameApp.Utils;
 using LearningOpenTK.Core.Lifecycle;
 using LearningOpenTK.Core.Threading;
-using VoxelWorldEngine.Core;
-using VoxelWorldEngine.Core.ChunkLoading;
-using VoxelWorldEngine.Core.Chunks;
-using VoxelWorldEngine.Core.Serialization;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+using VoxelModule.Core;
+using VoxelModule.Core.ChunkLoading;
+using VoxelModule.Core.Chunks;
+using VoxelModule.Core.Serialization;
+using VoxelModule.DataStructures.Common.Structures.Vectors;
 
 namespace GameApp.Content.Systems;
 

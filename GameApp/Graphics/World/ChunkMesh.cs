@@ -1,6 +1,6 @@
 ﻿using LearningOpenTK.Core;
 using LearningOpenTK.Engine.Meshing;
-using VoxelWorldEngine.DataStructures.Special.Structures.Vertices;
+using VoxelModule.DataStructures.Special.Structures.Vertices;
 
 namespace GameApp.Graphics.World;
 

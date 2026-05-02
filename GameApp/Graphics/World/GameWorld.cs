@@ -6,10 +6,10 @@ using LearningOpenTK.Engine.Resources.Shaders;
 using LearningOpenTK.Engine.Resources.Textures.Array;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using VoxelWorldEngine.Core;
-using VoxelWorldEngine.Core.Chunks;
-using VoxelWorldEngine.Core.Serialization;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+using VoxelModule.Core;
+using VoxelModule.Core.Chunks;
+using VoxelModule.Core.Serialization;
+using VoxelModule.DataStructures.Common.Structures.Vectors;
 
 namespace GameApp.Graphics.World;
 

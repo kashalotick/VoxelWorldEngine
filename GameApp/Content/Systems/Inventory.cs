@@ -1,5 +1,5 @@
 ﻿using LearningOpenTK.Core.Reactive;
-using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
+using VoxelModule.DataStructures.Special.Structures.Voxels;
 
 namespace GameApp.Content.Systems;
 

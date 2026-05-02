@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
-using VoxelWorldEngine;
-using VoxelWorldEngine.Core;
-using VoxelWorldEngine.Core.Builders;
-using VoxelWorldEngine.Core.Chunks;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.DataStructures.Special.Collections.VoxelTrees;
+using VoxelModule;
+using VoxelModule.Core;
+using VoxelModule.Core.Builders;
+using VoxelModule.Core.Chunks;
+using VoxelModule.DataStructures.Common.Structures.Vectors;
+using VoxelModule.DataStructures.Special.Collections.VoxelTrees;
 
 namespace TestField;
 

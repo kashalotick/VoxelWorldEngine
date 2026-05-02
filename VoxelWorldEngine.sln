@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelWorldEngine", "VoxelWorldEngine\VoxelWorldEngine.csproj", "{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoxelModule", "VoxelModule\VoxelModule.csproj", "{9F4034B0-9494-4CCD-B41D-EE2B9DD88F8E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameApp", "GameApp\GameApp.csproj", "{46921D3B-53E8-4F4B-8142-F6005F6A073B}"
 EndProject

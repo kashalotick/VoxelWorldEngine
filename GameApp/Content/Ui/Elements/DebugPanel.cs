@@ -5,9 +5,9 @@ using LearningOpenTK.Engine.Resources.Fonts;
 using LearningOpenTK.Engine.Resources.Shaders;
 using LearningOpenTK.Engine.Resources.Textures;
 using OpenTK.Mathematics;
-using VoxelWorldEngine.Core.Raycasting;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
-using VoxelWorldEngine.Utils;
+using VoxelModule.Core.Raycasting;
+using VoxelModule.DataStructures.Common.Structures.Vectors;
+using VoxelModule.Utils;
 
 namespace GameApp.Content.Ui.Elements;
 

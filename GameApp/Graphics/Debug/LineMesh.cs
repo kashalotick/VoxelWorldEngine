@@ -1,7 +1,7 @@
 ﻿using LearningOpenTK.Engine.Meshing;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using VoxelWorldEngine.Core.Raycasting;
+using VoxelModule.Core.Raycasting;
 
 namespace GameApp.Graphics.Debug;
 

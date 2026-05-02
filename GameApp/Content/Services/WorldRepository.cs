@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
-using VoxelWorldEngine.Core;
-using VoxelWorldEngine.Core.Serialization;
+using VoxelModule.Core;
+using VoxelModule.Core.Serialization;
 
 namespace GameApp.Content.Services;
 

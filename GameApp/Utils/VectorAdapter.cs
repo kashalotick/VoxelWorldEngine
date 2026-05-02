@@ -1,5 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+using VoxelModule.DataStructures.Common.Structures.Vectors;
 
 namespace GameApp.Utils;
 

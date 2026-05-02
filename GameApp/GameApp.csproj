@@ -12,7 +12,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\LearningOpenTK\LearningOpenTK\LearningOpenTK.csproj"/>
-        <ProjectReference Include="..\VoxelWorldEngine\VoxelWorldEngine.csproj"/>
+        <ProjectReference Include="..\VoxelModule\VoxelModule.csproj" />
     </ItemGroup>
 
     <ItemGroup>

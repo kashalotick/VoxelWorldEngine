@@ -1,9 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using LearningOpenTK.Core.Threading;
-using VoxelWorldEngine.Core;
-using VoxelWorldEngine.Core.Builders;
-using VoxelWorldEngine.Core.Chunks;
-using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
+using VoxelModule.Core;
+using VoxelModule.Core.Builders;
+using VoxelModule.Core.Chunks;
+using VoxelModule.DataStructures.Common.Structures.Vectors;
 
 namespace GameApp.Content.Systems;
 
