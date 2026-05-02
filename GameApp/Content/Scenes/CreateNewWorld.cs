@@ -5,14 +5,14 @@ using GameApp.Content.Services;
 using GameApp.Utils;
 using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
 using LearningOpenTK.Content.Ui.StaticDraw;
-using LearningOpenTK.Core.Components;
-using LearningOpenTK.Core.DTO;
-using LearningOpenTK.Core.Input;
-using LearningOpenTK.Core.Scenes;
+using LearningOpenTK.Core;
+using LearningOpenTK.Core.Reactive;
+using LearningOpenTK.Core.Transform;
 using LearningOpenTK.Engine.Resources.Fonts;
+using LearningOpenTK.Engine.Resources.Shaders;
 using LearningOpenTK.Engine.Resources.Textures;
+using LearningOpenTK.Engine.Scenes;
 using LearningOpenTK.Engine.UI;
-using LearningOpenTK.Resources;
 
 namespace GameApp.Content.Scenes;
 

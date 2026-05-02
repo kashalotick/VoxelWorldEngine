@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 using LearningOpenTK.Core;
-using LearningOpenTK.Engine.Meshes;
+using LearningOpenTK.Engine.Meshing;
 using OpenTK.Graphics.OpenGL4;
 
 namespace GameApp.Graphics.VoxelSelectionSystem;

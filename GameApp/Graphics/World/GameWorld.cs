@@ -1,9 +1,9 @@
 ﻿using GameApp.Utils;
-using LearningOpenTK.Core.DTO;
-using LearningOpenTK.Core.Primitives;
+using LearningOpenTK.Core.Lifecycle;
+using LearningOpenTK.Core.Rendering;
+using LearningOpenTK.Engine.Resources.Shaders;
 using LearningOpenTK.Engine.Resources.Textures.Array;
-using LearningOpenTK.Entities.World;
-using LearningOpenTK.Resources.Interfaces;
+using LearningOpenTK.Engine.World;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core;

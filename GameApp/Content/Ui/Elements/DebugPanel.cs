@@ -2,8 +2,8 @@
 using LearningOpenTK.Content.Ui.DynamicDraw;
 using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Engine.Resources.Fonts;
+using LearningOpenTK.Engine.Resources.Shaders;
 using LearningOpenTK.Engine.Resources.Textures;
-using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;

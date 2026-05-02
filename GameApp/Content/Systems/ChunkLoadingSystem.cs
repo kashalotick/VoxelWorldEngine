@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using GameApp.Utils;
-using LearningOpenTK.Core.Primitives;
+using LearningOpenTK.Core.Lifecycle;
 using LearningOpenTK.Core.Threading;
 using VoxelWorldEngine.Core;
 using VoxelWorldEngine.Core.ChunkLoading;

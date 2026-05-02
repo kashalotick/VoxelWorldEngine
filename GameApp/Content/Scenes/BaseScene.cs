@@ -1,6 +1,6 @@
 ﻿using GameApp.Application;
 using LearningOpenTK.Core;
-using LearningOpenTK.Core.Scenes;
+using LearningOpenTK.Engine.Scenes;
 
 namespace GameApp.Content.Scenes;
 

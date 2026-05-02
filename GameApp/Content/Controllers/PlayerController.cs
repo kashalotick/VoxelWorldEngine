@@ -1,7 +1,7 @@
 using GameApp.Content.Controllers.MovementStrategies;
 using GameApp.Content.Systems;
 using LearningOpenTK.Core;
-using LearningOpenTK.Core.Input;
+using LearningOpenTK.Engine.Input;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 

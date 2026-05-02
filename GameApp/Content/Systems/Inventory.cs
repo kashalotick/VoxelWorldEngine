@@ -1,4 +1,4 @@
-﻿using LearningOpenTK.Core.DTO;
+﻿using LearningOpenTK.Core.Reactive;
 using VoxelWorldEngine.DataStructures.Special.Structures.Voxels;
 
 namespace GameApp.Content.Systems;

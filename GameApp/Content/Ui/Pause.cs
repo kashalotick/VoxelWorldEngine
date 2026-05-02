@@ -1,11 +1,11 @@
 ﻿using GameApp.Utils;
 using LearningOpenTK.Content.Ui.DynamicDraw.Interactive;
 using LearningOpenTK.Content.Ui.StaticDraw;
-using LearningOpenTK.Core.Components;
+using LearningOpenTK.Core.Transform;
 using LearningOpenTK.Engine.Resources.Fonts;
+using LearningOpenTK.Engine.Resources.Shaders;
 using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
-using LearningOpenTK.Resources.Interfaces;
 
 namespace GameApp.Content.Ui;
 

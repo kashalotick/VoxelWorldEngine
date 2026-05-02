@@ -1,8 +1,8 @@
 ﻿using GameApp.Content.Controllers.MovementStrategies;
-using LearningOpenTK.Core.Components;
+using LearningOpenTK.Core.Transform;
+using LearningOpenTK.Engine.Resources.Shaders;
 using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
-using LearningOpenTK.Resources.Interfaces;
 
 namespace GameApp.Content.Ui.Elements;
 

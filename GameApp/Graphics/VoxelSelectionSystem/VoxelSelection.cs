@@ -1,8 +1,8 @@
 ﻿using GameApp.Utils;
-using LearningOpenTK.Core.Components;
-using LearningOpenTK.Core.DTO;
-using LearningOpenTK.Core.Primitives;
-using LearningOpenTK.Resources.Interfaces;
+using LearningOpenTK.Core.Lifecycle;
+using LearningOpenTK.Core.Rendering;
+using LearningOpenTK.Core.Transform;
+using LearningOpenTK.Engine.Resources.Shaders;
 using OpenTK.Graphics.OpenGL4;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;
 using Vector3 = OpenTK.Mathematics.Vector3;

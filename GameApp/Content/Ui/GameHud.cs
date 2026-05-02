@@ -2,9 +2,9 @@
 using GameApp.Utils;
 using LearningOpenTK.Content.Ui.StaticDraw;
 using LearningOpenTK.Engine.Resources.Fonts;
+using LearningOpenTK.Engine.Resources.Shaders;
 using LearningOpenTK.Engine.Resources.Textures;
 using LearningOpenTK.Engine.UI;
-using LearningOpenTK.Resources.Interfaces;
 using OpenTK.Mathematics;
 using VoxelWorldEngine.Core.Raycasting;
 using VoxelWorldEngine.DataStructures.Common.Structures.Vectors;

@@ -1,6 +1,6 @@
-﻿using LearningOpenTK.Core.DTO;
-using LearningOpenTK.Core.Primitives;
-using LearningOpenTK.Resources.Interfaces;
+﻿using LearningOpenTK.Core.Lifecycle;
+using LearningOpenTK.Core.Rendering;
+using LearningOpenTK.Engine.Resources.Shaders;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
