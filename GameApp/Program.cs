@@ -13,7 +13,7 @@ public class Program
             1200,
             900,
             "Voxel engine test",
-            gc => new MainMenu(gc),
+            gc => new MainMenuScene(gc),
             MyGameContext.Create,
             "Assets/IconDark.png"
         );

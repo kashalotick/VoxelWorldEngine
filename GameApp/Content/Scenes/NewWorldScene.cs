@@ -16,7 +16,7 @@ using GameEngine.Engine.UI;
 
 namespace GameApp.Content.Scenes;
 
-public class CreateNewWorld : BaseScene
+public class NewWorldScene : BaseScene
 {
     private const string DefaultWorldName = "New World";
     private const int FormWidth = 180;
@@ -31,7 +31,7 @@ public class CreateNewWorld : BaseScene
     private Texture _plainTexture;
 
 
-    public CreateNewWorld(MyGameContext gameContext, WorldRepository repository, int slot) : base(gameContext)
+    public NewWorldScene(MyGameContext gameContext, WorldRepository repository, int slot) : base(gameContext)
     {
         _repository = repository;
         _slot = slot;
@@ -51,7 +51,7 @@ public class CreateNewWorld : BaseScene
         ((IScene)this).Dispose();
     }
 
-    protected override void Load()
+    protected override void OnLoad()
     {
         _plainShader = GameContext.ShaderRepository.Get("plain");
         _plainTexture = GameContext.UiAtlas.Get("Plain");
@@ -233,11 +233,11 @@ public class CreateNewWorld : BaseScene
         }
 
         _repository.CreateSlot(_slot, worldName, seed);
-        SceneContext.SetState(new MainMenu(GameContext));
+        SceneContext.SetState(new MainMenuScene(GameContext));
     }
 
     private void OnBack()
     {
-        SceneContext.SetState(new MainMenu(GameContext));
+        SceneContext.SetState(new MainMenuScene(GameContext));
     }
 }

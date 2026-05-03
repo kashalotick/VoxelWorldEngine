@@ -83,7 +83,7 @@ public class DemoScene : BaseScene
         ((IScene)this).Dispose();
     }
 
-    protected override void Load()
+    protected override void OnLoad()
     {
         GL.Enable(EnableCap.DepthTest);
         GL.Enable(EnableCap.CullFace);
@@ -358,7 +358,7 @@ public class DemoScene : BaseScene
     }
 
 
-    protected override void Render(RenderContext renderContext)
+    protected override void OnRender(RenderContext renderContext)
     {
         GL.Enable(EnableCap.Blend);
         GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
@@ -373,15 +373,15 @@ public class DemoScene : BaseScene
         _raycaster.Render(renderContext);
     }
 
-    public override void Update(double deltaTime)
+    protected override void OnUpdate(double deltaTime)
     {
         _elapsedTime += deltaTime;
         ProcessRaycast(deltaTime);
     }
 
-    public override void FixedUpdate(double deltaTime)
+    protected override void OnFixedUpdate(double deltaTime)
     {
-        base.FixedUpdate(deltaTime);
+        base.OnFixedUpdate(deltaTime);
 
         _worldState.Player.ViewDirection = Camera.Front;
         _worldState.Player.Position = Camera.Position;
@@ -465,7 +465,7 @@ public class DemoScene : BaseScene
     private void OnSaveAndExit()
     {
         SaveWorld();
-        SceneContext.SetState(new MainMenu(GameContext));
+        SceneContext.SetState(new MainMenuScene(GameContext));
     }
 
     private void OnPlaceBlock()

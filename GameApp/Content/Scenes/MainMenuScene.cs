@@ -15,7 +15,7 @@ using GameEngine.Engine.UI;
 
 namespace GameApp.Content.Scenes;
 
-public class MainMenu : BaseScene
+public class MainMenuScene : BaseScene
 {
     private const int SlotCount = 3;
     private const int TileWidth = 170;
@@ -27,7 +27,7 @@ public class MainMenu : BaseScene
     private Texture _plainTexture;
     private WorldRepository _repository;
 
-    public MainMenu(MyGameContext gameContext) : base(gameContext)
+    public MainMenuScene(MyGameContext gameContext) : base(gameContext)
     {
     }
 
@@ -42,7 +42,7 @@ public class MainMenu : BaseScene
     }
 
 
-    protected override void Load()
+    protected override void OnLoad()
     {
         _plainShader = GameContext.ShaderRepository.Get("plain");
         _plainTexture = GameContext.UiAtlas.Get("Plain");
@@ -204,13 +204,13 @@ public class MainMenu : BaseScene
     {
         // _repository.CreateSlot(slot, "New world");
         // RebuildUi();
-        SceneContext.SetState(new CreateNewWorld(GameContext, _repository, slot));
+        SceneContext.SetState(new NewWorldScene(GameContext, _repository, slot));
     }
 
     private void RebuildUi()
     {
         // Простіше перезайти в сцену — всі ресурси коректно перевантажаться
-        SceneContext.SetState(new MainMenu(GameContext));
+        SceneContext.SetState(new MainMenuScene(GameContext));
     }
 
 
