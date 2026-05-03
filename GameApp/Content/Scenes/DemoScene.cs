@@ -133,7 +133,7 @@ public class DemoScene : BaseScene
         _playerController.PlaceBlock += OnPlaceBlock;
         // _playerController.PlaceBlock += _raycaster.Trace;
         _playerController.BreakBlock += OnBreakBlock;
-        _playerController.MiddleButtonClick += OnMiddleButtonClick;
+        _playerController.MiddleButtonClick += OnPlaceTree;
         _playerController.InventoryNext += _inventory.NextSlot;
         _playerController.InventoryPrevious += _inventory.PreviousSlot;
         _playerController.SetBrushSize += _inventory.SetBrushSize;
@@ -492,33 +492,75 @@ public class DemoScene : BaseScene
         SceneContext.SetState(new MainMenuScene(GameContext));
     }
 
-    private void OnPlaceBlock()
-    {
-        var blockToPlace = _inventory.SelectedBlock;
+    
 
+    public void OnPlaceBlock()
+    {
+        if (!TryGetHitVoxel(out var hitVoxel)) return;
+
+        var placeVoxel = hitVoxel + _raycaster.LastHit.HitFaceNormal.FloorToVector3Int();
+
+        if (IsIntersectsPlayer(placeVoxel))
+        {
+            Console.WriteLine("Cannot place: intersects player");
+            return;
+        }
+
+        DispatchAndExecute(placeVoxel, _inventory.SelectedBlock, ModifyMode.ReplaceAir);
+    }
+
+    public void OnBreakBlock()
+    {
+        if (!TryGetHitVoxel(out var hitVoxel)) return;
+
+        DispatchAndExecute(hitVoxel, BlockId.Air, ModifyMode.ReplaceAll);
+    }
+
+    public void OnPlaceTree()  // було OnMiddleButtonClick
+    {
         var lastHit = _raycaster.LastHit;
         if (!lastHit.IsHit) return;
 
         var hitVoxel = lastHit.HitIn - lastHit.HitFaceNormal * 0.001f;
-
         var placeVoxel = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
 
-        if (IsIntersectsPlayer(placeVoxel))
-        {
-            Console.WriteLine("Cannot place");
-            return;
-        }
+        _treeFactory.GetCommand(_voxelWorld, placeVoxel, new TreeArgs(1)).Execute();
+    }
+    
+    private bool TryGetHitVoxel(out Vector3Int hitVoxel)
+    {
+        var lastHit = _raycaster.LastHit;
+        hitVoxel = default;
 
-        Console.WriteLine(
-            $"Place block at {placeVoxel}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
-        var command = DispatchCommand(
-            _inventory.BrushSize.Value,
-            _inventory.BrushType.Value,
-            placeVoxel,
-            blockToPlace);
-        command.Execute();
+        if (!lastHit.IsHit) return false;
+
+        System.Numerics.Vector3 t = lastHit.HitIn - lastHit.HitFaceNormal * 0.001f;
+        hitVoxel = t.FloorToVector3Int();
+        return true;
+    }
+    
+    private void DispatchAndExecute(Vector3Int position, BlockId blockId, ModifyMode modifyMode)
+    {
+        BuildCommand(position, blockId, modifyMode).Execute();
     }
 
+    private ICommand BuildCommand(Vector3Int position, BlockId blockId, ModifyMode modifyMode)
+    {
+        var brushSize = _inventory.BrushSize.Value;
+
+        if (brushSize == 1)
+            return new PlaceBlockCommand(_voxelWorld, position, blockId);
+
+        return _inventory.BrushType.Value switch
+        {
+            BrushShape.Cube => _cubeFactory.GetCommand(
+                _voxelWorld, position, new CubeArgs(brushSize, blockId, modifyMode)),
+            BrushShape.Sphere => _sphereFactory.GetCommand(
+                _voxelWorld, position, new SphereArgs(brushSize, blockId, modifyMode)),
+            var unknown => throw new ArgumentException($"Unknown brush shape: {unknown}")
+        };
+    }
+    
     private bool IsIntersectsPlayer(Vector3Int placeVoxel)
     {
         var playerPos = _worldState.Player.Position;
@@ -541,66 +583,6 @@ public class DemoScene : BaseScene
             && placeVoxel.Z + 1 > min.Z
             && placeVoxel.Z < max.Z;
         return intersectsPlayer;
-    }
-
-    private void OnBreakBlock()
-    {
-        var lastHit = _raycaster.LastHit;
-        if (!lastHit.IsHit) return;
-
-        var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f).FloorToVector3Int();
-
-        Console.WriteLine($"Breaking block at {hitVoxel}");
-        var command = DispatchCommand(
-            _inventory.BrushSize.Value,
-            _inventory.BrushType.Value,
-            hitVoxel,
-            BlockId.Air);
-        command.Execute();
-    }
-
-    private ICommand DispatchCommand(
-        int brushSize,
-        BrushShape brashType,
-        Vector3Int position,
-        BlockId blockId
-    )
-    {
-        if (brushSize == 1)
-        {
-            return new PlaceBlockCommand(_voxelWorld, position, blockId);
-        }
-
-        var modifyMode = blockId == BlockId.Air ? ModifyMode.ReplaceAll : ModifyMode.ReplaceAir;
-
-        switch (brashType)
-        {
-            case BrushShape.Cube:
-                return _cubeFactory.GetCommand(
-                    _voxelWorld,
-                    position,
-                    new CubeArgs(brushSize, blockId, modifyMode));
-            case BrushShape.Sphere:
-                return _sphereFactory.GetCommand(
-                    _voxelWorld,
-                    position,
-                    new SphereArgs(brushSize, blockId, modifyMode));
-            default:
-                throw new ArgumentException();
-        }
-    }
-
-    private void OnMiddleButtonClick()
-    {
-        var lastHit = _raycaster.LastHit;
-        if (!lastHit.IsHit) return;
-
-        var hitVoxel = lastHit.HitIn - lastHit.HitFaceNormal * 0.001f;
-        var voxelPlaceIndex = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
-        Console.WriteLine(
-            $"Place Tree at {voxelPlaceIndex}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
-        var command = _treeFactory.GetCommand(_voxelWorld, voxelPlaceIndex, new TreeArgs(1));
-        command.Execute();
     }
 
     protected override void ReleaseManagedResources()
