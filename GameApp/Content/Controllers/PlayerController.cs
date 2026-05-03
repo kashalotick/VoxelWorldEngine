@@ -20,14 +20,10 @@ public class PlayerController : SceneController
     private readonly WalkMovementStrategy _walkStrategy;
     private readonly Dictionary<IMovementStrategy, MovementMode> _movementModeMap;
     private IMovementStrategy _movementStrategy;
+    
 
-    private readonly Raycaster _raycaster;
-
-
-    public PlayerController(Camera camera, Raycaster raycaster, CharacterPhysics physics)
+    public PlayerController(Camera camera, CharacterPhysics physics)
     {
-        _raycaster = raycaster;
-
         _walkStrategy
             = new WalkMovementStrategy(
                 camera,
@@ -64,6 +60,7 @@ public class PlayerController : SceneController
     public float FlightSprintMultiplier { get; set; } = 2.5f;
     public float JumpForce { get; set; } = 8f;
 
+    
     public event Action? Pause;
     public event Action? ToggleHud;
     public event Action? ToggleDebug;
@@ -217,7 +214,6 @@ public class PlayerController : SceneController
     {
         if (mouse.IsButtonDown(MouseButton.Left))
         {
-            _raycaster.Trace();
             BreakBlock?.Invoke();
         }
 
@@ -231,7 +227,6 @@ public class PlayerController : SceneController
     {
         if (e.Button == MouseButton.Left)
         {
-            _raycaster.Trace();
             BreakBlock?.Invoke();
         }
 

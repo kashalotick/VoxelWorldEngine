@@ -10,10 +10,13 @@ public class CharacterPhysics
     private const float StepSize = 0.05f;
     private readonly Func<Vector3Int, bool> _isSolidVoxel;
 
-    public CharacterPhysics(Vector3 initialPosition, Func<Vector3Int, bool> isSolidVoxel)
+    public CharacterPhysics(Player player, Func<Vector3Int, bool> isSolidVoxel)
     {
-        Position = initialPosition;
+        Position = player.Position;
         _isSolidVoxel = isSolidVoxel;
+        Width = player.Width;
+        Height = player.Height;
+        EyeHeight = player.EyeHeight;
     }
 
     public float Gravity { get; set; } = DefaultGravity;
@@ -23,9 +26,9 @@ public class CharacterPhysics
     public Vector3 Velocity { get; private set; }
     public bool IsGrounded { get; private set; }
 
-    public float Width { get; set; } = 0.6f;
-    public float Height { get; set; } = 1.8f;
-    public float EyeHeight { get; set; } = 1.65f;
+    public float Width { get; set; }
+    public float Height { get; set; }
+    public float EyeHeight { get; set; }
 
     public void Teleport(Vector3 position)
     {

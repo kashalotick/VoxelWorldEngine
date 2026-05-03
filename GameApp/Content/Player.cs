@@ -10,6 +10,10 @@ public class Player
     public int ChunkViewRadius { get; set; } = 8;
     public int ChunkViewHeightRadius { get; set; } = 5;
 
+    public float Width = 0.6f;
+    public float Height = 1.8f;
+    public float EyeHeight = 1.65f;
+
     public static explicit operator PlayerDto(Player obj)
     {
         return new PlayerDto

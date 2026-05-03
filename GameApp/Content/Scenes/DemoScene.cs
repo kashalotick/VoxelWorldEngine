@@ -39,7 +39,6 @@ public class DemoScene : BaseScene
     private readonly ThrottleReactive<RayHit> _rayHit = new(TextUpdateInterval);
 
     private readonly WorldRepository _worldRepository;
-    private CharacterPhysics _characterPhysics;
     private ChunkLoadingSystem _chunkLoadingSystem;
     private ChunkUpdateSystem _chunkUpdateSystem;
     private CubeCommandFactory _cubeFactory;
@@ -67,7 +66,11 @@ public class DemoScene : BaseScene
     private WorldMeta _worldMeta;
     private WorldState _worldState;
 
-    public DemoScene(MyGameContext gameContext, WorldRepository repository, WorldMeta worldMeta) : base(gameContext)
+    public DemoScene(
+        MyGameContext gameContext,
+        WorldRepository repository,
+        WorldMeta worldMeta
+    ) : base(gameContext)
     {
         _worldRepository = repository;
         _worldMeta = worldMeta;
@@ -103,12 +106,16 @@ public class DemoScene : BaseScene
         if (_worldMeta.LastPlayed == DateTime.MinValue)
         {
             var spawnPosition = SpawnPosition();
-            Camera = new Camera(spawnPosition, (float)GameContext.ScreenWidth / GameContext.ScreenHeight);
+            Camera = new Camera(
+                spawnPosition,
+                (float)GameContext.ScreenWidth / GameContext.ScreenHeight);
             Camera.LookAt(spawnPosition + Vector3.UnitX);
         }
         else
         {
-            Camera = new Camera(_worldState.Player.Position, GameContext.ScreenWidth / GameContext.ScreenHeight);
+            Camera = new Camera(
+                _worldState.Player.Position,
+                GameContext.ScreenWidth / GameContext.ScreenHeight);
             var viewDirection = _worldState.Player.ViewDirection == Vector3.Zero
                 ? Vector3.UnitX
                 : _worldState.Player.ViewDirection;
@@ -116,13 +123,15 @@ public class DemoScene : BaseScene
         }
 
 
-        _characterPhysics = new CharacterPhysics(_worldState.Player.Position,
+        var characterPhysics = new CharacterPhysics(
+            _worldState.Player,
             voxelPosition => _voxelWorld.IsSolid(voxelPosition));
-        _playerController = new PlayerController(Camera, _raycaster, _characterPhysics);
+        _playerController = new PlayerController(Camera, characterPhysics);
         _playerController.Pause += OnPause;
         _playerController.ToggleHud += OnToggleHud;
         _playerController.ToggleDebug += OnToggleDebug;
         _playerController.PlaceBlock += OnPlaceBlock;
+        // _playerController.PlaceBlock += _raycaster.Trace;
         _playerController.BreakBlock += OnBreakBlock;
         _playerController.MiddleButtonClick += OnMiddleButtonClick;
         _playerController.InventoryNext += _inventory.NextSlot;
@@ -141,7 +150,7 @@ public class DemoScene : BaseScene
         const int startHeight = 128;
         const int endLimit = -512;
         const float epsilon = 0.02f;
-                
+
         var spawnPosition = new Vector3(0.5f, startHeight, 0.5f);
         RayHit hit = RayHit.NoHit;
 
@@ -149,21 +158,25 @@ public class DemoScene : BaseScene
         {
             var chunkPos = Chunk.GlobalToChunk(spawnPosition.FloorToVector3Int());
             _chunkLoadingSystem.LoadChunkImmediately(chunkPos);
-                
+
             var rayOrigin = (System.Numerics.Vector3)spawnPosition;
             rayOrigin.Y += epsilon;
-                
-            hit = _voxelWorld.Raycast(new Ray
-            {
-                Length = Chunk.ChunkSize + 1f,
-                Origin = (System.Numerics.Vector3)new Vector3(0.5f, chunkPos.Y * Chunk.ChunkSize + Chunk.ChunkSize - epsilon, 0.5f),
-                Direction = -System.Numerics.Vector3.UnitY,
-            });
+
+            hit = _voxelWorld.Raycast(
+                new Ray
+                {
+                    Length = Chunk.ChunkSize + 1f,
+                    Origin = (System.Numerics.Vector3)new Vector3(
+                        0.5f,
+                        chunkPos.Y * Chunk.ChunkSize + Chunk.ChunkSize - epsilon,
+                        0.5f),
+                    Direction = -System.Numerics.Vector3.UnitY,
+                });
 
             if (!hit.IsHit)
             {
                 spawnPosition.Y -= Chunk.ChunkSize;
-                    
+
                 if (spawnPosition.Y < endLimit) break;
             }
         }
@@ -204,14 +217,20 @@ public class DemoScene : BaseScene
         var worldState = _worldRepository.LoadState(_worldMeta.Slot);
         _worldState = worldState ?? new WorldState();
 
-        _gameWorld = new GameWorld(_voxelWorld, material, _worldRepository.GetChunkRepository(_worldMeta.Slot));
+        _gameWorld = new GameWorld(
+            _voxelWorld,
+            material,
+            _worldRepository.GetChunkRepository(_worldMeta.Slot));
         _voxelWorld.ChunkAdded += _gameWorld.AddChunk;
         _voxelWorld.ChunkUpdated += _gameWorld.UpdateChunk;
         _voxelWorld.ChunkRemoved += _gameWorld.RemoveChunk;
         _gameWorld.Load();
 
         _chunkLoadingSystem
-            = SOR.Register(new ChunkLoadingSystem(_voxelWorld, _worldRepository.GetChunkRepository(_worldMeta.Slot)));
+            = SOR.Register(
+                new ChunkLoadingSystem(
+                    _voxelWorld,
+                    _worldRepository.GetChunkRepository(_worldMeta.Slot)));
         _chunkUpdateSystem = new ChunkUpdateSystem(_voxelWorld);
 
         LightComposition(material.Shader);
@@ -237,7 +256,8 @@ public class DemoScene : BaseScene
             GameContext.UiAtlas.Get("Crosshair"),
             GameContext.FontRepository.Get("Pixel")
         );
-        _hud = SOR.Register(new GameHud(GameContext.ScreenWidth, GameContext.ScreenHeight, hudMaterial));
+        _hud = SOR.Register(
+            new GameHud(GameContext.ScreenWidth, GameContext.ScreenHeight, hudMaterial));
         _hud.Enable();
         _fpsCounter = new FpsCounter(1.0, 0.25);
         _fpsCounter.OnFpsChanged += fps => _hud.UpdateFps(fps);
@@ -250,7 +270,9 @@ public class DemoScene : BaseScene
         var brushInfo = LoadBrushIndicator();
         var movementIndicator = LoadMovementIndicator();
 
-        var hudList = new ListElement(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"))
+        var hudList = new ListElement(
+            GameContext.ShaderRepository.Get("plain"),
+            GameContext.UiAtlas.Get("Plain"))
         {
             Transform =
             {
@@ -291,7 +313,8 @@ public class DemoScene : BaseScene
             GameContext.ShaderRepository.Get("plain"),
             GameContext.UiAtlas.Get("Plain"),
             GameContext.UiAtlas.Get("Selection"),
-            inventoryBlocks.Select(block => (ITexture)GameContext.BlockAtlas.Get(block.ToString())).ToArray(),
+            inventoryBlocks.Select(block => (ITexture)GameContext.BlockAtlas.Get(block.ToString()))
+                .ToArray(),
             GameContext.UiAtlas.Get("Empty")
         );
         var inventoryHud = new InventoryPanel(_inventory, inventoryHudMaterial);
@@ -334,7 +357,8 @@ public class DemoScene : BaseScene
             GameContext.UiAtlas.Get("Plain"),
             GameContext.FontRepository.Get("Pixel")
         );
-        _pause = SOR.Register(new Pause(GameContext.ScreenWidth, GameContext.ScreenHeight, pauseMaterial));
+        _pause = SOR.Register(
+            new Pause(GameContext.ScreenWidth, GameContext.ScreenHeight, pauseMaterial));
         _pause.Resume += OnResume;
         _pause.Save += OnSave;
         _pause.SaveAndExit += OnSaveAndExit;
@@ -476,29 +500,47 @@ public class DemoScene : BaseScene
         if (!lastHit.IsHit) return;
 
         var hitVoxel = lastHit.HitIn - lastHit.HitFaceNormal * 0.001f;
-        
+
         var placeVoxel = (hitVoxel + lastHit.HitFaceNormal).FloorToVector3Int();
-        var playerPos = _worldState.Player.Position;
-        var halfWidth = _characterPhysics.Width * 0.5f;
-    
-        var min = new Vector3(playerPos.X - halfWidth, playerPos.Y - _characterPhysics.EyeHeight, playerPos.Z - halfWidth);
-        var max = new Vector3(playerPos.X + halfWidth, playerPos.Y + (_characterPhysics.Height - _characterPhysics.EyeHeight), playerPos.Z + halfWidth);
 
-        bool intersectsPlayer = 
-            placeVoxel.X + 1 > min.X && placeVoxel.X < max.X &&
-            placeVoxel.Y + 1 > min.Y && placeVoxel.Y < max.Y &&
-            placeVoxel.Z + 1 > min.Z && placeVoxel.Z < max.Z;
-
-        if (intersectsPlayer) 
+        if (IsIntersectsPlayer(placeVoxel))
         {
             Console.WriteLine("Cannot place");
             return;
-        }            
+        }
 
         Console.WriteLine(
             $"Place block at {placeVoxel}, on normal {lastHit.HitFaceNormal.ToVector3Int()} of {hitVoxel.ToVector3Int()}");
-        var command = DispatchCommand(_inventory.BrushSize.Value, _inventory.BrushType.Value, placeVoxel, blockToPlace);
+        var command = DispatchCommand(
+            _inventory.BrushSize.Value,
+            _inventory.BrushType.Value,
+            placeVoxel,
+            blockToPlace);
         command.Execute();
+    }
+
+    private bool IsIntersectsPlayer(Vector3Int placeVoxel)
+    {
+        var playerPos = _worldState.Player.Position;
+        var halfWidth = _worldState.Player.Width * 0.5f;
+
+        var min = new Vector3(
+            playerPos.X - halfWidth,
+            playerPos.Y - _worldState.Player.EyeHeight,
+            playerPos.Z - halfWidth);
+        var max = new Vector3(
+            playerPos.X + halfWidth,
+            playerPos.Y + (_worldState.Player.Height - _worldState.Player.EyeHeight),
+            playerPos.Z + halfWidth);
+
+        bool intersectsPlayer =
+            placeVoxel.X + 1 > min.X
+            && placeVoxel.X < max.X
+            && placeVoxel.Y + 1 > min.Y
+            && placeVoxel.Y < max.Y
+            && placeVoxel.Z + 1 > min.Z
+            && placeVoxel.Z < max.Z;
+        return intersectsPlayer;
     }
 
     private void OnBreakBlock()
@@ -509,11 +551,20 @@ public class DemoScene : BaseScene
         var hitVoxel = (lastHit.HitIn - lastHit.HitFaceNormal * 0.001f).FloorToVector3Int();
 
         Console.WriteLine($"Breaking block at {hitVoxel}");
-        var command = DispatchCommand(_inventory.BrushSize.Value, _inventory.BrushType.Value, hitVoxel, BlockId.Air);
+        var command = DispatchCommand(
+            _inventory.BrushSize.Value,
+            _inventory.BrushType.Value,
+            hitVoxel,
+            BlockId.Air);
         command.Execute();
     }
 
-    private ICommand DispatchCommand(int brushSize, BrushShape brashType, Vector3Int position, BlockId blockId)
+    private ICommand DispatchCommand(
+        int brushSize,
+        BrushShape brashType,
+        Vector3Int position,
+        BlockId blockId
+    )
     {
         if (brushSize == 1)
         {
@@ -525,9 +576,15 @@ public class DemoScene : BaseScene
         switch (brashType)
         {
             case BrushShape.Cube:
-                return _cubeFactory.GetCommand(_voxelWorld, position, new CubeArgs(brushSize, blockId, modifyMode));
+                return _cubeFactory.GetCommand(
+                    _voxelWorld,
+                    position,
+                    new CubeArgs(brushSize, blockId, modifyMode));
             case BrushShape.Sphere:
-                return _sphereFactory.GetCommand(_voxelWorld, position, new SphereArgs(brushSize, blockId, modifyMode));
+                return _sphereFactory.GetCommand(
+                    _voxelWorld,
+                    position,
+                    new SphereArgs(brushSize, blockId, modifyMode));
             default:
                 throw new ArgumentException();
         }
