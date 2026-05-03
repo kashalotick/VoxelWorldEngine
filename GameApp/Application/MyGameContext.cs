@@ -1,4 +1,5 @@
 ﻿using GameEngine.Core;
+using GameEngine.Core.Resources;
 using GameEngine.Engine;
 using GameEngine.Engine.Resources.Fonts;
 using GameEngine.Engine.Resources.Shaders;
@@ -17,15 +18,18 @@ public class MyGameContext : GameContext
 
     public static MyGameContext Create(int width, int height)
     {
-        var textureRepository = new GLTextureRepository();
+        var textureRepository = new ResourceRepository<GlTexture>(new GlTextureCreator());
+        var shaderRepository = new ResourceRepository<Shader>(new ShaderCreator());
+        var fontRepository = new ResourceRepository<Font>(new FontCreator());
+
         var textureArrayRepository = new TextureArrayRepository();
         return new MyGameContext
         {
             ScreenWidth = width,
             ScreenHeight = height,
             TextureRepository = textureRepository,
-            ShaderRepository = new ShaderRepository(),
-            FontRepository = new FontRepository(),
+            ShaderRepository = shaderRepository,
+            FontRepository = fontRepository,
             UiAtlas = new AtlasTextureRepository(textureRepository, "Ui"),
             BlockAtlas = new AtlasTextureRepository(textureRepository, "Blocks"),
             TextureArrayRepository = textureArrayRepository
