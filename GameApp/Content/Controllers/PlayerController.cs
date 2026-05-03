@@ -12,32 +12,35 @@ public class PlayerController : SceneController
     private const double DoubleTapWindow = 0.35;
     private const double InitialDelay = 0.25;
     private const double RepeatInterval = 0.2;
-    private readonly FlightBaseMovementStrategy _flightBaseStrategy;
-    private readonly FreeCameraBaseMovementStrategy _freeCameraBaseStrategy;
-
-
-    private readonly Raycaster _raycaster;
-    private readonly WalkBaseMovementStrategy _walkBaseStrategy;
-
-    private ClickState _currentClickState;
-    private MovementMode _movementMode = MovementMode.Walk;
-
-    private IMovementStrategy _movementStrategy;
-
     private double _timer;
+    private ClickState _currentClickState;
+
+    private readonly FlightMovementStrategy _flightStrategy;
+    private readonly FreeCameraMovementStrategy _freeCameraStrategy;
+    private readonly WalkMovementStrategy _walkStrategy;
+    private readonly Dictionary<IMovementStrategy, MovementMode> _movementModeMap;
+    private IMovementStrategy _movementStrategy;
+    
+    private readonly Raycaster _raycaster;
+
 
     public PlayerController(Camera camera, Raycaster raycaster, CharacterPhysics physics)
     {
         _raycaster = raycaster;
 
-        _walkBaseStrategy
-            = new WalkBaseMovementStrategy(camera, physics, MouseSensitivity, MoveSpeed, SprintMultiplier, JumpForce);
-        _flightBaseStrategy = new FlightBaseMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed,
+        _walkStrategy
+            = new WalkMovementStrategy(camera, physics, MouseSensitivity, MoveSpeed, SprintMultiplier, JumpForce);
+        _flightStrategy = new FlightMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed,
             FlightSprintMultiplier, FlightSpeed);
-        _freeCameraBaseStrategy = new FreeCameraBaseMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed,
+        _freeCameraStrategy = new FreeCameraMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed,
             FlightSprintMultiplier, FlightSpeed);
-        _movementStrategy = _walkBaseStrategy;
-        _movementStrategy.OnEnter();
+        _movementModeMap = new Dictionary<IMovementStrategy, MovementMode>
+        {
+            { _walkStrategy, MovementMode.Walk },
+            { _flightStrategy, MovementMode.Flight },
+            { _freeCameraStrategy, MovementMode.FreeCamera }
+        };
+        _movementStrategy = _walkStrategy;
     }
 
     public float MouseSensitivity { get; set; } = 0.2f;
@@ -45,8 +48,8 @@ public class PlayerController : SceneController
     public float SprintMultiplier { get; set; } = 1.75f;
     public float FlightSpeed { get; set; } = 10f;
     public float FlightSprintMultiplier { get; set; } = 2.5f;
-
     public float JumpForce { get; set; } = 8f;
+    
     public event Action? Pause;
     public event Action? ToggleHud;
     public event Action? ToggleDebug;
@@ -134,32 +137,21 @@ public class PlayerController : SceneController
 
     private void ToggleFreeCam()
     {
-        if (_movementMode == MovementMode.FreeCamera) SwitchMovementMode(MovementMode.Walk);
-        else SwitchMovementMode(MovementMode.FreeCamera);
+        if (_movementStrategy == _freeCameraStrategy) SetMovementStrategy(_walkStrategy);
+        else SetMovementStrategy(_freeCameraStrategy);
     }
 
     private void ToggleFlightMode()
     {
-        if (_movementMode == MovementMode.Flight) SwitchMovementMode(MovementMode.Walk);
-        else SwitchMovementMode(MovementMode.Flight);
+        if (_movementStrategy == _flightStrategy) SetMovementStrategy(_walkStrategy);
+        else SetMovementStrategy(_flightStrategy);
     }
-
-    private void SwitchMovementMode(MovementMode nextMode)
+    private void SetMovementStrategy(IMovementStrategy strategy)
     {
-        if (_movementMode == nextMode) return;
+        if (_movementStrategy == strategy) return;
 
-
-        _movementStrategy.OnExit();
-        _movementMode = nextMode;
-        _movementStrategy = _movementMode switch
-        {
-            MovementMode.Walk => _walkBaseStrategy,
-            MovementMode.Flight => _flightBaseStrategy,
-            MovementMode.FreeCamera => _freeCameraBaseStrategy,
-            _ => _walkBaseStrategy
-        };
-        SetMovementMode?.Invoke(_movementMode);
-        _movementStrategy.OnEnter();
+        _movementStrategy = strategy;
+        SetMovementMode?.Invoke(_movementModeMap[_movementStrategy]);
     }
 
     public override void OnMousePressed(double deltaTime, MouseState mouse)

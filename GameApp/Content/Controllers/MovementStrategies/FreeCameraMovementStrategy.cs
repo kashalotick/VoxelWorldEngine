@@ -4,9 +4,9 @@ using OpenTK.Mathematics;
 
 namespace GameApp.Content.Controllers.MovementStrategies;
 
-public class FreeCameraBaseMovementStrategy : FlightBaseMovementStrategy
+public class FreeCameraMovementStrategy : FlightMovementStrategy
 {
-    public FreeCameraBaseMovementStrategy(
+    public FreeCameraMovementStrategy(
         Camera camera,
         CharacterPhysics physics,
         float mouseSensitivity,
@@ -17,9 +17,7 @@ public class FreeCameraBaseMovementStrategy : FlightBaseMovementStrategy
         : base(camera, physics, mouseSensitivity, moveSpeed, sprintMultiplier, verticalSpeed)
     {
     }
-
-    public override MovementMode Mode => MovementMode.FreeCamera;
-
+    
     protected override void ApplyPhysics(double deltaTime, Vector3 velocity)
     {
         Camera.Position += velocity * (float)deltaTime;

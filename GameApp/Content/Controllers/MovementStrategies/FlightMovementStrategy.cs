@@ -5,11 +5,11 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace GameApp.Content.Controllers.MovementStrategies;
 
-public class FlightBaseMovementStrategy : BaseMovementStrategy
+public class FlightMovementStrategy : BaseMovementStrategy
 {
     private readonly float _verticalSpeed = 1f;
 
-    public FlightBaseMovementStrategy(
+    public FlightMovementStrategy(
         Camera camera,
         CharacterPhysics physics,
         float mouseSensitivity,
@@ -21,9 +21,7 @@ public class FlightBaseMovementStrategy : BaseMovementStrategy
     {
         _verticalSpeed = verticalSpeed;
     }
-
-    public override MovementMode Mode => MovementMode.Flight;
-
+    
     public override void Update(double deltaTime, KeyboardState keyboard, MouseState mouse)
     {
         ApplyMouseLook(mouse);

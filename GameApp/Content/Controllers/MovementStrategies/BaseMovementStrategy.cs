@@ -28,19 +28,7 @@ public abstract class BaseMovementStrategy : IMovementStrategy
     protected float MouseSensitivity { get; }
     protected float MoveSpeed { get; }
     public float SprintMultiplier { get; }
-
-    public abstract MovementMode Mode { get; }
-
-    public virtual void OnEnter()
-    {
-        Physics.Teleport(Camera.Position);
-    }
-
-    public virtual void OnExit()
-    {
-        Physics.Teleport(Camera.Position);
-    }
-
+    
     public abstract void Update(double deltaTime, KeyboardState keyboard, MouseState mouse);
 
     protected void ApplyMouseLook(MouseState mouse)

@@ -5,11 +5,11 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace GameApp.Content.Controllers.MovementStrategies;
 
-public class WalkBaseMovementStrategy : BaseMovementStrategy
+public class WalkMovementStrategy : BaseMovementStrategy
 {
     private bool _jumpHeld;
 
-    public WalkBaseMovementStrategy(
+    public WalkMovementStrategy(
         Camera camera,
         CharacterPhysics physics,
         float mouseSensitivity,
@@ -23,9 +23,7 @@ public class WalkBaseMovementStrategy : BaseMovementStrategy
     }
 
     public float JumpForce { get; }
-
-    public override MovementMode Mode => MovementMode.Walk;
-
+    
 
     private double _jumpBufferTimer = 0;
     private const double _jumpBufferTime = 0.1;
