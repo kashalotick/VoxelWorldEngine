@@ -1,4 +1,4 @@
-﻿using VoxelModule.DataStructures.Common.Collections.Trees;
+﻿using VoxelModule.DataStructures.Collections.Trees;
 using VoxelModule.DataStructures.Special.Collections;
 using VoxelModule.DataStructures.Special.Collections.Meshes;
 using VoxelModule.DataStructures.Special.Structures.Voxels;

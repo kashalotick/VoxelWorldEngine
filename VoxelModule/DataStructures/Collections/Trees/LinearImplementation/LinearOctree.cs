@@ -1,8 +1,7 @@
 ﻿using VoxelModule.Core.Serialization;
 using VoxelModule.DataStructures.Common.Structures.Vectors;
-using VoxelModule.Utils;
 
-namespace VoxelModule.DataStructures.Common.Collections.Trees.LinearImplementation;
+namespace VoxelModule.DataStructures.Collections.Trees.LinearImplementation;
 
 public class LinearOctree<T>
 {

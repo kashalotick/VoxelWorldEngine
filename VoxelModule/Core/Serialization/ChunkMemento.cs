@@ -1,7 +1,6 @@
-﻿using VoxelModule.DataStructures.Common.Collections.Trees.LinearImplementation;
+﻿using VoxelModule.DataStructures.Collections.Trees.LinearImplementation;
 using VoxelModule.DataStructures.Common.Structures.Vectors;
 using VoxelModule.DataStructures.Special.Structures.Voxels;
-using VoxelModule.DataStructures.Common.Collections.Trees;
 
 namespace VoxelModule.Core.Serialization;
 

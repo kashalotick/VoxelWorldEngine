@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using VoxelModule.Core.Serialization;
-using VoxelModule.DataStructures.Common.Collections.Trees.LinearImplementation;
+using VoxelModule.DataStructures.Collections.Trees.LinearImplementation;
 using VoxelModule.DataStructures.Common.Structures.Vectors;
 using VoxelModule.DataStructures.Special.Structures.Voxels;
 

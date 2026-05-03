@@ -1,7 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
+﻿using VoxelModule.DataStructures.Common.Structures.Vectors;
 
-namespace VoxelModule.DataStructures.Common.Collections.Trees;
+namespace VoxelModule.DataStructures.Collections.Trees;
 
 
 public static class OctreeMath

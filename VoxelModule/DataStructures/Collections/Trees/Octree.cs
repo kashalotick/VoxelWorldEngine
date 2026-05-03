@@ -1,8 +1,8 @@
 ﻿using VoxelModule.Core.Serialization;
-using VoxelModule.DataStructures.Common.Collections.Trees.LinearImplementation;
+using VoxelModule.DataStructures.Collections.Trees.LinearImplementation;
 using VoxelModule.DataStructures.Common.Structures.Vectors;
 
-namespace VoxelModule.DataStructures.Common.Collections.Trees;
+namespace VoxelModule.DataStructures.Collections.Trees;
 
 public partial class Octree<T> : IOctree<T>
 {
@@ -34,7 +34,7 @@ public partial class Octree<T> : IOctree<T>
 
     public void Accept(IOctreeVisitor<T> visitor)
     {
-        Root().AcceptRecursive(visitor);
+        Root().Accept(visitor);
     }
 
 

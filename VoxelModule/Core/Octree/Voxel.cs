@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using VoxelModule.DataStructures.Common.Collections.Trees;
 
 namespace VoxelModule.DataStructures.Special.Structures.Voxels;
 

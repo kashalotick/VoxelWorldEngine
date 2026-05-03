@@ -1,13 +1,12 @@
 ﻿using System.Numerics;
 using VoxelModule.Core;
 using VoxelModule.Core.Raycasting;
-using VoxelModule.DataStructures.Common.Collections.Trees;
 using VoxelModule.DataStructures.Common.Structures.Vectors;
 using VoxelModule.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelModule.DataStructures.Special.Collections.VoxelTrees;
 
-public class VoxelOctree : Octree<Voxel>, IVoxelOctree, IWorldRegion
+public class VoxelOctree : DataStructures.Collections.Trees.Octree<Voxel>, IVoxelOctree, IWorldRegion
 {
 
     

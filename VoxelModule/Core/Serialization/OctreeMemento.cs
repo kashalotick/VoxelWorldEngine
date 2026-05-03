@@ -1,4 +1,4 @@
-﻿using VoxelModule.DataStructures.Common.Collections.Trees.LinearImplementation;
+﻿using VoxelModule.DataStructures.Collections.Trees.LinearImplementation;
 
 namespace VoxelModule.Core.Serialization;
 

@@ -1,6 +1,4 @@
-﻿using VoxelModule.DataStructures.Special.Structures.Voxels;
-
-namespace VoxelModule.DataStructures.Common.Collections.Trees.LinearImplementation;
+﻿namespace VoxelModule.DataStructures.Collections.Trees.LinearImplementation;
 
 
 public struct LinearOctreeNode<T>

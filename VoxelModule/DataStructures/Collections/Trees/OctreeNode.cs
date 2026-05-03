@@ -1,9 +1,8 @@
-﻿using VoxelModule.DataStructures.Common.Collections.Trees.LinearImplementation;
+﻿using VoxelModule.DataStructures.Collections.Trees.LinearImplementation;
 using VoxelModule.DataStructures.Common.Structures.Vectors;
 using VoxelModule.Utils;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
 
-namespace VoxelModule.DataStructures.Common.Collections.Trees;
+namespace VoxelModule.DataStructures.Collections.Trees;
 
 public partial class Octree<T>
 {
@@ -142,7 +141,7 @@ public partial class Octree<T>
             }
         }
 
-        internal void AcceptRecursive(IOctreeVisitor<T> visitor)
+        public void Accept(IOctreeVisitor<T> visitor)
         {
             if (IsLeaf)
             {
@@ -152,7 +151,7 @@ public partial class Octree<T>
 
             for (int i = 0; i < 8; i++)
             {
-                GetChild(i).AcceptRecursive(visitor);
+                GetChild(i).Accept(visitor);
             }
         }
 

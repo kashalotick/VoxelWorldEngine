@@ -1,11 +1,10 @@
 ﻿using System.Numerics;
-using VoxelModule.DataStructures.Common.Collections.Trees;
+using VoxelModule.DataStructures.Collections.Trees;
 using VoxelModule.DataStructures.Common.Structures.Vectors;
 using VoxelModule.DataStructures.Special.Collections;
 using VoxelModule.DataStructures.Special.Collections.Meshes;
 using VoxelModule.DataStructures.Special.Structures.Vertices;
 using VoxelModule.DataStructures.Special.Structures.Voxels;
-using VoxelModule.DataStructures.Special.Collections.VoxelTrees;
 
 namespace VoxelModule.Core.Builders;
 
