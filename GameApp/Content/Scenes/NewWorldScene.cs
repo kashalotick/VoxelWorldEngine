@@ -43,12 +43,12 @@ public class NewWorldScene : BaseScene
 
     public override void StateEnter()
     {
-        ((IScene)this).Load();
+        Load();
     }
 
     public override void StateExit()
     {
-        ((IScene)this).Dispose();
+        Dispose();
     }
 
     protected override void OnLoad()
