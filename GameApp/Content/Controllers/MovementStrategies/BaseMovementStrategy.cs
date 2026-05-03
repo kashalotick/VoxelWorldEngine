@@ -10,6 +10,10 @@ public abstract class BaseMovementStrategy : IMovementStrategy
     protected readonly Camera Camera;
     protected readonly CharacterPhysics Physics;
 
+    private float MouseSensitivity { get; }
+    protected float MoveSpeed { get; }
+    private float SprintMultiplier { get; }
+    
     protected BaseMovementStrategy(
         Camera camera,
         CharacterPhysics physics,
@@ -24,10 +28,6 @@ public abstract class BaseMovementStrategy : IMovementStrategy
         MoveSpeed = moveSpeed;
         SprintMultiplier = sprintMultiplier;
     }
-
-    protected float MouseSensitivity { get; }
-    protected float MoveSpeed { get; }
-    public float SprintMultiplier { get; }
     
     public abstract void Update(double deltaTime, KeyboardState keyboard, MouseState mouse);
 
@@ -68,7 +68,4 @@ public abstract class BaseMovementStrategy : IMovementStrategy
         var speed = keyboard.IsKeyDown(Keys.LeftControl) ? moveSpeed * SprintMultiplier : moveSpeed;
         return speed;
     }
-
-
-    protected abstract void ApplyPhysics(double deltaTime, Vector3 velocity);
 }

@@ -20,7 +20,7 @@ public class PlayerController : SceneController
     private readonly WalkMovementStrategy _walkStrategy;
     private readonly Dictionary<IMovementStrategy, MovementMode> _movementModeMap;
     private IMovementStrategy _movementStrategy;
-    
+
     private readonly Raycaster _raycaster;
 
 
@@ -29,11 +29,25 @@ public class PlayerController : SceneController
         _raycaster = raycaster;
 
         _walkStrategy
-            = new WalkMovementStrategy(camera, physics, MouseSensitivity, MoveSpeed, SprintMultiplier, JumpForce);
-        _flightStrategy = new FlightMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed,
-            FlightSprintMultiplier, FlightSpeed);
-        _freeCameraStrategy = new FreeCameraMovementStrategy(camera, physics, MouseSensitivity, FlightSpeed,
-            FlightSprintMultiplier, FlightSpeed);
+            = new WalkMovementStrategy(
+                camera,
+                physics,
+                MouseSensitivity,
+                MoveSpeed,
+                SprintMultiplier,
+                JumpForce);
+        _flightStrategy = new FlightMovementStrategy(
+            camera,
+            physics,
+            MouseSensitivity,
+            FlightSpeed,
+            FlightSprintMultiplier);
+        _freeCameraStrategy = new FreeCameraMovementStrategy(
+            camera,
+            physics,
+            MouseSensitivity,
+            FlightSpeed,
+            FlightSprintMultiplier);
         _movementModeMap = new Dictionary<IMovementStrategy, MovementMode>
         {
             { _walkStrategy, MovementMode.Walk },
@@ -49,7 +63,7 @@ public class PlayerController : SceneController
     public float FlightSpeed { get; set; } = 10f;
     public float FlightSprintMultiplier { get; set; } = 2.5f;
     public float JumpForce { get; set; } = 8f;
-    
+
     public event Action? Pause;
     public event Action? ToggleHud;
     public event Action? ToggleDebug;
@@ -146,6 +160,7 @@ public class PlayerController : SceneController
         if (_movementStrategy == _flightStrategy) SetMovementStrategy(_walkStrategy);
         else SetMovementStrategy(_flightStrategy);
     }
+
     private void SetMovementStrategy(IMovementStrategy strategy)
     {
         if (_movementStrategy == strategy) return;

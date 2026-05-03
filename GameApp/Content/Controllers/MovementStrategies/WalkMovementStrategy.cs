@@ -8,6 +8,9 @@ namespace GameApp.Content.Controllers.MovementStrategies;
 public class WalkMovementStrategy : BaseMovementStrategy
 {
     private bool _jumpHeld;
+    private float JumpForce { get; }
+    private double _jumpBufferTimer = 0;
+    private const double _jumpBufferTime = 0.1;
 
     public WalkMovementStrategy(
         Camera camera,
@@ -21,13 +24,7 @@ public class WalkMovementStrategy : BaseMovementStrategy
     {
         JumpForce = jumpForce;
     }
-
-    public float JumpForce { get; }
     
-
-    private double _jumpBufferTimer = 0;
-    private const double _jumpBufferTime = 0.1;
-
     public override void Update(double deltaTime, KeyboardState keyboard, MouseState mouse)
     {
         ApplyMouseLook(mouse);
@@ -55,11 +52,6 @@ public class WalkMovementStrategy : BaseMovementStrategy
             _jumpBufferTimer = 0;
         }
 
-        ApplyPhysics(deltaTime, new Vector3(velocity));
-    }
-
-    protected override void ApplyPhysics(double deltaTime, Vector3 velocity)
-    {
         Physics.Update((float)deltaTime, true, true);
         Camera.Position = Physics.Position;
     }
