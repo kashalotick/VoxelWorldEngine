@@ -30,8 +30,8 @@ public class MyGameContext : GameContext
             TextureRepository = textureRepository,
             ShaderRepository = shaderRepository,
             FontRepository = fontRepository,
-            UiAtlas = new AtlasTextureRepository(textureRepository, "Ui"),
-            BlockAtlas = new AtlasTextureRepository(textureRepository, "Blocks"),
+            UiAtlas = new AtlasTextureRepository(textureRepository.Get(Path.Combine("Atlases", "Ui")), "Ui"),
+            BlockAtlas = new AtlasTextureRepository(textureRepository.Get(Path.Combine("Atlases", "Blocks")), "Blocks"),
             TextureArrayRepository = textureArrayRepository
         };
     }
