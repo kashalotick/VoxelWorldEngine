@@ -8,7 +8,7 @@ using VoxelModule.Utils;
 
 namespace VoxelModule.Core;
 
-public class VoxelWorld : IWorldRegion
+public class VoxelWorld : IWorldRegion, IDisposable
 {
     public event Action<Chunk> ChunkAdded;
     public event Action<Chunk> ChunkUpdated;
@@ -134,5 +134,14 @@ public class VoxelWorld : IWorldRegion
         } while (enumerator.MoveNext());
 
         return RayHit.NoHit;
+    }
+
+    public void Dispose()
+    {
+        foreach (var chunk in _chunks)
+        {
+            ChunkRemoved?.Invoke(chunk.Value);
+        }
+        _chunks.Clear();
     }
 }

@@ -203,6 +203,7 @@ public class DemoScene : BaseScene
         SOR.Register(_sky);
     }
 
+    
     private void LoadWorld()
     {
         new BlockRegistry().Build(GameContext.TextureArrayRepository); // essential
@@ -217,14 +218,14 @@ public class DemoScene : BaseScene
         var worldState = _worldRepository.LoadState(_worldMeta.Slot);
         _worldState = worldState ?? new WorldState();
 
-        _gameWorld = new GameWorld(
-            _voxelWorld,
-            material,
-            _worldRepository.GetChunkRepository(_worldMeta.Slot));
-        _voxelWorld.ChunkAdded += _gameWorld.AddChunk;
-        _voxelWorld.ChunkUpdated += _gameWorld.UpdateChunk;
-        _voxelWorld.ChunkRemoved += _gameWorld.RemoveChunk;
+        _gameWorld = new GameWorld(material);
+        _voxelWorld.ChunkAdded += _gameWorld.OnAddChunk;
+        _voxelWorld.ChunkUpdated += _gameWorld.OnUpdateChunk;
+        _voxelWorld.ChunkRemoved += _gameWorld.OnRemoveChunk;
         _gameWorld.Load();
+        
+        var chunkSaver = new ChunkSaverService(_worldRepository.GetChunkRepository(_worldMeta.Slot));
+        _voxelWorld.ChunkRemoved += chunkSaver.OnRemoveChunk;
 
         _chunkLoadingSystem
             = SOR.Register(
@@ -448,6 +449,7 @@ public class DemoScene : BaseScene
 
     private void SaveWorld()
     {
+        
         _worldRepository.SaveState(_worldMeta.Slot, _worldState);
         _worldMeta = _worldRepository.UpdateMeta(_worldMeta, _elapsedTime);
         _elapsedTime = 0;
@@ -587,6 +589,7 @@ public class DemoScene : BaseScene
 
     protected override void ReleaseManagedResources()
     {
+        _voxelWorld.Dispose();
         _gameWorld.Dispose();
         SaveWorld();
     }

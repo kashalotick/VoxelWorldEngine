@@ -22,25 +22,16 @@ public record GameWorldMaterial(
 
 public class GameWorld : ILoadable, IRenderable
 {
-    private readonly IChunkMementoRepository _chunkRepository;
-
     private readonly Dictionary<Vector3Int, ChunkObject> _chunks = new();
     private readonly GameWorldMaterial _material;
-    private readonly VoxelWorld _voxelWorld;
 
     private int _previousChunksWithMesh = 0;
     private float[] _tileOffsets;
 
     // TODO: temp repository usage here
-    public GameWorld(
-        VoxelWorld voxelWorld,
-        GameWorldMaterial material,
-        IChunkMementoRepository chunkRepository
-    )
+    public GameWorld(GameWorldMaterial material)
     {
-        _voxelWorld = voxelWorld;
         _material = material;
-        _chunkRepository = chunkRepository;
     }
 
     public void Load()
@@ -57,14 +48,6 @@ public class GameWorld : ILoadable, IRenderable
     {
         foreach (var pair in _chunks)
         {
-            var chunk = _voxelWorld.Chunks[pair.Key];
-
-            if (chunk.IsDirty)
-            {
-                _chunkRepository.Save(chunk.Save());
-            }
-
-
             pair.Value.Dispose();
         }
     }
@@ -81,18 +64,16 @@ public class GameWorld : ILoadable, IRenderable
         _material.Shader.SetVector3("viewPos", context.CameraPosition);
         _material.Shader.SetFloat("tileScale", _material.TileScale);
 
-        var chunks = _chunks.Count;
 
         foreach (var chunk in _chunks)
         {
             if (chunk.Value.Mesh == null) continue;
 
-            if (_voxelWorld.Chunks.TryGetValue(chunk.Key, out var chunkData))
-            {
-                var globalPos = chunkData.GlobalPosition.ToVector3();
-                if (!context.IsInFrustum(globalPos, globalPos + new Vector3(Chunk.ChunkSize)))
-                    continue;
-            }
+
+            var globalPos = chunk.Value.Transform.Position;
+            if (!context.IsInFrustum(globalPos, globalPos + new Vector3(Chunk.ChunkSize)))
+                continue;
+
 
             var model = chunk.Value.Transform.GetModelMatrix();
             _material.Shader.SetMatrix4("model", model);
@@ -105,7 +86,7 @@ public class GameWorld : ILoadable, IRenderable
         }
     }
 
-    public void AddChunk(Chunk chunk)
+    public void OnAddChunk(Chunk chunk)
     {
         var wo = new ChunkObject(chunk);
         _chunks[chunk.Position] = wo;
@@ -115,11 +96,11 @@ public class GameWorld : ILoadable, IRenderable
         }
     }
 
-    public void UpdateChunk(Chunk chunk)
+    public void OnUpdateChunk(Chunk chunk)
     {
         if (!_chunks.ContainsKey(chunk.Position))
         {
-            AddChunk(chunk);
+            OnAddChunk(chunk);
         }
 
         var wo = _chunks[chunk.Position];
@@ -130,22 +111,17 @@ public class GameWorld : ILoadable, IRenderable
         }
         else
         {
-            AddChunk(chunk);
+            OnAddChunk(chunk);
         }
     }
 
-    public void RemoveChunk(Chunk chunk)
+    public void OnRemoveChunk(Chunk chunk)
     {
-        if (chunk.IsDirty)
-        {
-            _chunkRepository.Save(chunk.Save());
-        }
-
         _chunks[chunk.Position].Dispose();
         _chunks.Remove(chunk.Position);
     }
-    
-    
+
+
     private class ChunkObject : ILoadable
     {
         public ChunkMesh? Mesh;
@@ -153,7 +129,6 @@ public class GameWorld : ILoadable, IRenderable
 
         public ChunkObject(Chunk chunk)
         {
-
             if (chunk.ChunkMesh.Vertices.Length == 0)
             {
                 Mesh = null;
@@ -162,6 +137,7 @@ public class GameWorld : ILoadable, IRenderable
             {
                 Mesh = new ChunkMesh(chunk.ChunkMesh.Vertices, chunk.ChunkMesh.Indices);
             }
+
             Transform = new Transform3D()
             {
                 Position = chunk.GlobalPosition.ToVector3(),
