@@ -224,7 +224,7 @@ public class DemoScene : BaseScene
         _voxelWorld.ChunkRemoved += _gameWorld.OnRemoveChunk;
         _gameWorld.Load();
         
-        var chunkSaver = new ChunkSaverService(_worldRepository.GetChunkRepository(_worldMeta.Slot));
+        var chunkSaver = new ChunkSavingService(_worldRepository.GetChunkRepository(_worldMeta.Slot));
         _voxelWorld.ChunkRemoved += chunkSaver.OnRemoveChunk;
 
         _chunkLoadingSystem
