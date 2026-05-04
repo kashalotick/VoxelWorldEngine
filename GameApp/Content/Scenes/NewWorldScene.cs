@@ -28,7 +28,7 @@ public class NewWorldScene : BaseScene
     private readonly Reactive<string> _worldSeed;
     private Font _pixelFont;
     private Shader _plainShader;
-    private Texture _plainTexture;
+    private ITexture _plainTexture;
 
 
     public NewWorldScene(MyGameContext gameContext, WorldRepository repository, int slot) : base(gameContext)

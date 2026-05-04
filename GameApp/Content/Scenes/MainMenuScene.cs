@@ -24,7 +24,7 @@ public class MainMenuScene : BaseScene
 
 
     private Shader _plainShader;
-    private Texture _plainTexture;
+    private ITexture _plainTexture;
     private WorldRepository _repository;
 
     public MainMenuScene(MyGameContext gameContext) : base(gameContext)
