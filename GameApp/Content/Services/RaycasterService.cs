@@ -5,9 +5,9 @@ using GameEngine.Engine.Resources.Shaders;
 using OpenTK.Graphics.OpenGL4;
 using VoxelModule.Core.Raycasting;
 
-namespace GameApp.Content.Systems;
+namespace GameApp.Content.Services;
 
-public class Raycaster : ILoadable, IRenderable
+public class RaycasterService : ILoadable, IRenderable
 {
     private readonly IShader _shader;
 
@@ -15,7 +15,7 @@ public class Raycaster : ILoadable, IRenderable
     private RayHitPointsMesh _rayHitPointsMesh;
     private LineMesh _rayMesh;
 
-    public Raycaster(IShader shader)
+    public RaycasterService(IShader shader)
     {
         _shader = shader;
     }

@@ -1,4 +1,5 @@
 using GameApp.Content.Controllers.MovementStrategies;
+using GameApp.Content.Services;
 using GameApp.Content.Systems;
 using GameEngine.Core;
 using GameEngine.Engine.Input;
@@ -22,7 +23,7 @@ public class PlayerController : SceneController
     private IMovementStrategy _movementStrategy;
     
 
-    public PlayerController(Camera camera, CharacterPhysics physics)
+    public PlayerController(Camera camera, CharacterPhysicsService physics)
     {
         _walkStrategy
             = new WalkMovementStrategy(

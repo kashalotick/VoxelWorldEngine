@@ -1,4 +1,5 @@
-﻿using GameApp.Content.Systems;
+﻿using GameApp.Content.Services;
+using GameApp.Content.Systems;
 using GameApp.Utils;
 using GameEngine.Content.Ui.StaticDraw;
 using GameEngine.Engine.Resources.Shaders;
@@ -17,14 +18,14 @@ public record InventoryPanelMaterial(
 
 public class InventoryPanel : ListElement
 {
-    private readonly Inventory _inventory;
+    private readonly InventoryService _inventory;
     private readonly InventoryPanelMaterial _material;
 
     private readonly Slot[] _slots;
 
     private int _previousSelectedSlot;
 
-    public InventoryPanel(Inventory inventory, InventoryPanelMaterial material) : base(material.Shader,
+    public InventoryPanel(InventoryService inventory, InventoryPanelMaterial material) : base(material.Shader,
         material.Background)
     {
         _inventory = inventory;

@@ -1,16 +1,16 @@
 ﻿using OpenTK.Mathematics;
 using VoxelModule.DataStructures.Common.Structures.Vectors;
 
-namespace GameApp.Content.Systems;
+namespace GameApp.Content.Services;
 
-public class CharacterPhysics
+public class CharacterPhysicsService
 {
     private const float DefaultGravity = -25f;
     private const float DefaultTerminalVelocity = -50f;
     private const float StepSize = 0.05f;
     private readonly Func<Vector3Int, bool> _isSolidVoxel;
 
-    public CharacterPhysics(Player player, Func<Vector3Int, bool> isSolidVoxel)
+    public CharacterPhysicsService(Player player, Func<Vector3Int, bool> isSolidVoxel)
     {
         Position = player.Position;
         _isSolidVoxel = isSolidVoxel;

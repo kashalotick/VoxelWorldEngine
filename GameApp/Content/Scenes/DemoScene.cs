@@ -49,11 +49,11 @@ public class DemoScene : BaseScene
     private FpsCounter _fpsCounter;
     private GameWorld _gameWorld;
     private GameHud _hud;
-    private Inventory _inventory;
+    private InventoryService _inventory;
     private MovementIndicator _movementIndicator;
     private Pause _pause;
     private PlayerController _playerController;
-    private Raycaster _raycaster;
+    private RaycasterService _raycasterService;
 
     private Sky _sky;
     private SphereCommandFactory _sphereFactory;
@@ -123,7 +123,7 @@ public class DemoScene : BaseScene
         }
 
 
-        var characterPhysics = new CharacterPhysics(
+        var characterPhysics = new CharacterPhysicsService(
             _worldState.Player,
             voxelPosition => _voxelWorld.IsSolid(voxelPosition));
         _playerController = new PlayerController(Camera, characterPhysics);
@@ -241,8 +241,8 @@ public class DemoScene : BaseScene
     {
         var debugLinesShader = GameContext.ShaderRepository.Get("line");
 
-        _raycaster = new Raycaster(debugLinesShader);
-        _raycaster.Load();
+        _raycasterService = new RaycasterService(debugLinesShader);
+        _raycasterService.Load();
 
         _voxelSelection = SOR.Register(new VoxelSelection(debugLinesShader));
         _hitVoxelPosition.OnChanged += pos => _voxelSelection.SetVoxelPosition(pos);
@@ -308,7 +308,7 @@ public class DemoScene : BaseScene
             BlockId.Wood,
             BlockId.Leaves
         ];
-        _inventory = new Inventory(inventoryBlocks);
+        _inventory = new InventoryService(inventoryBlocks);
 
         var inventoryHudMaterial = new InventoryPanelMaterial(
             GameContext.ShaderRepository.Get("plain"),
@@ -395,7 +395,7 @@ public class DemoScene : BaseScene
         _gameWorld.Render(renderContext);
 
         GL.Disable(EnableCap.DepthTest);
-        _raycaster.Render(renderContext);
+        _raycasterService.Render(renderContext);
     }
 
     protected override void OnUpdate(double deltaTime)
@@ -428,7 +428,7 @@ public class DemoScene : BaseScene
             Direction = (System.Numerics.Vector3)Camera.Front
         };
 
-        var rayHit = _raycaster.Shoot(ray, _voxelWorld);
+        var rayHit = _raycasterService.Shoot(ray, _voxelWorld);
 
         _hitVoxelPosition.Value = rayHit.IsHit
             ? (rayHit.HitIn - rayHit.HitFaceNormal * 0.001f).FloorToVector3Int()
@@ -500,7 +500,7 @@ public class DemoScene : BaseScene
     {
         if (!TryGetHitVoxel(out var hitVoxel)) return;
 
-        var placeVoxel = hitVoxel + _raycaster.LastHit.HitFaceNormal.FloorToVector3Int();
+        var placeVoxel = hitVoxel + _raycasterService.LastHit.HitFaceNormal.FloorToVector3Int();
 
         if (IsIntersectsPlayer(placeVoxel))
         {
@@ -520,7 +520,7 @@ public class DemoScene : BaseScene
 
     public void OnPlaceTree()  // було OnMiddleButtonClick
     {
-        var lastHit = _raycaster.LastHit;
+        var lastHit = _raycasterService.LastHit;
         if (!lastHit.IsHit) return;
 
         var hitVoxel = lastHit.HitIn - lastHit.HitFaceNormal * 0.001f;
@@ -531,7 +531,7 @@ public class DemoScene : BaseScene
     
     private bool TryGetHitVoxel(out Vector3Int hitVoxel)
     {
-        var lastHit = _raycaster.LastHit;
+        var lastHit = _raycasterService.LastHit;
         hitVoxel = default;
 
         if (!lastHit.IsHit) return false;

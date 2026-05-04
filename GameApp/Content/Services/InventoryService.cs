@@ -1,7 +1,7 @@
 ﻿using GameEngine.Core.Reactive;
 using VoxelModule.DataStructures.Special.Structures.Voxels;
 
-namespace GameApp.Content.Systems;
+namespace GameApp.Content.Services;
 
 public enum BrushShape
 {
@@ -9,12 +9,12 @@ public enum BrushShape
     Sphere
 }
 
-public class Inventory
+public class InventoryService
 {
     public BlockId[] InventorySlots;
 
 
-    public Inventory(BlockId[] inventorySlots)
+    public InventoryService(BlockId[] inventorySlots)
     {
         SelectedSlot = new Reactive<int>();
         InventorySize = inventorySlots.Length;

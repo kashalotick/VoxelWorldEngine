@@ -1,4 +1,5 @@
-﻿using GameApp.Content.Systems;
+﻿using GameApp.Content.Services;
+using GameApp.Content.Systems;
 using GameEngine.Core;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -8,7 +9,7 @@ namespace GameApp.Content.Controllers.MovementStrategies;
 public abstract class BaseMovementStrategy : IMovementStrategy
 {
     protected readonly Camera Camera;
-    protected readonly CharacterPhysics Physics;
+    protected readonly CharacterPhysicsService Physics;
 
     private float MouseSensitivity { get; }
     protected float MoveSpeed { get; }
@@ -16,7 +17,7 @@ public abstract class BaseMovementStrategy : IMovementStrategy
     
     protected BaseMovementStrategy(
         Camera camera,
-        CharacterPhysics physics,
+        CharacterPhysicsService physics,
         float mouseSensitivity,
         float moveSpeed,
         float sprintMultiplier

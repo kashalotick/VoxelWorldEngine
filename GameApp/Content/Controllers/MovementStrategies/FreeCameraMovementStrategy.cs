@@ -1,4 +1,5 @@
-﻿using GameApp.Content.Systems;
+﻿using GameApp.Content.Services;
+using GameApp.Content.Systems;
 using GameEngine.Core;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
@@ -9,7 +10,7 @@ public class FreeCameraMovementStrategy : BaseMovementStrategy
 {
     public FreeCameraMovementStrategy(
         Camera camera,
-        CharacterPhysics physics,
+        CharacterPhysicsService physics,
         float mouseSensitivity,
         float moveSpeed,
         float sprintMultiplier
