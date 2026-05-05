@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using DotnetNoise;
 using VoxelModule.Core;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
+using VoxelModule.Engine;
+using VoxelModule.Engine.Octree;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace VoxelModule.Content.Generators;
 
@@ -15,9 +16,6 @@ public class VegetationGenerator
     private readonly int _seed;
     private FastNoise _forestNoise;
 
-    // ==========================================
-    // НАЛАШТУВАННЯ ЛІСІВ ТА ПАГОРБІВ 
-    // ==========================================
     
     /// <summary>
     /// Масштаб лісових масивів та полів. 
@@ -49,7 +47,6 @@ public class VegetationGenerator
     /// </summary>
     public int MaxTreeElevation { get; set; } = 35;
 
-    // ==========================================
 
     public VegetationGenerator(SurfaceGenerator generator, int chunkSize, int borderRadius, int seed)
     {
@@ -60,18 +57,12 @@ public class VegetationGenerator
         
         InitNoise();
     }
-
-    /// <summary>
-    /// Викликай цей метод, якщо змінюєш ForestNoiseFrequency після створення об'єкта
-    /// </summary>
+    
     public void InitNoise()
     {
         _forestNoise = new FastNoise(_seed + 99)
         {
             Frequency = ForestNoiseFrequency,
-            // Для більш природних і рваних країв лісу можна увімкнути фрактальність:
-            // NoiseType = FastNoise.NoiseType.SimplexFractal,
-            // FractalOctaves = 3
         };
     }
 
@@ -98,7 +89,6 @@ public class VegetationGenerator
                 _generator.Offset = Vector3Int.Zero; 
                 int surfaceY = _generator.GetSurfaceY(worldX, worldZ);
                 
-                // Перевірка: на вершинах гір дерев нема
                 if (surfaceY > MaxTreeElevation) 
                     continue;
 
@@ -115,28 +105,22 @@ public class VegetationGenerator
 
     private bool ShouldSpawnTree(int worldX, int worldZ)
     {
-        // 1. Отримуємо маску лісу [0, 1]
         float noiseVal = _forestNoise.GetNoise(worldX, worldZ); 
         float forestMask = (noiseVal + 1f) * 0.5f; 
     
-        if (forestMask < ForestThreshold) // Тут чисте поле
+        if (forestMask < ForestThreshold)
             return false;
 
-        // 2. Обчислюємо глибину знаходження в лісі
         float depthInForest = forestMask - ForestThreshold;
         
-        // Нормалізуємо густоту. На краях лісу густота росте від 0 до MaxTreeDensity.
-        // Як тільки ми заглибились на EdgeFadeDistance, густота стає максимальною (1.0 * MaxTreeDensity)
         float densityFactor = Math.Min(depthInForest / EdgeFadeDistance, 1.0f); 
         float localDensity = MaxTreeDensity * densityFactor;
 
-        // 3. Хеш для псевдовипадкового шансу появи на конкретному блоці
         uint hash = (uint)(_seed ^ (worldX * 374761393) ^ (worldZ * 1000003));
         hash ^= hash >> 13;
         hash *= 1274126177;
         hash ^= hash >> 16;
 
-        // Використовуємо 1000 замість 100 для точнішого шансу (дозволяє густоту типу 0.065)
         uint threshold = (uint)(localDensity * 1000f); 
 
         return (hash % 1000) < threshold;

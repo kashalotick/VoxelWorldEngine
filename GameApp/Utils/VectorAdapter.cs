@@ -1,5 +1,6 @@
 ﻿using OpenTK.Mathematics;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
+using Vector2Int = VoxelModule.Core.Vectors.Vector2Int;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace GameApp.Utils;
 

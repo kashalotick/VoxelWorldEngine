@@ -3,10 +3,11 @@ using GameApp.Utils;
 using GameEngine.Core.Lifecycle;
 using GameEngine.Core.Threading;
 using VoxelModule.Core;
-using VoxelModule.Core.ChunkLoading;
-using VoxelModule.Core.Chunks;
 using VoxelModule.Core.Serialization;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
+using VoxelModule.Engine;
+using VoxelModule.Engine.Chunks;
+using Chunk = VoxelModule.Engine.Chunks.Chunk;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace GameApp.Content.Systems;
 

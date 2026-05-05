@@ -6,8 +6,8 @@ using GameEngine.Engine.Resources.Shaders;
 using GameEngine.Engine.Resources.Textures;
 using OpenTK.Mathematics;
 using VoxelModule.Core.Raycasting;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
 using VoxelModule.Utils;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace GameApp.Content.Ui.Elements;
 

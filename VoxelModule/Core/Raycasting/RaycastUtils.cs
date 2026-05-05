@@ -1,7 +1,4 @@
 ﻿using System.Numerics;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
-using VoxelModule.DataStructures.Special.Collections.VoxelTrees;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
 
 namespace VoxelModule.Core.Raycasting;
 

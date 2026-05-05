@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
-using Vector2Int = VoxelModule.DataStructures.Common.Structures.Vectors.Vector2Int;
-using Vector3Int = VoxelModule.DataStructures.Common.Structures.Vectors.Vector3Int;
-using Vectors_Vector3Int = VoxelModule.DataStructures.Common.Structures.Vectors.Vector3Int;
+using Vector2Int = VoxelModule.Core.Vectors.Vector2Int;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
+using Vectors_Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace VoxelModule.Utils;
 

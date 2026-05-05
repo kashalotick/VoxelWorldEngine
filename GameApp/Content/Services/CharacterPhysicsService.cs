@@ -1,5 +1,5 @@
 ﻿using OpenTK.Mathematics;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace GameApp.Content.Services;
 

@@ -1,8 +1,9 @@
 ﻿using VoxelModule.Core;
-using VoxelModule.Core.Commands;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
+using VoxelModule.Engine;
+using VoxelModule.Engine.Commands;
+using VoxelModule.Engine.Octree;
 using VoxelModule.Utils;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace VoxelModule.Content.Commands;
 

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Concurrent;
 using VoxelModule.Core.Serialization;
-using VoxelModule.DataStructures.Collections.Trees.LinearImplementation;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
+using VoxelModule.Core.Trees.LinearImplementation;
+using VoxelModule.Engine.Octree;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace GameApp.Content.Services;
 

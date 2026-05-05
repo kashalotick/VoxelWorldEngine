@@ -1,4 +1,4 @@
-﻿using VoxelModule.DataStructures.Common.Structures.Vectors;
+﻿using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace VoxelModule.Utils;
 

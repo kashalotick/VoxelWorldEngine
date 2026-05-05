@@ -1,5 +1,5 @@
-﻿using VoxelModule.Core.Chunks;
-using VoxelModule.Core.Serialization;
+﻿using VoxelModule.Core.Serialization;
+using Chunk = VoxelModule.Engine.Chunks.Chunk;
 
 namespace GameApp.Content.Services;
 

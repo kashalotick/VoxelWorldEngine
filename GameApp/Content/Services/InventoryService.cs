@@ -1,5 +1,5 @@
 ﻿using GameEngine.Core.Reactive;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
+using VoxelModule.Engine.Octree;
 
 namespace GameApp.Content.Services;
 

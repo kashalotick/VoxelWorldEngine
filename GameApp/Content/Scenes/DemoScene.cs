@@ -23,12 +23,13 @@ using OpenTK.Windowing.Common;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using VoxelModule.Content.Commands;
 using VoxelModule.Core;
-using VoxelModule.Core.Chunks;
-using VoxelModule.Core.Commands;
 using VoxelModule.Core.Raycasting;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
+using VoxelModule.Engine;
+using VoxelModule.Engine.Commands;
+using VoxelModule.Engine.Octree;
 using VoxelModule.Utils;
+using Chunk = VoxelModule.Engine.Chunks.Chunk;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace GameApp.Content.Scenes;
 

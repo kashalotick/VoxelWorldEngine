@@ -1,6 +1,6 @@
 ﻿using GameEngine.Core;
 using GameEngine.Engine.Meshing;
-using VoxelModule.DataStructures.Special.Structures.Vertices;
+using VoxelModule.Engine.Chunks;
 
 namespace GameApp.Graphics.World;
 

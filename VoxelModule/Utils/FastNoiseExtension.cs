@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using DotnetNoise;
-using Vector2Int = VoxelModule.DataStructures.Common.Structures.Vectors.Vector2Int;
-using Vectors_Vector2Int = VoxelModule.DataStructures.Common.Structures.Vectors.Vector2Int;
+using Vector2Int = VoxelModule.Core.Vectors.Vector2Int;
+using Vectors_Vector2Int = VoxelModule.Core.Vectors.Vector2Int;
 
 namespace VoxelModule.Utils;
 

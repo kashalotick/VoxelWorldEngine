@@ -1,9 +1,10 @@
 ﻿using System.Collections.Concurrent;
 using GameEngine.Core.Threading;
 using VoxelModule.Core;
-using VoxelModule.Core.Builders;
-using VoxelModule.Core.Chunks;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
+using VoxelModule.Engine;
+using VoxelModule.Engine.Builders;
+using Chunk = VoxelModule.Engine.Chunks.Chunk;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace GameApp.Content.Systems;
 

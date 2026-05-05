@@ -1,5 +1,5 @@
 ﻿using GameEngine.Engine.Resources.Textures.Array;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
+using VoxelModule.Engine.Octree;
 
 namespace GameApp.Application;
 

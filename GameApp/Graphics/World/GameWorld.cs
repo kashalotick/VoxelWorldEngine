@@ -7,9 +7,9 @@ using GameEngine.Engine.Resources.Textures.Array;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using VoxelModule.Core;
-using VoxelModule.Core.Chunks;
 using VoxelModule.Core.Serialization;
-using VoxelModule.DataStructures.Common.Structures.Vectors;
+using Chunk = VoxelModule.Engine.Chunks.Chunk;
+using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace GameApp.Graphics.World;
 

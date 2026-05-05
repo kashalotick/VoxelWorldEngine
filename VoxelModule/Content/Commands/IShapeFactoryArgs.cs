@@ -1,5 +1,5 @@
-﻿using VoxelModule.Core.Commands;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
+﻿using VoxelModule.Engine.Commands;
+using VoxelModule.Engine.Octree;
 
 namespace VoxelModule.Content.Commands;
 

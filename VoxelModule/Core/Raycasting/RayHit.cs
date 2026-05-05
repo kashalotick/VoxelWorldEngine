@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using VoxelModule.DataStructures.Special.Structures.Voxels;
+using VoxelModule.Engine.Octree;
 
 namespace VoxelModule.Core.Raycasting;
 
