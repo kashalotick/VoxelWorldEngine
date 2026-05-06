@@ -32,20 +32,9 @@ public class CubeEdgeMesh : Mesh<CubeEdgeVertex, uint>
 
     protected override void DefineAttributePointers()
     {
-        var stride = SizeOfTVertex; // sizeof(LineVertex)
-
-        // location = 0 → Position
-        // location = 1 → Color
         new VaoBuilder(SizeOfTVertex)
             .AddFloat(3)
             .AddFloat(3);
-        // // location = 0 → Position
-        // GL.EnableVertexAttribArray(0);
-        // GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, stride, 0);
-        //
-        // // location = 1 → Color
-        // GL.EnableVertexAttribArray(1);
-        // GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, stride, 3 * sizeof(float));
     }
 
     public new void Render()

@@ -20,11 +20,7 @@ public class MainMenuScene : BaseScene
     private const int SlotCount = 3;
     private const int TileWidth = 170;
     private const int TileHeight = 20;
-    private Font _pixelFont;
-
-
-    private Shader _plainShader;
-    private ITexture _plainTexture;
+    
     private WorldRepository _repository;
 
     public MainMenuScene(MyGameContext gameContext) : base(gameContext)
@@ -44,9 +40,6 @@ public class MainMenuScene : BaseScene
 
     protected override void OnLoad()
     {
-        _plainShader = GameContext.ShaderRepository.Get("plain");
-        _plainTexture = GameContext.UiAtlas.Get("Plain");
-        _pixelFont = GameContext.FontRepository.Get("Pixel");
         _repository = new WorldRepository();
 
         var ui = SOR.Register(new UiLayout(GameContext.ScreenWidth, GameContext.ScreenHeight));
@@ -69,7 +62,7 @@ public class MainMenuScene : BaseScene
 
     private UiElement CreateBackground()
     {
-        var bg = new Background(_plainShader, _plainTexture);
+        var bg = new Background(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"));
         bg.Color = ColorStyle.Background;
         bg.ZIndex = -1;
         return bg;
@@ -78,7 +71,7 @@ public class MainMenuScene : BaseScene
 
     private UiElement CreateHeading()
     {
-        var label = new StaticText(_plainShader, _pixelFont, "Voxel Game Prototype");
+        var label = new StaticText(GameContext.ShaderRepository.Get("plain"), GameContext.FontRepository.Get("Pixel"), "Voxel Game Prototype");
         label.Color = ColorStyle.White;
         label.Transform = new RectTransform
         {
@@ -94,12 +87,12 @@ public class MainMenuScene : BaseScene
     private ListElement BuildSlotList()
     {
         var worldTileMaterial = new WorldTileMaterial(
-            _plainShader,
-            _plainTexture,
+            GameContext.ShaderRepository.Get("plain"),
+            GameContext.UiAtlas.Get("Plain"),
             GameContext.UiAtlas.Get("Play"),
             GameContext.UiAtlas.Get("Cross"),
-            _pixelFont);
-        var list = new ListElement(_plainShader, _plainTexture)
+            GameContext.FontRepository.Get("Pixel"));
+        var list = new ListElement(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"))
         {
             Orientation = ListOrientation.Vertical,
             Gap = 16,
@@ -147,7 +140,7 @@ public class MainMenuScene : BaseScene
 
     private UiElement CreateEmptySlotButton(int slot)
     {
-        var button = new ButtonWithLabel(_plainShader, _plainTexture, _pixelFont, "+ Create world");
+        var button = new ButtonWithLabel(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"), GameContext.FontRepository.Get("Pixel"), "+ Create world");
         button.Transform = new RectTransform
         {
             Width = TileWidth,
@@ -163,7 +156,7 @@ public class MainMenuScene : BaseScene
 
     private UiElement CreateExitButton()
     {
-        var button = new ButtonWithLabel(_plainShader, _plainTexture, _pixelFont, "Exit");
+        var button = new ButtonWithLabel(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"), GameContext.FontRepository.Get("Pixel"), "Exit");
         button.Transform = new RectTransform
         {
             Width = 48,

@@ -1,4 +1,5 @@
-﻿using GameEngine.Core;
+﻿using GameApp.Application;
+using GameEngine.Core;
 using GameEngine.Engine;
 using GameEngine.Engine.Input;
 using OpenTK.Mathematics;
@@ -10,13 +11,13 @@ namespace GameApp.Content.Controllers;
 // TODO: make ui controller interface
 public class UiController : SceneController
 {
-    public UiController(GameContext gameContext)
+    public UiController(MyGameContext gameContext)
     {
         GameContext = gameContext;
     }
 
 
-    public GameContext GameContext { get; }
+    public MyGameContext GameContext { get; }
     public event Action<Vector2> Click;
     public event Action<Vector2> MouseMove;
     public event Action<KeyboardKeyEventArgs> KeyUp;

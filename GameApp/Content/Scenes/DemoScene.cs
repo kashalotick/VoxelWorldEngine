@@ -10,6 +10,7 @@ using GameApp.Utils;
 using GameEngine.Content;
 using GameEngine.Content.Ui.StaticDraw;
 using GameEngine.Core;
+using GameEngine.Core.Lifecycle;
 using GameEngine.Core.Reactive;
 using GameEngine.Core.Rendering;
 using GameEngine.Engine.Input;
@@ -201,7 +202,7 @@ public class DemoScene : BaseScene
         var skyBottom = new Vector3(0.85f, 0.95f, 1.0f);
 
         _sky = new Sky(GameContext.ShaderRepository.Get("sky"), skyTop, skyBottom);
-        SOR.Register(_sky);
+        SOR.Register((ILoadable)_sky);
     }
 
     

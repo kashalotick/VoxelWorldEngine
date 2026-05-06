@@ -26,10 +26,6 @@ public class NewWorldScene : BaseScene
 
     private readonly Reactive<string> _worldName;
     private readonly Reactive<string> _worldSeed;
-    private Font _pixelFont;
-    private Shader _plainShader;
-    private ITexture _plainTexture;
-
 
     public NewWorldScene(MyGameContext gameContext, WorldRepository repository, int slot) : base(gameContext)
     {
@@ -53,10 +49,6 @@ public class NewWorldScene : BaseScene
 
     protected override void OnLoad()
     {
-        _plainShader = GameContext.ShaderRepository.Get("plain");
-        _plainTexture = GameContext.UiAtlas.Get("Plain");
-        _pixelFont = GameContext.FontRepository.Get("Pixel");
-
         var ui = SOR.Register(new UiLayout(GameContext.ScreenWidth, GameContext.ScreenHeight));
         ui.Enable();
         ui.Add(CreateBackground());
@@ -78,14 +70,14 @@ public class NewWorldScene : BaseScene
 
     private UiElement CreateBackground()
     {
-        var bg = new Background(_plainShader, _plainTexture);
+        var bg = new Background(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"));
         bg.Color = ColorStyle.Background;
         return bg;
     }
 
     private UiElement CreateForm()
     {
-        var list = new ListElement(_plainShader, _plainTexture);
+        var list = new ListElement(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"));
         list.Transform = new RectTransform
         {
             Anchor = (0.5f, 0.5f),
@@ -105,7 +97,7 @@ public class NewWorldScene : BaseScene
 
     private UiElement CreateSpacingElement(int width, int height)
     {
-        var rect = new StaticElement(_plainShader, _plainTexture);
+        var rect = new StaticElement(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"));
         rect.Transform = new RectTransform
         {
             Width = width,
@@ -117,7 +109,7 @@ public class NewWorldScene : BaseScene
 
     private TextField CreateField(Reactive<string> reactive)
     {
-        var field = new TextField(_plainShader, _plainTexture, _pixelFont, reactive)
+        var field = new TextField(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"), GameContext.FontRepository.Get("Pixel"), reactive)
         {
             Transform = new RectTransform
             {
@@ -167,7 +159,7 @@ public class NewWorldScene : BaseScene
 
     private UiElement CreateSubmitButton()
     {
-        var button = new ButtonWithLabel(_plainShader, _plainTexture, _pixelFont, "Create world")
+        var button = new ButtonWithLabel(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("Plain"), GameContext.FontRepository.Get("Pixel"), "Create world")
         {
             Transform = new RectTransform
             {
@@ -188,7 +180,7 @@ public class NewWorldScene : BaseScene
 
     private UiElement CreateHeading()
     {
-        var label = new StaticText(_plainShader, _pixelFont, $"Create world #{_slot}");
+        var label = new StaticText(GameContext.ShaderRepository.Get("plain"), GameContext.FontRepository.Get("Pixel"), $"Create world #{_slot}");
         label.Color = ColorStyle.White;
         label.Transform = new RectTransform
         {
@@ -203,7 +195,7 @@ public class NewWorldScene : BaseScene
 
     private UiElement CreateBackButton()
     {
-        var button = new Button(_plainShader, GameContext.UiAtlas.Get("ArrowLeft"));
+        var button = new Button(GameContext.ShaderRepository.Get("plain"), GameContext.UiAtlas.Get("ArrowLeft"));
         button.Transform = new RectTransform
         {
             Width = 20,
