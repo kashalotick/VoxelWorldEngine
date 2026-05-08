@@ -6,7 +6,7 @@ using Vector3Int = VoxelModule.Core.Vectors.Vector3Int;
 
 namespace VoxelModule.Engine.Octree;
 
-public class VoxelOctree : Octree<Voxel>, IVoxelOctree, IWorldRegion
+public class VoxelOctree : Octree<Voxel>, IVoxelOctree
 {
 
     
@@ -143,8 +143,8 @@ public class VoxelOctree : Octree<Voxel>, IVoxelOctree, IWorldRegion
         return RayHit.NoHit;
     }
 
-    public bool PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
+    public bool SetBlock(Vector3Int voxelPositionIndex, BlockId blockId, Func<Voxel, Voxel, bool>? canReplace)
     {
-        return SetData(voxelPositionIndex, new Voxel(blockId), null);
+        return SetData(voxelPositionIndex, new Voxel(blockId), canReplace);
     }
 }

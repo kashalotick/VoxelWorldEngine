@@ -19,14 +19,6 @@ public interface IOctree<T> : IVisitable<T>
 
     bool SetData(Vector3Int index, T data, Func<T, T, bool>? canReplace);
 
-    void ModifyArea(
-        Vector3Int insertPosition,
-        Vector3Int areaSize,
-        T[] data,
-        Func<T, T, bool>? canReplace
-    );
-
-
     OctreeMemento<T> Save();
     void Restore(OctreeMemento<T> memento);
 }

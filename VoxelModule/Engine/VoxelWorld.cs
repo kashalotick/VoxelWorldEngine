@@ -56,12 +56,12 @@ public class VoxelWorld : IWorldRegion, IDisposable
         _meshDirtyChunks.Remove(chunkPos);
     }
 
-    public bool PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
+    public bool SetBlock(Vector3Int voxelPositionIndex, BlockId blockId, Func<Voxel, Voxel, bool>? canReplace)
     {
         var chunkPos = Chunk.GlobalToChunk(voxelPositionIndex);
         var chunk = _chunks[chunkPos];
 
-        var result = chunk.PlaceBlock(voxelPositionIndex, blockId);
+        var result = chunk.SetBlock(voxelPositionIndex, blockId, canReplace);
         if (result)
         {
             chunk.MarkDirty();
@@ -70,29 +70,6 @@ public class VoxelWorld : IWorldRegion, IDisposable
 
 
         return result;
-    }
-
-    public void ModifyArea(
-        Vector3Int insertPosition,
-        Vector3Int areaSize,
-        Voxel[] data,
-        Func<Voxel, Voxel, bool>? canReplace = null
-    )
-    {
-        var firstChunk = Chunk.GlobalToChunk(insertPosition);
-        var lastChunk = Chunk.GlobalToChunk(insertPosition + areaSize - Vector3Int.One);
-
-
-        for (int x = firstChunk.X; x <= lastChunk.X; x++)
-        for (int y = firstChunk.Y; y <= lastChunk.Y; y++)
-        for (int z = firstChunk.Z; z <= lastChunk.Z; z++)
-        {
-            var chunkPos = new Vector3Int(x, y, z);
-            var chunk = _chunks[chunkPos];
-            chunk.ModifyArea(insertPosition, areaSize, data, canReplace);
-            chunk.MarkDirty();
-            _meshDirtyChunks.Add(chunkPos);
-        }
     }
 
     public bool TryGetVoxel(Vector3Int voxelPosition, out Voxel voxel)

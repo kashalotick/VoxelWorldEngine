@@ -21,18 +21,48 @@ public record ModifyRegionCommand(
 {
     public virtual void Execute()
     {
+        
         switch (Mode)
         {
             case ModifyMode.ReplaceAll:
-                Region.ModifyArea(InsertPosition, AreaSize, Data, CanPlaceInAnyIfNotVoid);
+                ModifyArea(InsertPosition, AreaSize, Data, CanPlaceInAnyIfNotVoid);
                 break;
 
             case ModifyMode.ReplaceAir:
-                Region.ModifyArea(InsertPosition, AreaSize, Data, CanPlaceInAirIfNotVoid);
+                ModifyArea(InsertPosition, AreaSize, Data, CanPlaceInAirIfNotVoid);
                 break;
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(Mode), "Unknown ModifyMode");
+        }
+    }
+
+    private void ModifyArea(
+        Vector3Int insertPosition,
+        Vector3Int areaSize,
+        Voxel[] data,
+        Func<Voxel, Voxel, bool> canReplace
+    )
+    {
+        for (int z = 0; z < areaSize.Z; z++)
+        {
+            for (int y = 0; y < areaSize.Y; y++)
+            {
+                for (int x = 0; x < areaSize.X; x++)
+                {
+                    int index = x + y * areaSize.X + z * areaSize.X * areaSize.Y;
+                    if (index >= data.Length) continue;
+
+                    Voxel newVoxel = data[index];
+                    Vector3Int pos = new Vector3Int(
+                        insertPosition.X + x,
+                        insertPosition.Y + y,
+                        insertPosition.Z + z
+                    );
+
+                    Region.SetBlock(pos, newVoxel.BlockId, canReplace);
+                }
+            }
         }
     }
 

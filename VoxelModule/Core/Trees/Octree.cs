@@ -57,7 +57,7 @@ public partial class Octree<T> : IOctree<T>
         return node.Data;
     }
 
-    public bool SetData(Vector3Int index, T data, Func<T, T, bool>? canReplace = null)
+    public bool SetData(Vector3Int index, T data, Func<T, T, bool>? canReplace)
     {
         return _linearOctree.SetData(data, index, canReplace);
     }

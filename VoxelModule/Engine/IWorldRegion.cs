@@ -6,12 +6,5 @@ namespace VoxelModule.Engine;
 
 public interface IWorldRegion : IRaycastable
 {
-    bool PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId);
-
-    void ModifyArea(
-        Vector3Int insertPosition,
-        Vector3Int areaSize,
-        Voxel[] data,
-        Func<Voxel, Voxel, bool>? canReplace
-    );
+    bool SetBlock(Vector3Int voxelPositionIndex, BlockId blockId, Func<Voxel, Voxel, bool>? canReplace);
 }

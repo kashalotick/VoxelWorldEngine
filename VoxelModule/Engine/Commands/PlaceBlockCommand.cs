@@ -9,6 +9,6 @@ public record PlaceBlockCommand(IWorldRegion Region, Vector3Int VoxelPositionInd
 {
     public virtual void Execute()
     {
-        Region.PlaceBlock(VoxelPositionIndex, BlockId);
+        Region.SetBlock(VoxelPositionIndex, BlockId, null);
     }
 }

@@ -74,25 +74,14 @@ public partial class Chunk : IWorldRegion
         return hit;
     }
 
-    public bool PlaceBlock(Vector3Int voxelPositionIndex, BlockId blockId)
+    public bool SetBlock(Vector3Int voxelPositionIndex, BlockId blockId, Func<Voxel, Voxel, bool>? canReplace)
     {
+        var chunkPos = Chunk.GlobalToChunk(voxelPositionIndex);
+        if (chunkPos != Position) return false;
+
         var localVoxelIndex = Chunk.GlobalToLocal(voxelPositionIndex);
-        var isDataChanged = Octree.PlaceBlock(localVoxelIndex, blockId);
+        var isDataChanged = Octree.SetBlock(localVoxelIndex, blockId, canReplace);
 
         return isDataChanged;
-    }
-
-    public void ModifyArea(
-        Vector3Int insertPosition,
-        Vector3Int areaSize,
-        Voxel[] data,
-        Func<Voxel, Voxel, bool>? canReplace
-    )
-    {
-        var chunkOriginGlobal = Chunk.ChunkToGlobal(Position);
-        var relativeInsertPosition = insertPosition - chunkOriginGlobal;
-
-        Octree.ModifyArea(relativeInsertPosition, areaSize, data, canReplace);
-
     }
 }
