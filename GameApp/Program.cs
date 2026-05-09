@@ -2,6 +2,7 @@
 using GameApp.Content.Scenes;
 using GameEngine.Core;
 using GameEngine.Engine;
+using GameEngine.Engine.Resources.Textures.Atlas;
 
 namespace GameApp;
 
@@ -9,6 +10,9 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        var atlasBuilder = new AtlasBuilder();
+        atlasBuilder.Prebuild();
+        
         var game = new Game<MyGameContext>(
             1200,
             900,
