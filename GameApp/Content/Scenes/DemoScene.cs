@@ -112,6 +112,7 @@ public class DemoScene : BaseScene
                 spawnPosition,
                 (float)GameContext.ScreenWidth / GameContext.ScreenHeight);
             Camera.LookAt(spawnPosition + Vector3.UnitX);
+            Console.WriteLine(Camera.Position);
         }
         else
         {
@@ -129,6 +130,8 @@ public class DemoScene : BaseScene
             _worldState.Player,
             voxelPosition => _voxelWorld.IsSolid(voxelPosition));
         _playerController = new PlayerController(Camera, characterPhysics);
+        characterPhysics.Teleport(Camera.Position);
+        Console.WriteLine(Camera.Position);
         _playerController.Pause += OnPause;
         _playerController.ToggleHud += OnToggleHud;
         _playerController.ToggleDebug += OnToggleDebug;
@@ -205,7 +208,7 @@ public class DemoScene : BaseScene
         SOR.Register((ILoadable)_sky);
     }
 
-    
+
     private void LoadWorld()
     {
         new BlockRegistry().Build(GameContext.TextureArrayRepository); // essential
@@ -225,8 +228,9 @@ public class DemoScene : BaseScene
         _voxelWorld.ChunkUpdated += _gameWorld.OnUpdateChunk;
         _voxelWorld.ChunkRemoved += _gameWorld.OnRemoveChunk;
         _gameWorld.Load();
-        
-        var chunkSaver = new ChunkSavingService(_worldRepository.GetChunkRepository(_worldMeta.Slot));
+
+        var chunkSaver
+            = new ChunkSavingService(_worldRepository.GetChunkRepository(_worldMeta.Slot));
         _voxelWorld.ChunkRemoved += chunkSaver.OnRemoveChunk;
 
         _chunkLoadingSystem
@@ -451,7 +455,6 @@ public class DemoScene : BaseScene
 
     private void SaveWorld()
     {
-        
         _worldRepository.SaveState(_worldMeta.Slot, _worldState);
         _worldMeta = _worldRepository.UpdateMeta(_worldMeta, _elapsedTime);
         _elapsedTime = 0;
@@ -496,7 +499,6 @@ public class DemoScene : BaseScene
         SceneContext.SetState(new MainMenuScene(GameContext));
     }
 
-    
 
     public void OnPlaceBlock()
     {
@@ -520,7 +522,7 @@ public class DemoScene : BaseScene
         DispatchAndExecute(hitVoxel, BlockId.Air, ModifyMode.ReplaceAll);
     }
 
-    public void OnPlaceTree()  // було OnMiddleButtonClick
+    public void OnPlaceTree() // було OnMiddleButtonClick
     {
         var lastHit = _raycasterService.LastHit;
         if (!lastHit.IsHit) return;
@@ -530,7 +532,7 @@ public class DemoScene : BaseScene
 
         _treeFactory.GetCommand(_voxelWorld, placeVoxel, new TreeArgs(1)).Execute();
     }
-    
+
     private bool TryGetHitVoxel(out Vector3Int hitVoxel)
     {
         var lastHit = _raycasterService.LastHit;
@@ -542,7 +544,7 @@ public class DemoScene : BaseScene
         hitVoxel = t.FloorToVector3Int();
         return true;
     }
-    
+
     private void DispatchAndExecute(Vector3Int position, BlockId blockId, ModifyMode modifyMode)
     {
         BuildCommand(position, blockId, modifyMode).Execute();
@@ -558,13 +560,17 @@ public class DemoScene : BaseScene
         return _inventory.BrushType.Value switch
         {
             BrushShape.Cube => _cubeFactory.GetCommand(
-                _voxelWorld, position, new CubeArgs(brushSize, blockId, modifyMode)),
+                _voxelWorld,
+                position,
+                new CubeArgs(brushSize, blockId, modifyMode)),
             BrushShape.Sphere => _sphereFactory.GetCommand(
-                _voxelWorld, position, new SphereArgs(brushSize, blockId, modifyMode)),
+                _voxelWorld,
+                position,
+                new SphereArgs(brushSize, blockId, modifyMode)),
             var unknown => throw new ArgumentException($"Unknown brush shape: {unknown}")
         };
     }
-    
+
     private bool IsIntersectsPlayer(Vector3Int placeVoxel)
     {
         var playerPos = _worldState.Player.Position;
